@@ -1,0 +1,213 @@
+{
+  "devices": [
+    {
+      "type": "PLC",
+      "manufacturer": "Siemens",
+      "models": ["S7-1200", "S7-1500", "S7-300", "S7-400", "S7-1200F", "S7-1500F", "LOGO!"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Allen-Bradley",
+      "models": ["ControlLogix", "CompactLogix", "MicroLogix", "GuardLogix", "Micro800", "PLC-5"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Schneider Electric",
+      "models": ["Modicon M580", "Modicon M340", "Modicon M221", "Modicon Quantum"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Mitsubishi",
+      "models": ["MELSEC iQ-R", "MELSEC iQ-F", "MELSEC Q Series"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Omron",
+      "models": ["CJ2M", "CP1L", "NX Series", "NJ Series"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "ABB",
+      "models": ["AC500", "AC500-eCo", "AC500-S"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Phoenix Contact",
+      "models": ["PLCnext AXC F 2152", "PLCnext RFC 4072"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "WAGO",
+      "models": ["PFC200", "PFC100"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Beckhoff",
+      "models": ["CX5020", "CX5140", "CX9020"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Delta Electronics",
+      "models": ["DVP Series", "AH500 Series"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "HollySys",
+      "models": ["LK PLC", "HOLLiAS-LM", "SCADAPlatform"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "INVT",
+      "models": ["GD Series VFD", "Goodrive200A", "IVC Series PLC"]
+    },
+    {
+      "type": "DCS Controller",
+      "manufacturer": "Supcon",
+      "models": ["WebField ECS-700", "JX-300XP", "InPlant SCADA"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "LS Electric",
+      "models": ["XGK Series", "XGI Series", "XBC Series"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Panasonic",
+      "models": ["FP7 Series", "FP-X Series", "FP0R Series"]
+    },
+    {
+      "type": "HMI",
+      "manufacturer": "Siemens",
+      "models": ["SIMATIC HMI Comfort", "SIMATIC HMI Basic", "WinCC", "WinCC Professional"]
+    },
+    {
+      "type": "HMI",
+      "manufacturer": "Wonderware",
+      "models": ["InTouch", "System Platform"]
+    },
+    {
+      "type": "HMI",
+      "manufacturer": "Rockwell Automation",
+      "models": ["FactoryTalk View", "PanelView Plus"]
+    },
+    {
+      "type": "HMI",
+      "manufacturer": "GE Digital",
+      "models": ["iFIX", "CIMPLICITY"]
+    },
+    {
+      "type": "RTU",
+      "manufacturer": "ABB",
+      "models": ["RTU560", "RTU540", "RTU520"]
+    },
+    {
+      "type": "RTU",
+      "manufacturer": "Schneider Electric",
+      "models": ["SCADAPack", "SCADAPack x70"]
+    },
+    {
+      "type": "DCS Controller",
+      "manufacturer": "Honeywell",
+      "models": ["Experion PKS", "PlantCruise"]
+    },
+    {
+      "type": "DCS Controller",
+      "manufacturer": "Emerson",
+      "models": ["DeltaV", "Ovation"]
+    },
+    {
+      "type": "DCS Controller",
+      "manufacturer": "Yokogawa",
+      "models": ["CENTUM VP", "ProSafe-RS"]
+    },
+    {
+      "type": "Safety PLC",
+      "manufacturer": "Schneider Electric",
+      "models": ["Triconex", "Safety Controller M580"]
+    },
+    {
+      "type": "Industrial Robot",
+      "manufacturer": "KUKA",
+      "models": ["KRC4", "KRC2"]
+    },
+    {
+      "type": "Industrial Robot",
+      "manufacturer": "Fanuc",
+      "models": ["R-30iB", "R-30iA"]
+    },
+    {
+      "type": "CNC Controller",
+      "manufacturer": "Fanuc",
+      "models": ["Series 0i-F", "Series 31i"]
+    },
+    {
+      "type": "Industrial Gateway",
+      "manufacturer": "Moxa",
+      "models": ["EDS-G516E", "EDS-408A"]
+    },
+    {
+      "type": "IoT Gateway",
+      "manufacturer": "Advantech",
+      "models": ["WISE-4012", "WISE-710"]
+    },
+    {
+      "type": "HMI",
+      "manufacturer": "Weintek",
+      "models": ["cMT Series", "MT8000 Series", "eMT Series"]
+    },
+    {
+      "type": "PLC",
+      "manufacturer": "Fuji Electric",
+      "models": ["SPH3000", "Micrex-SX Series"]
+    }
+  ],
+  "protocols": [
+    "Modbus TCP",
+    "Modbus RTU",
+    "Profinet",
+    "Profibus",
+    "DNP3",
+    "EtherNet/IP",
+    "OPC UA",
+    "OPC DA",
+    "BACnet",
+    "S7 Protocol",
+    "IEC 60870-5-104",
+    "IEC 61850",
+    "HART",
+    "FINS",
+    "SLMP",
+    "ADS",
+    "TriStation",
+    "POWERLINK",
+    "FOCAS",
+    "XGT Protocol",
+    "CODESYS Protocol",
+    "Vnet/IP",
+    "MQTT",
+    "SNMP"
+  ],
+  "interfaces": [
+    "Ethernet",
+    "Serial RS-232",
+    "Serial RS-485",
+    "Wireless (WiFi)",
+    "Wireless (Cellular)",
+    "Fiber Optic",
+    "USB"
+  ],
+  "industries": [
+    "Manufacturing",
+    "Energy",
+    "Oil & Gas",
+    "Water Treatment",
+    "Chemical",
+    "Pharmaceutical",
+    "Food Processing",
+    "Automotive",
+    "Building Automation",
+    "Transportation",
+    "Mining",
+    "Pulp & Paper"
+  ]
+}

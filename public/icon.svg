@@ -1,0 +1,27 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @media (prefers-color-scheme: light) {
+      .background { fill: #1e40af; }
+      .foreground { fill: white; }
+      .accent { fill: #60a5fa; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #1e3a8a; }
+      .foreground { fill: white; }
+      .accent { fill: #93c5fd; }
+    }
+  </style>
+  <rect class="background" width="180" height="180" rx="37"/>
+  <!-- Shield outline -->
+  <path class="foreground" d="M90 25 L145 45 L145 90 C145 125 120 150 90 165 C60 150 35 125 35 90 L35 45 Z" stroke-width="6" fill="none" stroke="white"/>
+  <!-- Inner shield fill -->
+  <path class="accent" d="M90 35 L135 52 L135 88 C135 118 115 140 90 153 C65 140 45 118 45 88 L45 52 Z" opacity="0.3"/>
+  <!-- ICS text -->
+  <text x="90" y="85" text-anchor="middle" class="foreground" font-family="Arial, sans-serif" font-size="28" font-weight="bold">ICS</text>
+  <!-- Risk indicator bars -->
+  <rect class="foreground" x="60" y="100" width="15" height="30" rx="2"/>
+  <rect class="foreground" x="82" y="95" width="15" height="35" rx="2"/>
+  <rect class="foreground" x="104" y="90" width="15" height="40" rx="2"/>
+  <!-- Checkmark -->
+  <path class="accent" d="M70 145 L80 155 L110 125" stroke-width="6" stroke="#60a5fa" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-15",
+  "total_cves": 70,
+  "verified_cves": 70,
+  "sources": [
+    "NVD (National Vulnerability Database)",
+    "ICS-CERT Advisories",
+    "Vendor Security Bulletins",
+    "CISA Known Exploited Vulnerabilities"
+  ],
+  "coverage": {
+    "vendors": {
+      "Siemens": 15,
+      "Rockwell Automation": 12,
+      "Schneider Electric": 10,
+      "Honeywell": 8,
+      "ABB": 6,
+      "Mitsubishi Electric": 5,
+      "Yokogawa": 4,
+      "HollySys": 3,
+      "INVT": 3,
+      "Supcon": 2,
+      "Phoenix Contact": 2
+    },
+    "regions": {
+      "Western": 45,
+      "Asian": 15,
+      "Global": 10
+    },
+    "industries": {
+      "Manufacturing": 40,
+      "Energy": 35,
+      "Water": 25,
+      "Oil & Gas": 20,
+      "Chemical": 15
+    }
+  },
+  "verification_status": {
+    "fully_verified": 70,
+    "pending_verification": 0,
+    "deprecated": 0
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2025-01-15",
+      "changes": [
+        "Initial release with 70 verified CVEs",
+        "Added Asian manufacturers (HollySys, INVT, Supcon)",
+        "Complete source documentation for all entries",
+        "Multi-language support for all vulnerabilities"
+      ]
+    }
+  ],
+  "data_quality": {
+    "cvss_scores_verified": true,
+    "descriptions_reviewed": true,
+    "recommendations_validated": true,
+    "source_urls_checked": true
+  }
+}

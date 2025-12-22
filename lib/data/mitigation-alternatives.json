@@ -1,0 +1,125 @@
+[
+  {
+    "id": "mit-001",
+    "cveId": "CVE-2019-6568",
+    "alternatives": [
+      {
+        "type": "network_isolation",
+        "title": "Network Segmentation",
+        "description": "Isolate the affected PLC in a separate VLAN with strict firewall rules to prevent unauthorized access from corporate network.",
+        "effectiveness": 0.85,
+        "complexity": "medium",
+        "cost": "low",
+        "steps": [
+          "Create dedicated VLAN for industrial control network",
+          "Configure layer 3 switch with ACLs",
+          "Block all traffic except whitelisted IPs",
+          "Implement NAT for outbound connections",
+          "Monitor traffic logs regularly"
+        ]
+      },
+      {
+        "type": "service_disable",
+        "title": "Disable Unused Services",
+        "description": "Disable unnecessary network services and protocols on the PLC to reduce attack surface.",
+        "effectiveness": 0.7,
+        "complexity": "low",
+        "cost": "none",
+        "steps": [
+          "Review running services on PLC",
+          "Disable HTTP/HTTPS web server if not used",
+          "Disable FTP/TFTP if not required",
+          "Turn off SNMP community strings",
+          "Document disabled services"
+        ]
+      },
+      {
+        "type": "access_control",
+        "title": "Strict Authentication",
+        "description": "Implement strong password policies and role-based access control for PLC access.",
+        "effectiveness": 0.75,
+        "complexity": "low",
+        "cost": "none",
+        "steps": [
+          "Change default passwords immediately",
+          "Use complex passwords (min 12 characters)",
+          "Enable account lockout after 3 failed attempts",
+          "Create separate accounts per engineer",
+          "Review access logs weekly"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mit-002",
+    "cveId": "CVE-2020-15782",
+    "alternatives": [
+      {
+        "type": "firewall_rule",
+        "title": "Protocol Firewall",
+        "description": "Deploy industrial protocol firewall to inspect and filter Modbus traffic.",
+        "effectiveness": 0.9,
+        "complexity": "high",
+        "cost": "high",
+        "steps": [
+          "Deploy industrial firewall (e.g., Tofino, Achilles)",
+          "Configure Modbus protocol inspection",
+          "Whitelist legitimate function codes",
+          "Block dangerous write operations",
+          "Alert on anomalies"
+        ]
+      },
+      {
+        "type": "network_isolation",
+        "title": "Air Gap Critical Systems",
+        "description": "Physically isolate critical Modbus devices from external networks.",
+        "effectiveness": 0.95,
+        "complexity": "high",
+        "cost": "medium",
+        "steps": [
+          "Install physically separate network switch",
+          "Remove all internet gateways",
+          "Use USB for firmware updates only",
+          "Implement one-way data diode for SCADA",
+          "Regular security audits"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mit-003",
+    "cveId": "CVE-2018-7522",
+    "alternatives": [
+      {
+        "type": "network_isolation",
+        "title": "DMZ Architecture",
+        "description": "Place HMI in DMZ zone between corporate and control networks.",
+        "effectiveness": 0.8,
+        "complexity": "medium",
+        "cost": "medium",
+        "steps": [
+          "Design three-zone architecture",
+          "Deploy dual firewalls",
+          "Configure HMI in DMZ",
+          "Allow only specific ports",
+          "Implement jump server for remote access"
+        ]
+      },
+      {
+        "type": "access_control",
+        "title": "Multi-Factor Authentication",
+        "description": "Implement 2FA for all HMI access to prevent unauthorized logins.",
+        "effectiveness": 0.85,
+        "complexity": "medium",
+        "cost": "low",
+        "steps": [
+          "Deploy RADIUS/TACACS+ server",
+          "Integrate hardware tokens or SMS",
+          "Require 2FA for remote access",
+          "Set session timeout (15 minutes)",
+          "Log all authentication attempts"
+        ]
+      }
+    ]
+  }
+]
