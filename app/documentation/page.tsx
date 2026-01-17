@@ -7,10 +7,10 @@ import { BookOpen, FileText, GraduationCap, Download, Code, ArrowLeft } from "lu
 import Link from "next/link"
 
 export default function DocumentationPage() {
-  const { language, t: translations } = useLanguage()
+  const { language, translations } = useLanguage()
   const isRTL = language === "ar"
 
-  const t = translations.documentation || {}
+  const t = translations as any
 
   const downloadMethodology = () => {
     const content = generateMethodologyDocument()
@@ -24,10 +24,10 @@ export default function DocumentationPage() {
 
   const generateMethodologyDocument = () => {
     return `# Industrial Control Systems Security Assessment Tool - Methodology
-
+    
 ## Abstract
 
-This document presents a comprehensive methodology for assessing security risks in Industrial Control Systems (ICS) and Supervisory Control and Data Analysis (SCADA) environments. The tool implements multiple security frameworks including STRIDE threat modeling, IEC 62443 compliance checking, and CVSS-based vulnerability assessment.
+This document presents a comprehensive methodology for assessing security risks in Industrial Control Systems (ICS) and Supervisory Control and Data Analysis (SCADA) environments. The tool implements multiple security frameworks including STRIDE threat modeling, IEC 62443 compliance checking, and a Monte Carlo simulation engine for advanced Probabilistic Risk Assessment (PRA).
 
 ## 1. Introduction
 
@@ -43,16 +43,30 @@ Industrial Control Systems are critical infrastructure components that control p
 
 ## 2. Methodology
 
-### 2.1 Risk Calculation Formula
+### 2.1 Risk Assessment Engine
 
-The core risk assessment uses a weighted scoring system:
+The tool utilizes a hybrid approach combining static scoring and dynamic simulation:
 
+#### A. Static Risk Scoring (CVSS-based)
 **Risk Score = (CVSS_avg × 0.6) + (Internet_Exposure × 0.3) + (Legacy_Weight × 0.1)**
 
 Where:
 - **CVSS_avg**: Average CVSS score of all identified vulnerabilities (0-10)
 - **Internet_Exposure**: Binary indicator (0 or 1) of internet connectivity
 - **Legacy_Weight**: Binary indicator (0 or 1) for unsupported/end-of-life systems
+
+#### B. Probabilistic Risk Assessment (Monte Carlo Simulation)
+For advanced analysis, the tool employs a Monte Carlo simulation engine (10,000 iterations) to model uncertainty in risk factors.
+
+**Simulation Parameters:**
+- **Likelihood Distribution**: Models the probability of attack vectors using Beta distributions.
+- **Impact Distribution**: Models financial and operational impact using Lognormal distributions.
+- **Control Effectiveness**: Models the mitigation power of existing defenses.
+
+**Output Metrics:**
+- **Value at Risk (VaR)**: 95th percentile risk exposure.
+- **Expected Loss**: Mean annualized loss expectancy (ALE).
+- **Residual Risk**: Risk remaining after controls are applied.
 
 ### 2.2 STRIDE Threat Modeling
 
@@ -83,11 +97,10 @@ Attack trees visualize potential attack paths with:
 The tool checks compliance with two major standards:
 
 #### IEC 62443 (Industrial Automation and Control Systems Security)
-- Network Segmentation (Requirement 3.3.5.1)
-- Access Control (Requirement 3.3.4.1)
-- Security Updates (Requirement 3.3.8.1)
-- Audit Logging (Requirement 3.3.10.1)
-- Cryptographic Functions (Requirement 3.3.11.1)
+The tool includes a **Standard-Compliant Calculator** supporting IEC 62443-3-3:
+- **Foundational Requirements (FR 1-7)**: Full detailed checklist.
+- **Security Levels (SL)**: Calculation of Target SL (SL-T) and Achieved SL (SL-A).
+- Reference: IEC 62443-3-3:2013 System Security Requirements.
 
 #### NIST Cybersecurity Framework
 - Identify (ID.AM-1, ID.RA-1)

@@ -15,6 +15,24 @@ import { useState } from "react"
 
 const examples = [
   {
+    id: "industry-4-0",
+    name: {
+      en: "Industry 4.0 Smart Factory",
+      ar: "مصنع ذكي (الجيل الرابع)",
+      de: "Industrie 4.0 Smart Factory",
+    },
+    config: {
+      deviceType: "IoT Gateway",
+      manufacturer: "Siemens",
+      model: "SIMATIC IOT2050",
+      protocols: ["OPC-UA", "MQTT", "REST API", "AMQP"],
+      connectionType: "Ethernet/Cloud",
+      internetExposed: true,
+      osVersion: "Industrial OS 2.0",
+      isLegacy: false,
+    },
+  },
+  {
     id: "steel-mill",
     name: {
       en: "Steel Mill SCADA System",

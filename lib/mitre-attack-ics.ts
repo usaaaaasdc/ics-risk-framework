@@ -283,15 +283,17 @@ export function getTechniquesByTactic(tacticId: string): MITRETechnique[] {
   return MITRE_TECHNIQUES.filter((t) => t.tacticId === tacticId)
 }
 
-export function mapVulnerabilityToMITRE(vulnerability: any): MITRETechnique[] {
+import { Vulnerability } from "./risk-engine"
+
+export function mapVulnerabilityToMITRE(vulnerability: Vulnerability): MITRETechnique[] {
   const mapped: MITRETechnique[] = []
 
-  // Map based on vulnerability type
-  if (vulnerability.type?.includes("Authentication")) {
+  // Map based on vulnerability category/description
+  if (vulnerability.category?.includes("Authentication") || vulnerability.description.toLowerCase().includes("authentication")) {
     mapped.push(...MITRE_TECHNIQUES.filter((t) => t.id === "T0866"))
   }
 
-  if (vulnerability.type?.includes("Code Injection")) {
+  if (vulnerability.category?.includes("Injection") || vulnerability.description.toLowerCase().includes("injection")) {
     mapped.push(...MITRE_TECHNIQUES.filter((t) => t.id === "T0871"))
   }
 

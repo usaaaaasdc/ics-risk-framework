@@ -15,6 +15,16 @@ import { Shield, Save, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function AssessmentPage() {
   const { t, language } = useLanguage()
@@ -24,6 +34,8 @@ export default function AssessmentPage() {
   const [assessment, setAssessment] = useState<RiskAssessment | null>(null)
   const [currentConfig, setCurrentConfig] = useState<SystemConfig | null>(null)
   const [currentProject, setCurrentProject] = useState<Project | null>(null)
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [exportLanguage, setExportLanguage] = useState<"ar" | "en" | "de" | "tr">("ar")
 
   useEffect(() => {
     if (projectId) {
@@ -109,7 +121,14 @@ export default function AssessmentPage() {
 
   const handleExportPDF = () => {
     if (!assessment || !currentConfig) return
-    generatePDF(assessment, currentConfig)
+    setExportLanguage(language as "ar" | "en" | "de" | "tr")
+    setIsExportDialogOpen(true)
+  }
+
+  const confirmExportPDF = () => {
+    if (!assessment || !currentConfig) return
+    generatePDF(assessment, currentConfig, exportLanguage)
+    setIsExportDialogOpen(false)
   }
 
   return (
@@ -125,6 +144,7 @@ export default function AssessmentPage() {
                   {language === "ar" && "العودة"}
                   {language === "en" && "Back"}
                   {language === "de" && "Zurück"}
+                  {language === "tr" && "Geri"}
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
@@ -134,6 +154,7 @@ export default function AssessmentPage() {
                     {language === "ar" && "تقييم المخاطر الأمنية"}
                     {language === "en" && "Security Risk Assessment"}
                     {language === "de" && "Sicherheitsrisikobewertung"}
+                    {language === "tr" && "Güvenlik Risk Değerlendirmesi"}
                   </h1>
                 </div>
               </div>
@@ -194,11 +215,57 @@ export default function AssessmentPage() {
               {language === "ar" && "التحليل الأمني المتقدم"}
               {language === "en" && "Advanced Security Analysis"}
               {language === "de" && "Erweiterte Sicherheitsanalyse"}
+              {language === "tr" && "Gelişmiş Güvenlik Analizi"}
             </h2>
             <AdvancedAnalysisTabs config={currentConfig} assessment={assessment} />
           </div>
         )}
       </div>
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === "ar" && "تصدير التقرير"}
+              {language === "en" && "Export Report"}
+              {language === "de" && "Bericht exportieren"}
+              {language === "tr" && "Raporu Dışa Aktar"}
+            </DialogTitle>
+            <DialogDescription>
+              {language === "ar" && "اختر لغة التقرير الذي تريد تصديره"}
+              {language === "en" && "Choose the language for the exported report"}
+              {language === "de" && "Wählen Sie die Sprache für den exportierten Bericht"}
+              {language === "tr" && "Dışa aktarılacak raporun dilini seçin"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="language" className="text-right">
+                {t("language")}
+              </Label>
+              <Select
+                value={exportLanguage}
+                onValueChange={(val: "ar" | "en" | "de" | "tr") => setExportLanguage(val)}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="de">Deutsch (German)</SelectItem>
+                  <SelectItem value="tr">Türkçe (Turkish)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>
+              {t("cancel")}
+            </Button>
+            <Button onClick={confirmExportPDF}>{t("confirm")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

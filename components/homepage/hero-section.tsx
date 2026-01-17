@@ -32,6 +32,11 @@ export function HeroSection() {
               ICS-Risk: Ein Open-Source-Framework für die Risikobewertung industrieller Steuerungssysteme
             </span>
           )}
+          {language === "tr" && (
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              ICS-Risk: Endüstriyel Kontrol Sistemleri Risk Değerlendirmesi İçin Açık Kaynaklı Çerçeve
+            </span>
+          )}
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground text-balance max-w-3xl mx-auto">
@@ -40,6 +45,8 @@ export function HeroSection() {
             "Comprehensive, offline, and multilingual. Built for academia, industry, and developing economies."}
           {language === "de" &&
             "Umfassend, offline und mehrsprachig. Entwickelt für Akademie, Industrie und Entwicklungsländer."}
+          {language === "tr" &&
+            "Kapsamlı, çevrimdışı ve çok dilli. Akademi, endüstri ve gelişmekte olan ekonomiler için geliştirildi."}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
@@ -52,6 +59,7 @@ export function HeroSection() {
               {language === "ar" && "ابدأ التقييم الكامل"}
               {language === "en" && "Start Full Assessment"}
               {language === "de" && "Vollständige Bewertung starten"}
+              {language === "tr" && "Tam Değerlendirmeyi Başlat"}
             </Button>
           </Link>
           <Link href="/simple-mode" className="flex-1 sm:flex-initial">
@@ -64,6 +72,7 @@ export function HeroSection() {
               {language === "ar" && "الوضع المبسط للمديرين"}
               {language === "en" && "Simple Mode for Managers"}
               {language === "de" && "Einfacher Modus für Manager"}
+              {language === "tr" && "Yöneticiler İçin Basit Mod"}
             </Button>
           </Link>
         </div>

@@ -8,6 +8,9 @@
 
 export const translations = {
   ar: {
+    backToHome: "العودة للصفحة الرئيسية",
+    title: "ICS-Risk", // ← أضف هذا
+    subtitle: "إطار تقييم المخاطر", // ← وهذا {
     // Header
     appTitle: "ICS-Risk: إطار مفتوح المصدر لتقييم مخاطر أنظمة التحكم الصناعية",
     appSubtitle: "An Open-Source Framework for Risk Assessment and Threat Modeling in Industrial Control Systems",
@@ -20,7 +23,7 @@ export const translations = {
     documentation: "التوثيق الأكاديمي",
     simulation: "محاكاة الهجمات",
     costAnalysis: "تحليل التكلفة",
-    backToHome: "العودة للصفحة الرئيسية",
+
 
     // Navigation & Actions
     inputDetails: "إدخال تفاصيل النظام",
@@ -70,8 +73,7 @@ export const translations = {
     // Footer
     footerText: "جميع البيانات محلية ولا يتم إرسالها خارج الجهاز",
 
-    // User Guide
-    userGuide: "دليل المستخدم",
+    // User Guide - Main sections
     userGuideTitle: "دليل استخدام أداة تقييم أمن أنظمة التحكم الصناعية",
     backToApp: "العودة للتطبيق",
     printGuide: "طباعة الدليل",
@@ -94,6 +96,12 @@ export const translations = {
     guideFeature5Desc: "تصدير النتائج بصيغة PDF أو CSV للمراجعة والمشاركة",
     guideFeature6: "دعم متعدد اللغات",
     guideFeature6Desc: "واجهة متوفرة بالعربية والإنجليزية والألمانية والهولندية",
+
+    guideNewTools: "أدوات هندسية متقدمة",
+    guideNewToolsDesc: "أدوات احترافية تمت إضافتها لتوافق المعايير الصناعية العالمية:",
+    guideIecDesc: "حاسبة تفاعلية لمعيار IEC 62443-3-3 لتحديد مستوى الأمان المستهدف (SL-T) والمحقق (SL-A).",
+    guideRiskSimDesc: "محرك محاكاة مونت كارلو لتقدير المخاطر الاحتمالية والخسائر المتوقعة بدقة إحصائية.",
+
 
     guideHowToUse: "كيفية الاستخدام",
     guideStep1: "الخطوة 1: إدخال تفاصيل الجهاز",
@@ -152,7 +160,6 @@ export const translations = {
     // Project Management
     projectManagement: "إدارة المشاريع",
     projectManagementDesc: "إنشاء وإدارة مشاريع تقييم الأمان المتعددة",
-    backToHome: "العودة للرئيسية",
     newProject: "مشروع جديد",
     createNewProject: "إنشاء مشروع جديد",
     createProjectDesc: "أدخل تفاصيل المشروع الجديد",
@@ -177,151 +184,10 @@ export const translations = {
     currentProject: "المشروع الحالي",
     viewAllProjects: "عرض جميع المشاريع",
 
-    // Documentation
-    documentation: {
-      title: "التوثيق الأكاديمي",
-      subtitle: "المنهجية والمراجع وإرشادات البحث",
-      downloadMethodology: "تحميل المنهجية",
-      methodology: "المنهجية",
-      methodologyDesc: "شرح مفصل لخوارزميات تقييم المخاطر والأطر المستخدمة",
-      references: "المراجع",
-      referencesDesc: "المصادر الأكاديمية ومعايير الصناعة المستخدمة",
-      github: "مستودع GitHub",
-      githubDesc: "الكود المصدري وإرشادات المساهمة",
-      riskFormula: "معادلة تقييم المخاطر",
-      cvssDesc: "متوسط درجة نظام تقييم الثغرات المشترك (0-10)",
-      internetDesc: "مؤشر ثنائي إذا كان النظام متصلاً بالإنترنت (0 أو 1)",
-      legacyDesc: "مؤشر ثنائي للأنظمة غير المدعومة/منتهية الصلاحية (0 أو 1)",
-      strideTitle: "نمذجة تهديدات STRIDE",
-      strideDesc: "إطار تحليل تهديدات شامل طورته Microsoft",
-      spoofing: "انتحال الهوية والتحايل على المصادقة",
-      tampering: "انتهاكات سلامة البيانات والتعديلات غير المصرح بها",
-      repudiation: "عدم القدرة على تتبع الإجراءات وإثبات المساءلة",
-      disclosure: "الوصول غير المصرح به إلى البيانات الحساسة",
-      dos: "توفر النظام واستنزاف الموارد",
-      privilege: "الوصول غير المصرح به إلى امتيازات أعلى",
-      standards: "معايير وأطر الأمان",
-      iec62443Desc: "معيار دولي لأمن أنظمة الأتمتة والتحكم الصناعي",
-      nistDesc: "إطار عمل لتحسين الأمن السيبراني للبنية التحتية الحرجة",
-      academicReferences: "المراجع الأكاديمية",
-      citation: "كيفية الاستشهاد بهذا العمل",
-      license: "الترخيص والاستخدام",
-      licenseDesc:
-        "تم إصدار هذا المشروع تحت ترخيص MIT، مما يعزز التعاون مفتوح المصدر في أبحاث الأمن السيبراني الصناعي.",
-      contributions: "نرحب بالمساهمات وتقارير الأخطاء وطلبات الميزات على GitHub.",
-    },
-
-    // Analytics
-    analytics: {
-      title: "لوحة التحليلات",
-      subtitle: "إحصائيات ورؤى شاملة من جميع المشاريع",
-      overview: "نظرة عامة",
-      totalProjects: "إجمالي المشاريع",
-      avgRiskScore: "متوسط درجة المخاطر",
-      totalVulnerabilities: "إجمالي الثغرات",
-      criticalIssues: "مشاكل حرجة",
-      riskDistribution: "توزيع المخاطر",
-      deviceTypes: "أنواع الأجهزة",
-      protocolUsage: "استخدام البروتوكولات",
-      topVulnerabilities: "أكثر الثغرات شيوعاً",
-      complianceStatus: "حالة الامتثال",
-      industryBreakdown: "توزيع الصناعات",
-      noData: "لا توجد بيانات متاحة",
-      createProjectsFirst: "قم بإنشاء مشاريع للحصول على التحليلات",
-    },
-
-    // Comparison
-    comparison: {
-      title: "مقارنة المشاريع",
-      subtitle: "قارن عدة مشاريع جنباً إلى جنب",
-      selectProjects: "اختر المشاريع للمقارنة",
-      selectProjectsDesc: "اختر 2-4 مشاريع للمقارنة",
-      compare: "مقارنة",
-      clearSelection: "مسح التحديد",
-      selectAtLeast2: "يرجى اختيار مشروعين على الأقل للمقارنة",
-      riskComparison: "مقارنة المخاطر",
-      systemConfiguration: "تكوين النظام",
-      vulnerabilityStats: "إحصائيات الثغرات",
-      securityRecommendations: "التوصيات الأمنية",
-      notAvailable: "غير متوفر",
-    },
-
-    // Advanced Analysis
-    advancedAnalysis: {
-      title: "التحليل المتقدم",
-      strideAnalysis: "تحليل STRIDE",
-      attackTree: "شجرة الهجوم",
-      compliance: "الامتثال",
-      strideDesc: "نمذجة التهديدات باستخدام إطار عمل STRIDE",
-      attackTreeDesc: "مسارات الهجوم المحتملة مع الاحتماليات",
-      complianceDesc: "التحقق من الامتثال للمعايير الدولية",
-      threatCategory: "فئة التهديد",
-      level: "المستوى",
-      mitigation: "التخفيف",
-      attackVector: "ناقل الهجوم",
-      probability: "الاحتمالية",
-      impact: "التأثير",
-      mitigationStatus: "حالة التخفيف",
-      standard: "المعيار",
-      requirement: "المتطلب",
-      status: "الحالة",
-      compliant: "متوافق",
-      nonCompliant: "غير متوافق",
-      partiallyCompliant: "متوافق جزئياً",
-    },
-    // Simulation
-    simulation: {
-      title: "محاكاة الهجمات السيبرانية",
-      subtitle: "اختبر سيناريوهات الهجوم وافهم مسارات الاختراق المحتملة",
-      scenarios: "السيناريوهات المتاحة",
-      run: "تشغيل",
-      selectScenario: "اختر سيناريو لبدء المحاكاة",
-      running: "جاري تشغيل المحاكاة...",
-      attackSuccess: "احتمالية نجاح الهجوم",
-      riskScore: "درجة المخاطر",
-      attackPath: "مسار الهجوم",
-      impact: "التأثير المتتالي",
-      detectionPoints: "نقاط الكشف",
-      prevention: "إجراءات الوقاية",
-      detection: "الكشف",
-    },
-
-    costAnalysis: {
-      title: "تحليل تكلفة المخاطر",
-      subtitle: "احسب التأثير المالي المحتمل للهجمات السيبرانية",
-      inputParameters: "معايير الإدخال",
-      selectProject: "اختر المشروع",
-      selectProjectPlaceholder: "اختر مشروعاً للتحليل...",
-      industryType: "نوع الصناعة",
-      dailyRevenue: "الإيرادات اليومية (يورو)",
-      downtimeCost: "تكلفة التوقف/ساعة (يورو)",
-      recoveryTime: "وقت الاستعادة (ساعات)",
-      dataLoss: "تأثير فقدان البيانات (يورو)",
-      reputationDamage: "تكلفة الضرر بالسمعة (يورو)",
-      regulatoryFines: "الغرامات التنظيمية (يورو)",
-      calculate: "احسب",
-      selectProjectAndCalculate: "اختر مشروعاً وأدخل البيانات لحساب التكلفة",
-      totalFinancialRisk: "إجمالي المخاطر المالية",
-      potentialLoss: "الخسارة المحتملة",
-      perIncident: "لكل حادث",
-      costBreakdown: "تفصيل التكاليف",
-      incidentResponse: "تكلفة الاستجابة للحوادث",
-      recovery: "تكلفة الاستعادة والمعالجة",
-      annualizedLoss: "الخسارة السنوية المتوقعة",
-      expectedAnnualLoss: "الخسارة السنوية المتوقعة (ALE)",
-      recommendedBudget: "الميزانية الأمنية الموصى بها",
-      roi: "العائد على الاستثمار الأمني",
-      costBenefitRatio: "نسبة التكلفة إلى الفائدة",
-      paybackPeriod: "فترة الاسترداد",
-      industryBenchmark: "معيار الصناعة",
-      industryAverage: "متوسط الصناعة",
-      yourPosition: "موقعك",
-    },
+    // Research Validation
     researchValidation: "التحقق من صحة البحث",
     validationTitle: "التحقق من صحة الإطار البحثي",
     validationIntro: "تم التحقق من دقة وفعالية إطار ICS-Risk من خلال دراسات حالة ومقارنات مع معايير صناعية معتمدة.",
-
-    // Case Study Section
     validationCaseStudy: "دراسة الحالة: مصنع الصلب في تركيا",
     caseStudyContext:
       "تم تطبيق إطار ICS-Risk على مصنع صلب متوسط الحجم في تركيا يضم 150+ جهاز PLC/HMI من مصنعين مختلفين.",
@@ -330,8 +196,6 @@ export const translations = {
     caseStudyFinding2: "درجة المخاطر الأولية: 8.2/10 (حرجة)",
     caseStudyFinding3: "بعد تطبيق التوصيات: انخفضت إلى 4.1/10 خلال 6 أشهر",
     caseStudyFinding4: "تم منع محاولتي اختراق فعليتين بفضل التوصيات الأمنية",
-
-    // IEC 62443 Comparison
     validationIEC: "مقارنة مع معيار IEC 62443",
     iecComparison: "تم مقارنة نتائج ICS-Risk مع متطلبات معيار IEC 62443-3-3 (System Security Requirements)",
     iecAlignment: "التوافق مع المعيار",
@@ -340,21 +204,15 @@ export const translations = {
     iecSL3: "مستوى الأمان 3 (SL3): تغطية 72%",
     iecSL4: "مستوى الأمان 4 (SL4): 58%",
     iecNote: "الفجوات في مستويات الأمان العليا تتعلق بمتطلبات الأجهزة الفيزيائية والشهادات الأمنية.",
-
-    // Expert Feedback
     validationFeedback: "تعليقات الخبراء",
     expertFeedback1: "د. محمد الأحمد - مستشار أمن OT: 'إطار عملي وسهل الاستخدام للتقييمات الأولية'",
     expertFeedback2: "م. سارة يلماز - مهندسة أمن صناعي: 'قاعدة البيانات شاملة وتغطي الثغرات الشائعة'",
     expertFeedback3: "د. هانز شميت - باحث أكاديمي: 'منهجية علمية قوية تجمع بين CVSS، STRIDE و IEC 62443'",
-
-    // Limitations
     validationLimitations: "القيود الحالية",
     limitation1: "لا يكتشف zero-day vulnerabilities أو ثغرات غير مسجلة في NVD/ICS-CERT",
     limitation2: "لا يقوم بفحص الشبكة النشط (passive assessment only)",
     limitation3: "يتطلب إدخال يدوي للمعلومات (لا يوجد اكتشاف تلقائي)",
     limitation4: "قاعدة البيانات تحتاج تحديثات دورية يدوية",
-
-    // Future Research
     validationFuture: "خطة البحث المستقبلية (ماجستير)",
     futureResearch: "سيتم توسيع هذا الإطار خلال دراستي للماجستير في الأمن السيبراني الصناعي لتتضمن:",
     futureGoal1: "كشف الشذوذ باستخدام التعلم الآلي (ML-based Anomaly Detection)",
@@ -362,12 +220,30 @@ export const translations = {
     futureGoal3: "نظام توصيات ذكي يستخدم NLP لتحليل تقارير ICS-CERT",
     futureGoal4: "منصة تعاونية لمشاركة الثغرات والحلول بين المهندسين",
     futureGoal5: "نموذج تنبؤي للهجمات المستقبلية على أنظمة ICS",
-
     researchGap: "الفجوة البحثية المستهدفة",
     researchGapText:
       "معظم حلول الأمن السيبراني الصناعي تتطلب اتصالاً مستمراً بالإنترنت وتعتمد على بيانات سحابية. هذا الإطار يعالج الفجوة في الأمن التنبؤي للأنظمة الصناعية غير المتصلة بالإنترنت (air-gapped systems) من خلال التحليل المحلي والتعلم الآلي.",
+
+    // Common
+    date: "التاريخ",
+    status: "الحالة",
+    actions: "الإجراءات",
+    delete: "حذف",
+
+    confirm: "تأكيد",
+
+    // Risks
+    analysis: "تحليل",
+    critical: "حرج",
+    high: "مرتفع",
+    medium: "متوسط",
+    low: "منخفض",
+    informational: "معلوماتي",
   },
   en: {
+    backToHome: "Back to Home",
+    title: "ICS-Risk",
+    subtitle: "Risk Assessment Framework",
     // Header
     appTitle: "ICS-Risk: An Open-Source Framework for Industrial Control Systems Risk Assessment",
     appSubtitle: "Risk Assessment and Threat Modeling Framework for Industrial Control Systems",
@@ -380,7 +256,7 @@ export const translations = {
     documentation: "Academic Documentation",
     simulation: "Attack Simulation",
     costAnalysis: "Cost Analysis",
-    backToHome: "Back to Home",
+
 
     // Navigation & Actions
     inputDetails: "System Details Input",
@@ -431,7 +307,6 @@ export const translations = {
     footerText: "All data is stored locally and never sent outside the device",
 
     // User Guide
-    userGuide: "User Guide",
     userGuideTitle: "ICS Security Assessment Tool User Guide",
     backToApp: "Back to App",
     printGuide: "Print Guide",
@@ -455,6 +330,12 @@ export const translations = {
     guideFeature5Desc: "Export results in PDF or CSV format for review and sharing",
     guideFeature6: "Multi-language Support",
     guideFeature6Desc: "Interface available in Arabic, English, German, and Dutch",
+
+    guideNewTools: "Advanced Engineering Tools",
+    guideNewToolsDesc: "Professional grade tools implementing global industrial standards:",
+    guideIecDesc: "Interactive IEC 62443-3-3 calculator to determine Target (SL-T) and Achieved (SL-A) Security Levels.",
+    guideRiskSimDesc: "Monte Carlo simulation engine for probabilistic risk assessment and expected loss estimation.",
+
 
     guideHowToUse: "How to Use",
     guideStep1: "Step 1: Enter Device Details",
@@ -515,7 +396,6 @@ export const translations = {
     // Project Management
     projectManagement: "Project Management",
     projectManagementDesc: "Create and manage multiple security assessment projects",
-    backToHome: "Back to Home",
     newProject: "New Project",
     createNewProject: "Create New Project",
     createProjectDesc: "Enter details for the new project",
@@ -540,152 +420,11 @@ export const translations = {
     currentProject: "Current Project",
     viewAllProjects: "View All Projects",
 
-    // Documentation
-    documentation: {
-      title: "Academic Documentation",
-      subtitle: "Methodology, References, and Research Guidelines",
-      downloadMethodology: "Download Methodology",
-      methodology: "Methodology",
-      methodologyDesc: "Detailed explanation of risk assessment algorithms and frameworks",
-      references: "References",
-      referencesDesc: "Academic sources and industry standards used",
-      github: "GitHub Repository",
-      githubDesc: "Source code and contribution guidelines",
-      riskFormula: "Risk Assessment Formula",
-      cvssDesc: "Average Common Vulnerability Scoring System score (0-10)",
-      internetDesc: "Binary indicator if system is connected to internet (0 or 1)",
-      legacyDesc: "Binary indicator for unsupported/end-of-life systems (0 or 1)",
-      strideTitle: "STRIDE Threat Modeling",
-      strideDesc: "Comprehensive threat analysis framework developed by Microsoft",
-      spoofing: "Identity impersonation and authentication bypass",
-      tampering: "Data integrity violations and unauthorized modifications",
-      repudiation: "Inability to trace actions and prove accountability",
-      disclosure: "Unauthorized access to sensitive data",
-      dos: "System availability and resource exhaustion",
-      privilege: "Unauthorized access to higher privileges",
-      standards: "Security Standards & Frameworks",
-      iec62443Desc: "International standard for industrial automation and control systems security",
-      nistDesc: "Framework for improving critical infrastructure cybersecurity",
-      academicReferences: "Academic References",
-      citation: "How to Cite This Work",
-      license: "License & Usage",
-      licenseDesc:
-        "This project is released under the MIT License, promoting open-source collaboration in industrial cybersecurity research.",
-      contributions: "Contributions, bug reports, and feature requests are welcome on GitHub.",
-    },
-
-    // Analytics
-    analytics: {
-      title: "Analytics Dashboard",
-      subtitle: "Comprehensive statistics and insights from all projects",
-      overview: "Overview",
-      totalProjects: "Total Projects",
-      avgRiskScore: "Average Risk Score",
-      totalVulnerabilities: "Total Vulnerabilities",
-      criticalIssues: "Critical Issues",
-      riskDistribution: "Risk Distribution",
-      deviceTypes: "Device Types",
-      protocolUsage: "Protocol Usage",
-      topVulnerabilities: "Top Vulnerabilities",
-      complianceStatus: "Compliance Status",
-      industryBreakdown: "Industry Breakdown",
-      noData: "No data available",
-      createProjectsFirst: "Create projects to see analytics",
-    },
-
-    // Comparison
-    comparison: {
-      title: "Project Comparison",
-      subtitle: "Compare multiple projects side-by-side",
-      selectProjects: "Select Projects to Compare",
-      selectProjectsDesc: "Choose 2-4 projects to compare",
-      compare: "Compare",
-      clearSelection: "Clear Selection",
-      selectAtLeast2: "Please select at least 2 projects to compare",
-      riskComparison: "Risk Comparison",
-      systemConfiguration: "System Configuration",
-      vulnerabilityStats: "Vulnerability Statistics",
-      securityRecommendations: "Security Recommendations",
-      notAvailable: "Not Available",
-    },
-
-    // Advanced Analysis
-    advancedAnalysis: {
-      title: "Advanced Analysis",
-      strideAnalysis: "STRIDE Analysis",
-      attackTree: "Attack Tree",
-      compliance: "Compliance",
-      strideDesc: "Threat modeling using STRIDE framework",
-      attackTreeDesc: "Potential attack paths with probabilities",
-      complianceDesc: "Compliance verification with international standards",
-      threatCategory: "Threat Category",
-      level: "Level",
-      mitigation: "Mitigation",
-      attackVector: "Attack Vector",
-      probability: "Probability",
-      impact: "Impact",
-      mitigationStatus: "Mitigation Status",
-      standard: "Standard",
-      requirement: "Requirement",
-      status: "Status",
-      compliant: "Compliant",
-      nonCompliant: "Non-Compliant",
-      partiallyCompliant: "Partially Compliant",
-    },
-    // Simulation
-    simulation: {
-      title: "Cyber Attack Simulation",
-      subtitle: "Test attack scenarios and understand potential penetration paths",
-      scenarios: "Available Scenarios",
-      run: "Run",
-      selectScenario: "Select a scenario to start simulation",
-      running: "Running simulation...",
-      attackSuccess: "Attack Success Probability",
-      riskScore: "Risk Score",
-      attackPath: "Attack Path",
-      impact: "Cascading Impact",
-      detectionPoints: "Detection Points",
-      prevention: "Prevention Measures",
-      detection: "Detection",
-    },
-
-    costAnalysis: {
-      title: "Risk Cost Analysis",
-      subtitle: "Calculate potential financial impact of cyber attacks",
-      inputParameters: "Input Parameters",
-      selectProject: "Select Project",
-      selectProjectPlaceholder: "Choose a project to analyze...",
-      industryType: "Industry Type",
-      dailyRevenue: "Daily Revenue (EUR)",
-      downtimeCost: "Downtime Cost/Hour (EUR)",
-      recoveryTime: "Recovery Time (Hours)",
-      dataLoss: "Data Loss Impact (EUR)",
-      reputationDamage: "Reputation Damage Cost (EUR)",
-      regulatoryFines: "Regulatory Fines (EUR)",
-      calculate: "Calculate",
-      selectProjectAndCalculate: "Select a project and enter data to calculate costs",
-      totalFinancialRisk: "Total Financial Risk",
-      potentialLoss: "Potential Loss",
-      perIncident: "Per Incident",
-      costBreakdown: "Cost Breakdown",
-      incidentResponse: "Incident Response Cost",
-      recovery: "Recovery and Remediation Cost",
-      annualizedLoss: "Annualized Loss Expectancy",
-      expectedAnnualLoss: "Expected Annual Loss (ALE)",
-      recommendedBudget: "Recommended Security Budget",
-      roi: "Return on Security Investment",
-      costBenefitRatio: "Cost-Benefit Ratio",
-      paybackPeriod: "Payback Period",
-      industryBenchmark: "Industry Benchmark",
-      industryAverage: "Industry Average",
-      yourPosition: "Your Position",
-    },
     // Research Validation Section
     researchValidation: "Research Validation",
     validationTitle: "Framework Validation and Research Findings",
     validationIntro:
       "The accuracy and effectiveness of the ICS-Risk framework have been validated through real-world case studies and comparisons with industry-standard frameworks.",
-
     validationCaseStudy: "Case Study: Steel Manufacturing Plant in Turkey",
     caseStudyContext:
       "The ICS-Risk framework was applied to a medium-sized steel manufacturing facility in Turkey with 150+ PLC/HMI devices from multiple vendors.",
@@ -694,7 +433,6 @@ export const translations = {
     caseStudyFinding2: "Initial risk score: 8.2/10 (Critical)",
     caseStudyFinding3: "After implementing recommendations: Reduced to 4.1/10 within 6 months",
     caseStudyFinding4: "Successfully prevented 2 actual attack attempts using the security recommendations",
-
     validationIEC: "Comparison with IEC 62443 Standard",
     iecComparison: "ICS-Risk results were compared against IEC 62443-3-3 (System Security Requirements) standards",
     iecAlignment: "Standard Alignment",
@@ -703,7 +441,6 @@ export const translations = {
     iecSL3: "Security Level 3 (SL3): 72% coverage",
     iecSL4: "Security Level 4 (SL4): 58% coverage",
     iecNote: "Gaps in higher security levels relate to physical hardware requirements and security certifications.",
-
     validationFeedback: "Expert Feedback",
     expertFeedback1:
       "Dr. Mohammad Al-Ahmad - OT Security Consultant: 'A practical and user-friendly tool for initial assessments'",
@@ -711,13 +448,11 @@ export const translations = {
       "Eng. Sara Yilmaz - Industrial Security Engineer: 'Comprehensive database covering common vulnerabilities'",
     expertFeedback3:
       "Dr. Hans Schmidt - Academic Researcher: 'Strong scientific methodology combining CVSS, STRIDE, and IEC 62443'",
-
     validationLimitations: "Current Limitations",
     limitation1: "Does not detect zero-day vulnerabilities or undocumented exploits",
     limitation2: "No active network scanning capability (passive assessment only)",
     limitation3: "Requires manual information input (no automatic discovery)",
     limitation4: "Database requires periodic manual updates",
-
     validationFuture: "Future Research Plan (Master's Thesis)",
     futureResearch:
       "This framework will be extended during my Master's studies in Industrial Cybersecurity to include:",
@@ -726,12 +461,30 @@ export const translations = {
     futureGoal3: "Intelligent recommendation system using NLP for ICS-CERT report analysis",
     futureGoal4: "Collaborative platform for vulnerability and solution sharing among engineers",
     futureGoal5: "Predictive model for future attacks on ICS systems",
-
     researchGap: "Targeted Research Gap",
     researchGapText:
       "Most industrial cybersecurity solutions require continuous internet connectivity and rely on cloud-based data. This framework addresses the gap in predictive security for offline industrial systems (air-gapped systems) through local analysis and machine learning.",
+
+    // Common
+    date: "Date",
+    status: "Status",
+    actions: "Actions",
+    delete: "Delete",
+
+    confirm: "Confirm",
+
+    // Risks
+    analysis: "Analysis",
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    informational: "Informational",
   },
   de: {
+    backToHome: "Zurück zur Startseite",
+    title: "ICS-Risk",
+    subtitle: "Risikobewertungs-Framework",
     // Header
     appTitle: "ICS-Risk: Ein Open-Source-Framework zur Risikobewertung industrieller Steuerungssysteme",
     appSubtitle: "Framework zur Risikobewertung und Bedrohungsmodellierung für industrielle Steuerungssysteme",
@@ -744,7 +497,7 @@ export const translations = {
     documentation: "Akademische Dokumentation",
     simulation: "Angriffssimulation",
     costAnalysis: "Kostenanalyse",
-    backToHome: "Zurück zur Startseite",
+
 
     // Navigation & Actions
     inputDetails: "Systemdetails eingeben",
@@ -796,7 +549,6 @@ export const translations = {
     footerText: "Alle Daten werden lokal gespeichert und niemals außerhalb des Geräts gesendet",
 
     // User Guide
-    userGuide: "Benutzerhandbuch",
     userGuideTitle: "ICS-Sicherheitsbewertungstool Benutzerhandbuch",
     backToApp: "Zurück zur App",
     printGuide: "Handbuch drucken",
@@ -821,6 +573,12 @@ export const translations = {
     guideFeature5Desc: "Exportieren Sie Ergebnisse im PDF- oder CSV-Format zur Überprüfung und Weitergabe",
     guideFeature6: "Mehrsprachige Unterstützung",
     guideFeature6Desc: "Benutzeroberfläche verfügbar in Arabisch, Englisch, Deutsch und Niederländisch",
+
+    guideNewTools: "Erweiterte Engineering-Tools",
+    guideNewToolsDesc: "Professionelle Werkzeuge gemäß globalen Industriestandards:",
+    guideIecDesc: "Interaktiver IEC 62443-3-3 Rechner zur Bestimmung von Target (SL-T) und Achieved (SL-A) Security Levels.",
+    guideRiskSimDesc: "Monte-Carlo-Simulations-Engine für probabilistische Risikobewertung und Verlustschätzung.",
+
 
     guideHowToUse: "Verwendung",
     guideStep1: "Schritt 1: Gerätedetails eingeben",
@@ -885,7 +643,6 @@ export const translations = {
     // Project Management
     projectManagement: "Projektverwaltung",
     projectManagementDesc: "Erstellen und verwalten Sie mehrere Sicherheitsbewertungsprojekte",
-    backToHome: "Zurück zur Startseite",
     newProject: "Neues Projekt",
     createNewProject: "Neues Projekt erstellen",
     createProjectDesc: "Geben Sie Details für das neue Projekt ein",
@@ -910,153 +667,11 @@ export const translations = {
     currentProject: "Aktuelles Projekt",
     viewAllProjects: "Alle Projekte anzeigen",
 
-    // Documentation
-    documentation: {
-      title: "Akademische Dokumentation",
-      subtitle: "Methodik, Referenzen und Forschungsrichtlinien",
-      downloadMethodology: "Methodik herunterladen",
-      methodology: "Methodik",
-      methodologyDesc: "Detaillierte Erklärung der Risikobewertungsalgorithmen und Frameworks",
-      references: "Referenzen",
-      referencesDesc: "Verwendete akademische Quellen und Industriestandards",
-      github: "GitHub-Repository",
-      githubDesc: "Quellcode und Beitragsrichtlinien",
-      riskFormula: "Risikobewertungsformel",
-      cvssDesc: "Durchschnittlicher Common Vulnerability Scoring System Score (0-10)",
-      internetDesc: "Binärer Indikator, ob das System mit dem Internet verbunden ist (0 oder 1)",
-      legacyDesc: "Binärer Indikator für nicht unterstützte/veraltete Systeme (0 oder 1)",
-      strideTitle: "STRIDE-Bedrohungsmodellierung",
-      strideDesc: "Umfassendes Bedrohungsanalyse-Framework von Microsoft entwickelt",
-      spoofing: "Identitätsfälschung und Authentifizierungsumgehung",
-      tampering: "Datenintegritätsverletzungen und unbefugte Änderungen",
-      repudiation: "Unfähigkeit, Aktionen nachzuverfolgen und Rechenschaftspflicht nachzuweisen",
-      disclosure: "Unbefugter Zugriff auf sensible Daten",
-      dos: "Systemverfügbarkeit und Ressourcenerschöpfung",
-      privilege: "Unbefugter Zugriff auf höhere Berechtigungen",
-      standards: "Sicherheitsstandards und Frameworks",
-      iec62443Desc:
-        "Internationaler Standard für die Sicherheit von industriellen Automatisierungs- und Steuerungssystemen",
-      nistDesc: "Framework zur Verbesserung der Cybersicherheit kritischer Infrastrukturen",
-      academicReferences: "Akademische Referenzen",
-      citation: "Wie man diese Arbeit zitiert",
-      license: "Lizenz und Nutzung",
-      licenseDesc:
-        "Dieses Projekt wird unter der MIT-Lizenz veröffentlicht und fördert die Open-Source-Zusammenarbeit in der industriellen Cybersicherheitsforschung.",
-      contributions: "Beiträge, Fehlerberichte und Feature-Anfragen sind auf GitHub willkommen.",
-    },
-
-    // Analytics
-    analytics: {
-      title: "Analytics-Dashboard",
-      subtitle: "Umfassende Statistiken und Einblicke aus allen Projekten",
-      overview: "Übersicht",
-      totalProjects: "Gesamtprojekte",
-      avgRiskScore: "Durchschnittliche Risikobewertung",
-      totalVulnerabilities: "Gesamte Schwachstellen",
-      criticalIssues: "Kritische Probleme",
-      riskDistribution: "Risikoverteilung",
-      deviceTypes: "Gerätetypen",
-      protocolUsage: "Protokollnutzung",
-      topVulnerabilities: "Top-Schwachstellen",
-      complianceStatus: "Compliance-Status",
-      industryBreakdown: "Branchenaufschlüsselung",
-      noData: "Keine Daten verfügbar",
-      createProjectsFirst: "Erstellen Sie Projekte, um Analysen zu sehen",
-    },
-
-    // Comparison
-    comparison: {
-      title: "Projektvergleich",
-      subtitle: "Vergleichen Sie mehrere Projekte nebeneinander",
-      selectProjects: "Projekte zum Vergleichen auswählen",
-      selectProjectsDesc: "Wählen Sie 2-4 Projekte zum Vergleichen",
-      compare: "Vergleichen",
-      clearSelection: "Auswahl löschen",
-      selectAtLeast2: "Bitte wählen Sie mindestens 2 Projekte zum Vergleichen",
-      riskComparison: "Risikovergleich",
-      systemConfiguration: "Systemkonfiguration",
-      vulnerabilityStats: "Schwachstellenstatistiken",
-      securityRecommendations: "Sicherheitsempfehlungen",
-      notAvailable: "Nicht verfügbar",
-    },
-
-    // Advanced Analysis
-    advancedAnalysis: {
-      title: "Erweiterte Analyse",
-      strideAnalysis: "STRIDE-Analyse",
-      attackTree: "Angriffsbaum",
-      compliance: "Compliance",
-      strideDesc: "Bedrohungsmodellierung mit STRIDE-Framework",
-      attackTreeDesc: "Potenzielle Angriffspfade mit Wahrscheinlichkeiten",
-      complianceDesc: "Compliance-Überprüfung mit internationalen Standards",
-      threatCategory: "Bedrohungskategorie",
-      level: "Stufe",
-      mitigation: "Minderung",
-      attackVector: "Angriffsvektor",
-      probability: "Wahrscheinlichkeit",
-      impact: "Auswirkung",
-      mitigationStatus: "Minderungsstatus",
-      standard: "Standard",
-      requirement: "Anforderung",
-      status: "Status",
-      compliant: "Konform",
-      nonCompliant: "Nicht konform",
-      partiallyCompliant: "Teilweise konform",
-    },
-    // Simulation
-    simulation: {
-      title: "Cyber-Angriffssimulation",
-      subtitle: "Testen Sie Angriffsszenarien und verstehen Sie potenzielle Eindringungspfade",
-      scenarios: "Verfügbare Szenarien",
-      run: "Ausführen",
-      selectScenario: "Wählen Sie ein Szenario, um die Simulation zu starten",
-      running: "Simulation läuft...",
-      attackSuccess: "Angriffserfolgwahrscheinlichkeit",
-      riskScore: "Risikobewertung",
-      attackPath: "Angriffspfad",
-      impact: "Kaskadierende Auswirkungen",
-      detectionPoints: "Erkennungspunkte",
-      prevention: "Präventionsmaßnahmen",
-      detection: "Erkennung",
-    },
-
-    costAnalysis: {
-      title: "Risikokostenanalyse",
-      subtitle: "Berechnen Sie die potenziellen finanziellen Auswirkungen von Cyberangriffen",
-      inputParameters: "Eingabeparameter",
-      selectProject: "Projekt auswählen",
-      selectProjectPlaceholder: "Wählen Sie ein Projekt zur Analyse...",
-      industryType: "Branche",
-      dailyRevenue: "Täglicher Umsatz (EUR)",
-      downtimeCost: "Ausfallkosten/Stunde (EUR)",
-      recoveryTime: "Wiederherstellungszeit (Stunden)",
-      dataLoss: "Datenverlustauswirkung (EUR)",
-      reputationDamage: "Reputationsschadenkosten (EUR)",
-      regulatoryFines: "Behördliche Bußgelder (EUR)",
-      calculate: "Berechnen",
-      selectProjectAndCalculate: "Wählen Sie ein Projekt und geben Sie Daten ein, um Kosten zu berechnen",
-      totalFinancialRisk: "Gesamtfinanzielles Risiko",
-      potentialLoss: "Potenzieller Verlust",
-      perIncident: "Pro Vorfall",
-      costBreakdown: "Kostenaufschlüsselung",
-      incidentResponse: "Incident-Response-Kosten",
-      recovery: "Wiederherstellungs- und Sanierungskosten",
-      annualizedLoss: "Annualisierte Verlusterwartung",
-      expectedAnnualLoss: "Erwarteter jährlicher Verlust (ALE)",
-      recommendedBudget: "Empfohlenes Sicherheitsbudget",
-      roi: "Sicherheitsinvestitionsrendite",
-      costBenefitRatio: "Kosten-Nutzen-Verhältnis",
-      paybackPeriod: "Amortisationszeit",
-      industryBenchmark: "Branchen-Benchmark",
-      industryAverage: "Branchendurchschnitt",
-      yourPosition: "Ihre Position",
-    },
     // Research Validation Section
     researchValidation: "Forschungsvalidierung",
     validationTitle: "Framework-Validierung und Forschungsergebnisse",
     validationIntro:
       "Die Genauigkeit und Wirksamkeit des ICS-Risk-Frameworks wurden durch reale Fallstudien und Vergleiche mit branchenüblichen Standards validiert.",
-
     validationCaseStudy: "Fallstudie: Stahlwerk in der Türkei",
     caseStudyContext:
       "Das ICS-Risk-Framework wurde auf ein mittelgroßes Stahlwerk in der Türkei mit über 150 PLC/HMI-Geräten verschiedener Hersteller angewendet.",
@@ -1065,7 +680,6 @@ export const translations = {
     caseStudyFinding2: "Anfänglicher Risiko-Score: 8,2/10 (Kritisch)",
     caseStudyFinding3: "Nach Umsetzung der Empfehlungen: Reduzierung auf 4,1/10 innerhalb von 6 Monaten",
     caseStudyFinding4: "Erfolgreich 2 tatsächliche Angriffsversuche durch die Sicherheitsempfehlungen verhindert",
-
     validationIEC: "Vergleich mit IEC 62443 Standard",
     iecComparison: "ICS-Risk-Ergebnisse wurden mit IEC 62443-3-3 (System Security Requirements) Standards verglichen",
     iecAlignment: "Standard-Ausrichtung",
@@ -1075,7 +689,6 @@ export const translations = {
     iecSL4: "Sicherheitsstufe 4 (SL4): 58% Abdeckung",
     iecNote:
       "Lücken in höheren Sicherheitsstufen beziehen sich auf physische Hardware-Anforderungen und Sicherheitszertifizierungen.",
-
     validationFeedback: "Experten-Feedback",
     expertFeedback1:
       "Dr. Mohammad Al-Ahmad - OT-Sicherheitsberater: 'Ein praktisches und benutzerfreundliches Tool für erste Bewertungen'",
@@ -1083,13 +696,11 @@ export const translations = {
       "Ing. Sara Yilmaz - Industriesicherheitsingenieurin: 'Umfassende Datenbank mit gängigen Schwachstellen'",
     expertFeedback3:
       "Dr. Hans Schmidt - Akademischer Forscher: 'Starke wissenschaftliche Methodik, die CVSS, STRIDE und IEC 62443 kombiniert'",
-
     validationLimitations: "Aktuelle Einschränkungen",
     limitation1: "Erkennt keine Zero-Day-Schwachstellen oder undokumentierte Exploits",
     limitation2: "Keine aktive Netzwerk-Scan-Funktion (nur passive Bewertung)",
     limitation3: "Erfordert manuelle Informationseingabe (keine automatische Erkennung)",
     limitation4: "Datenbank erfordert regelmäßige manuelle Updates",
-
     validationFuture: "Zukünftiger Forschungsplan (Masterarbeit)",
     futureResearch:
       "Dieses Framework wird während meines Masterstudiums in industrieller Cybersicherheit erweitert um:",
@@ -1098,12 +709,257 @@ export const translations = {
     futureGoal3: "Intelligentes Empfehlungssystem mit NLP zur ICS-CERT-Berichtsanalyse",
     futureGoal4: "Kollaborative Plattform zum Austausch von Schwachstellen und Lösungen zwischen Ingenieuren",
     futureGoal5: "Prädiktives Modell für zukünftige Angriffe auf ICS-Systeme",
-
     researchGap: "Anvisierte Forschungslücke",
     researchGapText:
       "Die meisten industriellen Cybersicherheitslösungen benötigen eine kontinuierliche Internetverbindung und basieren auf Cloud-Daten. Dieses Framework schließt die Lücke in der prädiktiven Sicherheit für offline industrielle Systeme (Air-Gapped-Systeme) durch lokale Analyse und maschinelles Lernen.",
+
+    // Common
+    date: "Datum",
+    status: "Status",
+    actions: "Aktionen",
+    delete: "Löschen",
+
+    confirm: "Bestätigen",
+
+    // Risks
+    analysis: "Analyse",
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    informational: "Informativ",
+  },
+  tr: {
+    backToHome: "Ana Sayfaya Dön",
+    title: "ICS-Risk",
+    subtitle: "Risk Değerlendirme Çerçevesi",
+    // Header
+    appTitle: "ICS-Risk: Endüstriyel Kontrol Sistemleri İçin Açık Kaynaklı Risk Değerlendirme Çerçevesi",
+    appSubtitle: "An Open-Source Framework for Risk Assessment and Threat Modeling in Industrial Control Systems",
+    designedBy: "Geliştiren: Osama Ali | Endüstriyel Siber Güvenlik Yüksek Lisans Öğrencisi",
+    language: "Dil",
+    newAssessment: "Yeni Değerlendirme",
+    savedProjects: "Kaydedilen Projeler",
+    analytics: "Analizler",
+    userGuide: "Kullanıcı Rehberi",
+    documentation: "Akademik Dokümantasyon",
+    simulation: "Saldırı Simülasyonu",
+    costAnalysis: "Maliyet Analizi",
+
+    // Navigation & Actions
+    inputDetails: "Sistem Detaylarını Girin",
+    inputDescription: "Kapsamlı bir güvenlik değerlendirmesi için ICS sistem bilgilerinizi giriniz",
+    results: "Değerlendirme Sonuçları",
+    analyzeBtn: "Güvenliği Analiz Et",
+    exportPDF: "PDF Dışa Aktar",
+    exportCSV: "CSV Dışa Aktar",
+
+    // Form Fields
+    deviceType: "Cihaz Tipi",
+    manufacturer: "Üretici",
+    model: "Model",
+    activeProtocols: "Aktif Protokoller",
+    interfaces: "Bağlantı Arayüzleri",
+    osVersion: "İşletim Sistemi Sürümü (İsteğe Bağlı)",
+    internetConnected: "İnternet Bağlantısı",
+    connectedToIT: "IT Ağına Bağlı",
+    legacyDevice: "Eski / Desteklenmeyen Cihaz",
+
+    // Placeholders
+    selectDevice: "Cihaz tipini seçin...",
+    selectManufacturer: "Üreticiyi seçin...",
+    selectModel: "Modeli seçin...",
+    osPlaceholder: "Örn: Windows 10, Linux Kernel 5.4...",
+
+    // Results Display
+    riskScore: "Risk Puanı",
+    riskAssessment: "Kapsamlı Güvenlik Değerlendirmesi",
+    attackSurface: "Saldırı Yüzeyi",
+    exposureLevel: "Maruz Kalma Seviyesi",
+    criticalPoints: "Kritik Noktalar",
+    vulnerabilities: "Tespit Edilen Zaafiyetler",
+    recommendations: "Güvenlik Önerileri",
+
+    // Table Headers
+    cveId: "CVE ID",
+    description: "Açıklama",
+    cvss: "CVSS",
+    severity: "Ciddiyet",
+    category: "Kategori",
+    recommendation: "Öneri",
+
+    // Empty State
+    emptyState: "Güvenlik değerlendirmesi almak için formu doldurun",
+
+    // Footer
+    footerText: "Tüm veriler yereldir ve cihaz dışına gönderilmez",
+
+    // User Guide - Main sections
+    userGuideTitle: "Endüstriyel Kontrol Sistemleri Güvenlik Değerlendirme Aracı Kullanım Kılavuzu",
+    backToApp: "Uygulamaya Dön",
+    printGuide: "Kılavuzu Yazdır",
+
+    // Guide Sections
+    guideIntro: "Giriş",
+    guideIntroContent:
+      "Bu uygulama, endüstriyel güvenlik mühendislerinin ICS sistemlerinin güvenlik risklerini değerlendirmesine yardımcı olmak için tasarlanmıştır. Uygulama sistem detaylarını analiz eder ve risk puanı, bilinen zaafiyetler ve öneriler içeren kapsamlı bir rapor oluşturur.",
+
+    guideFeatures: "Temel Özellikler",
+    guideFeature1: "Kapsamlı Risk Değerlendirmesi",
+    guideFeature1Desc: "CVSS, internet maruziyeti ve eski cihaz durumunu dikkate alan hassas risk puanı hesaplaması",
+    guideFeature2: "Güncel Zaafiyet Veritabanı",
+    guideFeature2Desc: "PLC, HMI, RTU ve DCS sistemleri için bilinen CVE zaafiyetlerine erişim",
+    guideFeature3: "Özel Güvenlik Önerileri",
+    guideFeature3Desc: "Cihaz tipi ve tespit edilen zaafiyetlere göre spesifik güvenlik tavsiyeleri",
+    guideFeature4: "Saldırı Yüzeyi Haritası",
+    guideFeature4Desc: "Potansiyel saldırı noktalarının ve maruz kalma seviyesinin görsel haritası",
+    guideFeature5: "Rapor Dışa Aktarma",
+    guideFeature5Desc: "Sonuçları incelemek ve paylaşmak için PDF veya CSV formatında dışa aktarma",
+    guideFeature6: "Çoklu Dil Desteği",
+    guideFeature6Desc: "Arapça, İngilizce, Almanca ve Türkçe arayüz desteği",
+
+    guideNewTools: "Gelişmiş Mühendislik Araçları",
+    guideNewToolsDesc: "Küresel endüstriyel standartları uygulayan profesyonel araçlar:",
+    guideIecDesc: "Hedef (SL-T) ve Elde Edilen (SL-A) Güvenlik Seviyelerini belirlemek için interaktif IEC 62443-3-3 hesaplayıcısı.",
+    guideRiskSimDesc: "Olasılıksal risk değerlendirmesi ve beklenen kayıp tahmini için Monte Carlo simülasyon motoru.",
+
+    guideHowToUse: "Nasıl Kullanılır",
+    guideStep1: "Adım 1: Cihaz Detaylarını Girin",
+    guideStep1Desc: "Ekranın sol tarafındaki formda endüstriyel kontrol sistemi detaylarını girin. Seçmeniz gerekenler:",
+    guideStep1Item1: "Cihaz Tipi: PLC (Programlanabilir Mantık Denetleyicisi), HMI (İnsan-Makine Arayüzü), RTU veya DCS Kontrolcüsü",
+    guideStep1Item2: "Üretici: Siemens, Allen-Bradley, Schneider Electric veya Mitsubishi Electric gibi",
+    guideStep1Item3: "Model: S7-1200 veya ControlLogix gibi belirli cihaz modeli",
+    guideStep1Item4: "Aktif Protokoller: Modbus TCP, Profinet, DNP3 veya EtherNet/IP gibi kullanılan tüm protokolleri seçin",
+    guideStep1Item5: "İletişim Arayüzleri: Cihazın ağa nasıl bağlandığını seçin (Ethernet, Seri, Kablosuz veya Fiber Optik)",
+    guideStep1Item6: "İşletim Sistemi (İsteğe Bağlı): Cihaz belirli bir işletim sistemi üzerinde çalışıyorsa buraya girebilirsiniz",
+    guideStep2: "Adım 2: Maruz Kalma ve Güvenlik Ayarları",
+    guideStep2Desc: "Doğru değerlendirme için aşağıdaki ayarları yapılandırın:",
+    guideStep2Item1: "İnternete Bağlı: Cihazın doğrudan internet bağlantısı varsa bunu işaretleyin",
+    guideStep2Item2: "IT Ağına Bağlı: Cihaz şirketin IT ağına bağlıysa bunu işaretleyin",
+    guideStep2Item3: "Eski/Desteklenmeyen Cihaz: Cihaz artık üretici tarafından desteklenmiyorsa veya güvenlik güncellemeleri almıyorsa bunu işaretleyin",
+
+    guideStep3: "Adım 3: Güvenliği Analiz Et",
+    guideStep3Desc: "Tüm bilgileri girdikten sonra 'Güvenliği Analiz Et' butonuna tıklayın. Uygulama verileri işleyecek ve sonuçları ekranın sağ tarafında görüntüleyecektir.",
+    guideStep3Item1: "Genel Risk Puanı (0-100)",
+    guideStep3Item2: "Risk Seviyesi (Düşük, Orta, Yüksek, Kritik)",
+    guideStep3Item3: "Saldırı Yüzeyi Haritası",
+    guideStep3Item4: "Bulunan Zaafiyetler Listesi",
+    guideStep4: "Adım 4: Sonuçları İnceleyin",
+    guideStep4Desc: "Şunları içeren kapsamlı bir rapor alacaksınız:",
+    guideStep4Item1: "Risk Puanı: Renk göstergeli 0-10 arası bir sayı (yeşil = düşük, sarı = orta, kırmızı = yüksek)",
+    guideStep4Item2: "Saldırı Yüzeyi Haritası: Potansiyel saldırı noktalarının görsel gösterimi",
+    guideStep4Item3: "Zaafiyetler Listesi: CVE ID, CVSS puanı ve açıklamasıyla birlikte bilinen tüm zaafiyetleri içeren tablo",
+    guideStep4Item4: "Güvenlik Önerileri: Sistemi güvence altına almak için özel ipuçları",
+
+    guideStep5: "Adım 5: Raporu Dışa Aktar",
+    guideStep5Desc: "Sonuçları iki formatta dışa aktarabilirsiniz: Ayrıntılı, yazdırılabilir ve paylaşılabilir bir rapor için PDF veya verileri Excel gibi diğer programlara aktarmak için CSV.",
+
+    guideRiskCalculation: "Risk Hesaplama Metodolojisi",
+    guideRiskCalculationDesc: "Risk puanı aşağıdaki faktörlerin ağırlıklı toplamı ile hesaplanır:",
+    guideRiskFormula: "Risk = (Ortalama CVSS × 0.6) + (İnternet Bağlantısı × 0.3) + (Eski Cihaz × 0.1)",
+    guideRiskFormulaDesc: "Not: Sonuç 0-100 ölçeğine normalleştirilir.",
+
+    guideTips: "Önemli İpuçları",
+    guideTip1: "Doğru sonuçlar için cihaz türünü ve modelini dikkatli seçin.",
+    guideTip2: "Eğer cihazınız listede yoksa, en yakın cihaz türünü seçin.",
+    guideTip3: "İnternet bağlantısı risk puanını önemli ölçüde artırır.",
+    guideTip4: "Eski cihazlar (Legacy) modern güvenlik özelliklerinden yoksun oldukları için daha yüksek risk taşır.",
+
+    guidePrivacy: "Gizlilik ve Güvenlik",
+    guidePrivacyDesc: "Bu uygulamada girilen tüm veriler cihazınızda yerel olarak kalır ve asla herhangi bir harici sunucuya gönderilmez. İlk indirmeden sonra uygulamayı çevrimdışı kullanabilirsiniz.",
+
+    guideSupport: "Destek ve Yardım",
+    guideSupportDesc: "Herhangi bir sorunla karşılaşırsanız veya uygulamayı geliştirmek için önerileriniz varsa, lütfen teknik destek ile iletişime geçin.",
+
+    // Project Management
+    projectManagement: "Proje Yönetimi",
+    projectManagementDesc: "Birden fazla güvenlik değerlendirme projesi oluşturun ve yönetin",
+    newProject: "Yeni Proje",
+    createNewProject: "Yeni Proje Oluştur",
+    createProjectDesc: "Yeni proje için detayları girin",
+    projectNamePlaceholder: "Örn: Ana Üretim Tesisi",
+    projectDescription: "Proje Açıklaması",
+    projectDescPlaceholder: "Projenin kısa açıklaması...",
+    industry: "Endüstri",
+    create: "Oluştur",
+    cancel: "İptal",
+    importProject: "Proje İçe Aktar",
+    noProjects: "Proje Yok",
+    noProjectsDesc: "İlk projenizi oluşturarak başlayın",
+    createFirstProject: "İlk Projeyi Oluştur",
+    noDescription: "Açıklama yok",
+    created: "Oluşturuldu",
+    updated: "Güncellendi",
+    open: "Aç",
+    confirmDelete: "Bu projeyi silmek istediğinizden emin misiniz?",
+    importSuccess: "Proje başarıyla içe aktarıldı!",
+    viewAllProjects: "Tüm Projeleri Görüntüle",
+
+    // Research Validation
+    researchValidation: "Araştırma Doğrulaması",
+    validationTitle: "Çerçeve Doğrulaması ve Araştırma Bulguları",
+    validationIntro: "ICS-Risk çerçevesinin doğruluğu ve etkinliği, gerçek dünya vaka çalışmaları ve endüstri standardı çerçevelerle yapılan karşılaştırmalarla doğrulanmıştır.",
+    validationCaseStudy: "Vaka Çalışması: Türkiye'de Çelik Üretim Tesisi",
+    caseStudyContext: "ICS-Risk çerçevesi, Türkiye'de birden fazla satıcıdan 150'den fazla PLC/HMI cihazı bulunan orta ölçekli bir çelik üretim tesisine uygulandı.",
+    caseStudyFindings: "Temel Bulgular",
+    caseStudyFinding1: "Teknik ekip tarafından bilinmeyen 15'i dahil olmak üzere 23 kritik zaafiyet tespit edildi",
+    caseStudyFinding2: "Başlangıç risk puanı: 8.2/10 (Kritik)",
+    caseStudyFinding3: "Önerilerin uygulanmasından sonra: 6 ay içinde 4.1/10'a düştü",
+    caseStudyFinding4: "Güvenlik önerileri kullanılarak 2 gerçek saldırı girişimi başarıyla önlendi",
+    validationIEC: "IEC 62443 Standardı ile Karşılaştırma",
+    iecComparison: "ICS-Risk sonuçları, IEC 62443-3-3 (Sistem Güvenlik Gereksinimleri) standartlarına göre karşılaştırıldı",
+    iecAlignment: "Standart Uyumu",
+    iecSL1: "Güvenlik Seviyesi 1 (SL1): %95 kapsam",
+    iecSL2: "Güvenlik Seviyesi 2 (SL2): %87 kapsam",
+    iecSL3: "Güvenlik Seviyesi 3 (SL3): %72 kapsam",
+    iecSL4: "Güvenlik Seviyesi 4 (SL4): %58 kapsam",
+    iecNote: "Daha yüksek güvenlik seviyelerindeki boşluklar, fiziksel donanım gereksinimleri ve güvenlik sertifikaları ile ilgilidir.",
+    validationFeedback: "Uzman Görüşleri",
+    expertFeedback1: "Dr. Mohammad Al-Ahmad - OT Güvenlik Danışmanı: 'İlk değerlendirmeler için pratik ve kullanıcı dostu bir araç'",
+    expertFeedback2: "Müh. Sara Yılmaz - Endüstriyel Güvenlik Mühendisi: 'Yaygın zaafiyetleri kapsayan kapsamlı veritabanı'",
+    expertFeedback3: "Dr. Hans Schmidt - Akademik Araştırmacı: 'CVSS, STRIDE ve IEC 62443'ü birleştiren güçlü bilimsel metodoloji'",
+    validationLimitations: "Mevcut Sınırlamalar",
+    limitation1: "Sıfırıncı gün (zero-day) zaafiyetlerini veya belgelenmemiş istismarları tespit etmez",
+    limitation2: "Aktif ağ tarama özelliği yok (yalnızca pasif değerlendirme)",
+
+    // Project Features
+    projectName: "Proje Adı",
+    currentProject: "Mevcut Proje",
+    saveProject: "Projeyi Kaydet",
+    loadProject: "Projeyi Yükle",
+    deleteProject: "Projeyi Sil",
+
+
+    // Common
+    date: "Tarih",
+    status: "Durum",
+    actions: "İşlemler",
+    delete: "Sil",
+
+    confirm: "Onayla",
+
+    // Risks
+    analysis: "Analiz",
+    critical: "Kritik",
+    high: "Yüksek",
+    medium: "Orta",
+    low: "Düşük",
+    informational: "Bilgi",
+
+    // Missing Keys from German/English
+    limitation3: "Manuel veri girişi gerektirir (Otomatik algılama yok)",
+    limitation4: "Veritabanı düzenli manuel güncelleme gerektirir",
+    validationFuture: "Gelecek Araştırma Planı (Yüksek Lisans Tezi)",
+    futureResearch: "Bu çerçeve, endüstriyel siber güvenlik alanındaki yüksek lisans çalışmaları kapsamında şu şekilde genişletilecektir:",
+    futureGoal1: "Tahmine dayalı güvenlik için ML tabanlı anomali tespiti",
+    futureGoal2: "Ağ tarama araçlarıyla entegrasyon (Nmap, Wireshark)",
+    futureGoal3: "ICS-CERT raporlarını analiz etmek için NLP tabanlı akıllı öneri sistemi",
+    futureGoal4: "Mühendisler arasında zaafiyet ve çözüm paylaşımı için işbirlikçi platform",
+    futureGoal5: "ICS sistemlerine yönelik gelecekteki saldırılar için tahmine dayalı model",
+    researchGap: "Hedeflenen Araştırma Boşluğu",
+    researchGapText: "Çoğu endüstriyel siber güvenlik çözümü sürekli internet bağlantısı gerektirir ve bulut tabanlı verilere dayanır. Bu çerçeve, yerel analiz ve makine öğrenimi yoluyla çevrimdışı endüstriyel sistemler (air-gapped sistemler) için tahmine dayalı güvenlik boşluğunu doldurur.",
   },
 }
 
-export type Language = "ar" | "en" | "de"
+export type Language = "ar" | "en" | "de" | "tr"
 export type Translations = typeof translations.ar

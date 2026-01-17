@@ -67,7 +67,7 @@ export default function UserGuidePage() {
         <Card className="p-6 mb-8">
           <h2 className="text-2xl font-bold mb-4">{t("guideFeatures")}</h2>
           <div className="space-y-4">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
               <div key={num} className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
                 <div>
@@ -161,6 +161,27 @@ export default function UserGuidePage() {
             </div>
             <p className="text-muted-foreground ml-11">{t("guideStep5Desc")}</p>
           </div>
+
+          {/* New Tools Section */}
+          <div className="mb-6 border-t pt-6 mt-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                *
+              </div>
+              <h3 className="text-xl font-semibold">{t("guideNewTools")}</h3>
+            </div>
+            <p className="text-muted-foreground mb-3 ml-11">{t("guideNewToolsDesc")}</p>
+            <div className="ml-11 grid md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-bold mb-2">IEC 62443 Calculator</h4>
+                <p className="text-sm text-muted-foreground">{t("guideIecDesc")}</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-bold mb-2">Risk Simulation</h4>
+                <p className="text-sm text-muted-foreground">{t("guideRiskSimDesc")}</p>
+              </div>
+            </div>
+          </div>
         </Card>
 
         {/* Risk Calculation */}
@@ -171,10 +192,10 @@ export default function UserGuidePage() {
             <code className="text-sm font-mono">{t("guideRiskFormula")}</code>
           </div>
           <p className="text-sm text-muted-foreground">{t("guideRiskFormulaDesc")}</p>
-        </Card>
+        </Card >
 
         {/* Important Tips */}
-        <Card className="p-6 mb-8">
+        < Card className="p-6 mb-8" >
           <div className="flex items-start gap-3 mb-4">
             <AlertTriangle className="w-6 h-6 text-yellow-500 mt-1" />
             <h2 className="text-2xl font-bold">{t("guideTips")}</h2>
@@ -189,25 +210,25 @@ export default function UserGuidePage() {
               </li>
             ))}
           </ul>
-        </Card>
+        </Card >
 
         {/* Privacy */}
-        <Card className="p-6 mb-8 bg-green-500/5">
+        < Card className="p-6 mb-8 bg-green-500/5" >
           <h2 className="text-2xl font-bold mb-3">{t("guidePrivacy")}</h2>
           <p className="text-muted-foreground leading-relaxed">{t("guidePrivacyDesc")}</p>
-        </Card>
+        </Card >
 
         {/* Support */}
-        <Card className="p-6 mb-8">
+        < Card className="p-6 mb-8" >
           <h2 className="text-2xl font-bold mb-3">{t("guideSupport")}</h2>
           <p className="text-muted-foreground leading-relaxed">{t("guideSupportDesc")}</p>
-        </Card>
+        </Card >
 
         {/* Footer - Print only */}
-        <div className="hidden print:block text-center py-6 border-t mt-8">
+        < div className="hidden print:block text-center py-6 border-t mt-8" >
           <p className="text-sm text-muted-foreground">{t("footerText")}</p>
-        </div>
-      </div>
-    </main>
+        </div >
+      </div >
+    </main >
   )
 }

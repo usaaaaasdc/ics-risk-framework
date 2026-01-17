@@ -17,11 +17,13 @@ export function HowItWorksSection() {
             {language === "ar" && "كيف يعمل ICS-Risk؟"}
             {language === "en" && "How Does ICS-Risk Work?"}
             {language === "de" && "Wie funktioniert ICS-Risk?"}
+            {language === "tr" && "ICS-Risk Nasıl Çalışır?"}
           </h2>
           <p className="text-lg text-muted-foreground">
             {language === "ar" && "رحلة بسيطة من 4 خطوات للحصول على تقييم أمني كامل"}
             {language === "en" && "A simple 4-step journey to get a complete security assessment"}
             {language === "de" && "Eine einfache 4-Schritte-Reise zu einer vollständigen Sicherheitsbewertung"}
+            {language === "tr" && "Tam güvenlik değerlendirmesi almak için 4 adımlı basit bir yolculuk"}
           </p>
         </div>
 
@@ -38,12 +40,14 @@ export function HowItWorksSection() {
                     {language === "ar" && "إدخال تفاصيل النظام"}
                     {language === "en" && "Input System Details"}
                     {language === "de" && "Systemdetails eingeben"}
+                    {language === "tr" && "Sistem Detaylarını Girin"}
                   </h3>
                 </div>
                 <p className="text-muted-foreground">
                   {language === "ar" && "اختر الأجهزة، البروتوكولات، التوصيلات، والبيئة"}
                   {language === "en" && "Choose devices, protocols, connections, and environment"}
                   {language === "de" && "Wählen Sie Geräte, Protokolle, Verbindungen und Umgebung"}
+                  {language === "tr" && "Cihazları, protokolleri, bağlantıları ve ortamı seçin"}
                 </p>
               </div>
             </div>
@@ -61,12 +65,14 @@ export function HowItWorksSection() {
                     {language === "ar" && "التقييم الآلي"}
                     {language === "en" && "Automated Assessment"}
                     {language === "de" && "Automatisierte Bewertung"}
+                    {language === "tr" && "Otomatik Değerlendirme"}
                   </h3>
                 </div>
                 <p className="text-muted-foreground">
                   {language === "ar" && "نحصل على درجة المخاطر + الثغرات + تحليل STRIDE"}
                   {language === "en" && "Get risk score + vulnerabilities + STRIDE analysis"}
                   {language === "de" && "Erhalten Sie Risikobewertung + Schwachstellen + STRIDE-Analyse"}
+                  {language === "tr" && "Risk puanı + zaafiyetler + STRIDE analizi alın"}
                 </p>
               </div>
             </div>
@@ -84,12 +90,14 @@ export function HowItWorksSection() {
                     {language === "ar" && "التوصيات الذكية"}
                     {language === "en" && "Smart Recommendations"}
                     {language === "de" && "Intelligente Empfehlungen"}
+                    {language === "tr" && "Akıllı Öneriler"}
                   </h3>
                 </div>
                 <p className="text-muted-foreground">
                   {language === "ar" && "خطة علاج مرتبة حسب الأولوية والتكلفة والفعالية"}
                   {language === "en" && "Remediation plan prioritized by severity, cost, and effectiveness"}
                   {language === "de" && "Sanierungsplan nach Priorität, Kosten und Wirksamkeit"}
+                  {language === "tr" && "Ciddiyet, maliyet ve etkinliğe göre önceliklendirilmiş iyileştirme planı"}
                 </p>
               </div>
             </div>
@@ -107,12 +115,14 @@ export function HowItWorksSection() {
                     {language === "ar" && "التصدير والمشاركة"}
                     {language === "en" && "Export & Share"}
                     {language === "de" && "Exportieren & Teilen"}
+                    {language === "tr" && "Dışa Aktar ve Paylaş"}
                   </h3>
                 </div>
                 <p className="text-muted-foreground">
                   {language === "ar" && "صدّر التقارير بصيغة PDF أو CSV أو قارن المشاريع"}
                   {language === "en" && "Export reports as PDF, CSV, or compare projects"}
                   {language === "de" && "Berichte als PDF, CSV exportieren oder Projekte vergleichen"}
+                  {language === "tr" && "Raporları PDF, CSV olarak dışa aktarın veya projeleri karşılaştırın"}
                 </p>
               </div>
             </div>
@@ -126,6 +136,7 @@ export function HowItWorksSection() {
               {language === "ar" && "شاهد الدليل الكامل"}
               {language === "en" && "View Complete Guide"}
               {language === "de" && "Vollständige Anleitung anzeigen"}
+              {language === "tr" && "Tam Kılavuzu Görüntüle"}
             </Button>
           </Link>
         </div>

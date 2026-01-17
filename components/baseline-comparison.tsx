@@ -22,6 +22,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
             {language === "ar" && "لا توجد متطلبات أساسية محددة لهذا الجهاز"}
             {language === "en" && "No specific baseline requirements defined for this device"}
             {language === "de" && "Keine spezifischen Baseline-Anforderungen für dieses Gerät definiert"}
+            {language === "tr" && "Bu cihaz için tanımlanmış belirli bir temel gereksinim yok"}
           </p>
         </div>
       </Card>
@@ -50,6 +51,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
             {language === "ar" && "الامتثال للحد الأدنى الأمني"}
             {language === "en" && "Secure Baseline Compliance"}
             {language === "de" && "Einhaltung der Sicherheitsbaseline"}
+            {language === "tr" && "Güvenli Temel Uyumluluğu"}
           </h3>
           {getComplianceBadge(comparison.compliance)}
         </div>
@@ -63,6 +65,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
               {language === "ar" && "نسبة الامتثال"}
               {language === "en" && "Compliance"}
               {language === "de" && "Konformität"}
+              {language === "tr" && "Uyumluluk"}
             </p>
           </div>
           <div className="text-center">
@@ -74,6 +77,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
               {language === "ar" && "مستوفاة"}
               {language === "en" && "Met"}
               {language === "de" && "Erfüllt"}
+              {language === "tr" && "Karşılandı"}
             </p>
           </div>
           <div className="text-center">
@@ -85,19 +89,19 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
               {language === "ar" && "غير مستوفاة"}
               {language === "en" && "Unmet"}
               {language === "de" && "Nicht erfüllt"}
+              {language === "tr" && "Karşılanmadı"}
             </p>
           </div>
         </div>
 
         <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
           <div
-            className={`h-full transition-all ${
-              comparison.compliance >= 80
+            className={`h-full transition-all ${comparison.compliance >= 80
                 ? "bg-green-600"
                 : comparison.compliance >= 50
                   ? "bg-yellow-600"
                   : "bg-red-600"
-            }`}
+              }`}
             style={{ width: `${comparison.compliance}%` }}
           />
         </div>
@@ -111,6 +115,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
             {language === "ar" && "الفجوات الأمنية"}
             {language === "en" && "Security Gaps"}
             {language === "de" && "Sicherheitslücken"}
+            {language === "tr" && "Güvenlik Boşlukları"}
           </h3>
 
           <div className="space-y-3">
@@ -122,6 +127,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
                       {language === "ar" && gap.requirement_ar}
                       {language === "en" && gap.requirement}
                       {language === "de" && gap.requirement_de}
+                      {language === "tr" && (gap.requirement_tr || gap.requirement)}
                     </div>
                     <div className="text-sm text-muted-foreground">{gap.category}</div>
                   </div>
@@ -141,6 +147,7 @@ export function BaselineComparison({ comparison }: BaselineComparisonProps) {
                   {language === "ar" && "المعيار"}
                   {language === "en" && "Standard"}
                   {language === "de" && "Standard"}: {gap.standard}
+                  {language === "tr" && "Standart"}: {gap.standard}
                 </div>
               </div>
             ))}

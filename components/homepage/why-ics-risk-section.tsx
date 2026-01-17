@@ -17,11 +17,13 @@ export function WhyICSRiskSection() {
             {language === "ar" && "لماذا ICS-Risk؟"}
             {language === "en" && "Why ICS-Risk?"}
             {language === "de" && "Warum ICS-Risk?"}
+            {language === "tr" && "Neden ICS-Risk?"}
           </h2>
           <p className="text-lg text-muted-foreground">
             {language === "ar" && "ثلاث مزايا فريدة تميزنا عن الأدوات التجارية"}
             {language === "en" && "Three unique advantages that set us apart from commercial tools"}
             {language === "de" && "Drei einzigartige Vorteile, die uns von kommerziellen Tools unterscheiden"}
+            {language === "tr" && "Bizi ticari araçlardan ayıran üç benzersiz avantaj"}
           </p>
         </div>
 
@@ -34,6 +36,7 @@ export function WhyICSRiskSection() {
               {language === "ar" && "خصوصية كاملة"}
               {language === "en" && "Complete Privacy"}
               {language === "de" && "Vollständige Privatsphäre"}
+              {language === "tr" && "Tam Gizlilik"}
             </h3>
             <p className="text-muted-foreground text-lg leading-relaxed">
               {language === "ar" && "100% بدون اتصال. لا إرسال بيانات، لا تتبع. مثالي للبنية التحتية الحرجة."}
@@ -41,6 +44,8 @@ export function WhyICSRiskSection() {
                 "100% offline. No data transmission, no tracking. Ideal for critical infrastructure."}
               {language === "de" &&
                 "100% offline. Keine Datenübertragung, kein Tracking. Ideal für kritische Infrastruktur."}
+              {language === "tr" &&
+                "%100 çevrimdışı. Veri iletimi yok, izleme yok. Kritik altyapi için ideal."}
             </p>
           </Card>
 
@@ -52,6 +57,7 @@ export function WhyICSRiskSection() {
               {language === "ar" && "عالمي ومتعدد اللغات"}
               {language === "en" && "Global & Multilingual"}
               {language === "de" && "Global & Mehrsprachig"}
+              {language === "tr" && "Küresel ve Çok Dilli"}
             </h3>
             <p className="text-muted-foreground text-lg leading-relaxed">
               {language === "ar" &&
@@ -60,6 +66,8 @@ export function WhyICSRiskSection() {
                 "Supports Arabic, English, German. Covers Western and Asian vendors like HollySys and INVT."}
               {language === "de" &&
                 "Unterstützt Arabisch, Englisch, Deutsch. Umfasst westliche und asiatische Hersteller wie HollySys und INVT."}
+              {language === "tr" &&
+                "Arapça, İngilizce, Almanca ve Türkçe destekler. HollySys ve INVT gibi Batılı ve Asyalı üreticileri kapsar."}
             </p>
           </Card>
 
@@ -71,6 +79,7 @@ export function WhyICSRiskSection() {
               {language === "ar" && "أكاديمي وتعليمي"}
               {language === "en" && "Academic & Educational"}
               {language === "de" && "Akademisch & Bildungsreich"}
+              {language === "tr" && "Akademik ve Eğitsel"}
             </h3>
             <p className="text-muted-foreground text-lg leading-relaxed">
               {language === "ar" && "مبني على CVSS وSTRIDE وIEC 62443. مثالي للأبحاث والتدريب ودراسات الحالة."}
@@ -78,6 +87,8 @@ export function WhyICSRiskSection() {
                 "Built with CVSS, STRIDE, IEC 62443. Perfect for research, training, and case studies."}
               {language === "de" &&
                 "Entwickelt mit CVSS, STRIDE, IEC 62443. Perfekt für Forschung, Schulung und Fallstudien."}
+              {language === "tr" &&
+                "CVSS, STRIDE, IEC 62443 ile oluşturuldu. Araştırma, eğitim ve vaka çalışmaları için mükemmel."}
             </p>
           </Card>
         </div>
@@ -88,6 +99,7 @@ export function WhyICSRiskSection() {
               {language === "ar" && "اقرأ المزيد عن المشروع"}
               {language === "en" && "Read More About the Project"}
               {language === "de" && "Mehr über das Projekt erfahren"}
+              {language === "tr" && "Proje Hakkında Daha Fazla Bilgi"}
               <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>
@@ -95,6 +107,7 @@ export function WhyICSRiskSection() {
             {language === "ar" && "مفتوح المصدر • MIT License • مجاني للأبد"}
             {language === "en" && "Open Source • MIT License • Free Forever"}
             {language === "de" && "Open Source • MIT-Lizenz • Für immer kostenlos"}
+            {language === "tr" && "Açık Kaynak • MIT Lisansı • Sonsuza Kadar Ücretsiz"}
           </div>
         </div>
       </div>

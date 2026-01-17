@@ -79,6 +79,7 @@ export function RiskDisplay({ assessment, onExportCSV, onExportPDF }: RiskDispla
             {language === "ar" && "مقارنة مع الحد الأدنى الأمني"}
             {language === "en" && "Secure Baseline Comparison"}
             {language === "de" && "Vergleich mit Sicherheitsbaseline"}
+            {language === "tr" && "Güvenli Temel Karşılaştırması"}
           </h3>
           <BaselineComparison comparison={assessment.baselineComparison} />
         </div>
@@ -138,6 +139,7 @@ export function RiskDisplay({ assessment, onExportCSV, onExportPDF }: RiskDispla
                   {language === "ar" && "الثقة"}
                   {language === "en" && "Confidence"}
                   {language === "de" && "Vertrauen"}
+                  {language === "tr" && "Güven"}
                 </TableHead>
                 <TableHead className="text-right">{t("category")}</TableHead>
                 <TableHead className="text-right">{t("recommendation")}</TableHead>

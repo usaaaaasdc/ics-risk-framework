@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { AlertTriangle, Globe, Network, Shield, Wifi } from "lucide-react"
 import type { SystemConfig } from "@/lib/risk-engine"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 interface AttackSurfaceMapProps {
   config: SystemConfig
@@ -10,6 +11,8 @@ interface AttackSurfaceMapProps {
 }
 
 export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
+  const { language } = useLanguage()
+
   const getRiskColor = () => {
     switch (riskLevel) {
       case "LOW":
@@ -30,6 +33,8 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
       icon: Globe,
       label: "Internet Exposure",
       label_ar: "التعرض للإنترنت",
+      label_de: "Internet-Exposition",
+      label_tr: "İnternet Maruziyeti",
       severity: "CRITICAL",
       color: "text-red-500",
     })
@@ -40,6 +45,8 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
       icon: Network,
       label: "IT Network Connection",
       label_ar: "الاتصال بشبكة IT",
+      label_de: "IT-Netzwerkverbindung",
+      label_tr: "IT Ağ Bağlantısı",
       severity: "HIGH",
       color: "text-orange-500",
     })
@@ -50,6 +57,8 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
       icon: AlertTriangle,
       label: "Legacy Device",
       label_ar: "جهاز قديم",
+      label_de: "Altgerät",
+      label_tr: "Eski Cihaz",
       severity: "HIGH",
       color: "text-orange-500",
     })
@@ -60,6 +69,8 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
       icon: Wifi,
       label: "Wireless Interface",
       label_ar: "واجهة لاسلكية",
+      label_de: "Drahtlose Schnittstelle",
+      label_tr: "Kablosuz Arayüz",
       severity: "MEDIUM",
       color: "text-yellow-500",
     })
@@ -70,6 +81,8 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
       icon: Shield,
       label: `${protocol} Protocol`,
       label_ar: `بروتوكول ${protocol}`,
+      label_de: `${protocol} Protokoll`,
+      label_tr: `${protocol} Protokolü`,
       severity: "MEDIUM",
       color: "text-blue-500",
     })
@@ -79,8 +92,18 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
     <Card className="p-6 border-primary/20">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold">خريطة سطح الهجوم (Attack Surface Map)</h3>
-          <div className={`text-sm font-semibold ${getRiskColor()}`}>Exposure: {riskLevel}</div>
+          <h3 className="text-xl font-bold">
+            {language === 'ar' && "خريطة سطح الهجوم"}
+            {language === 'en' && "Attack Surface Map"}
+            {language === 'de' && "Angriffsflächenkarte"}
+            {language === 'tr' && "Saldırı Yüzeyi Haritası"}
+          </h3>
+          <div className={`text-sm font-semibold ${getRiskColor()}`}>
+            {language === 'ar' && `التعرض: ${riskLevel}`}
+            {language === 'en' && `Exposure: ${riskLevel}`}
+            {language === 'de' && `Exposition: ${riskLevel}`}
+            {language === 'tr' && `Maruziyet: ${riskLevel}`}
+          </div>
         </div>
 
         <div className="relative">
@@ -94,15 +117,14 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
               </div>
               {/* Risk indicator ring */}
               <div
-                className={`absolute -inset-2 rounded-lg border-4 ${
-                  riskLevel === "CRITICAL"
+                className={`absolute -inset-2 rounded-lg border-4 ${riskLevel === "CRITICAL"
                     ? "border-red-500 animate-pulse"
                     : riskLevel === "HIGH"
                       ? "border-orange-500"
                       : riskLevel === "MEDIUM"
                         ? "border-yellow-500"
                         : "border-green-500"
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -117,8 +139,12 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
                 <div className="flex items-start gap-3">
                   <point.icon className={`w-5 h-5 mt-1 ${point.color}`} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate">{point.label}</div>
-                    <div className="text-xs text-muted-foreground truncate">{point.label_ar}</div>
+                    <div className="text-sm font-semibold truncate">
+                      {language === 'ar' ? point.label_ar :
+                        language === 'de' ? (point as any).label_de :
+                          language === 'tr' ? (point as any).label_tr :
+                            point.label}
+                    </div>
                     <div className={`text-xs font-semibold mt-1 ${point.color}`}>{point.severity}</div>
                   </div>
                 </div>
@@ -133,15 +159,30 @@ export function AttackSurfaceMap({ config, riskLevel }: AttackSurfaceMapProps) {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-primary">{criticalPoints.length}</div>
-                <div className="text-xs text-muted-foreground">Attack Vectors</div>
+                <div className="text-xs text-muted-foreground">
+                  {language === 'ar' && "نواقل الهجوم"}
+                  {language === 'en' && "Attack Vectors"}
+                  {language === 'de' && "Angriffsvektoren"}
+                  {language === 'tr' && "Saldırı Vektörleri"}
+                </div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-primary">{config.protocols.length}</div>
-                <div className="text-xs text-muted-foreground">Active Protocols</div>
+                <div className="text-xs text-muted-foreground">
+                  {language === 'ar' && "البروتوكولات النشطة"}
+                  {language === 'en' && "Active Protocols"}
+                  {language === 'de' && "Aktive Protokolle"}
+                  {language === 'tr' && "Aktif Protokoller"}
+                </div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-primary">{config.interfaces.length}</div>
-                <div className="text-xs text-muted-foreground">Interfaces</div>
+                <div className="text-xs text-muted-foreground">
+                  {language === 'ar' && "الواجهات"}
+                  {language === 'en' && "Interfaces"}
+                  {language === 'de' && "Schnittstellen"}
+                  {language === 'tr' && "Arayüzler"}
+                </div>
               </div>
             </div>
           </div>

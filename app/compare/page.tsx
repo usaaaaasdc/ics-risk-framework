@@ -106,9 +106,8 @@ export default function ComparePage() {
                   {projects.map((project) => (
                     <Card
                       key={project.id}
-                      className={`p-4 cursor-pointer transition-all ${
-                        selectedProjects.has(project.id) ? "ring-2 ring-primary" : ""
-                      }`}
+                      className={`p-4 cursor-pointer transition-all ${selectedProjects.has(project.id) ? "ring-2 ring-primary" : ""
+                        }`}
                       onClick={() => toggleProject(project.id)}
                     >
                       <div className="flex items-start gap-3">
@@ -229,14 +228,14 @@ export default function ComparePage() {
                       {selectedProjectsData.map((project) => (
                         <td key={project.id} className="py-3 px-4">
                           <div className="flex flex-wrap gap-1">
-                            {project.config?.protocols?.slice(0, 3).map((p) => (
+                            {(project.config?.protocols as string[] || [])?.slice(0, 3).map((p) => (
                               <Badge key={p} variant="outline" className="text-xs">
                                 {p}
                               </Badge>
                             ))}
-                            {(project.config?.protocols?.length || 0) > 3 && (
+                            {((project.config?.protocols as string[])?.length || 0) > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{(project.config?.protocols?.length || 0) - 3}
+                                +{((project.config?.protocols as string[])?.length || 0) - 3}
                               </Badge>
                             )}
                           </div>
@@ -277,7 +276,7 @@ export default function ComparePage() {
                       {selectedProjectsData.map((project) => (
                         <td key={project.id} className="py-3 px-4">
                           <Badge variant="destructive">
-                            {project.assessment.vulnerabilities?.filter((v) => v.severity === "CRITICAL").length || 0}
+                            {project.assessment.vulnerabilities?.filter((v: any) => v.severity === "CRITICAL").length || 0}
                           </Badge>
                         </td>
                       ))}
@@ -287,7 +286,7 @@ export default function ComparePage() {
                       {selectedProjectsData.map((project) => (
                         <td key={project.id} className="py-3 px-4">
                           <Badge variant="default">
-                            {project.assessment.vulnerabilities?.filter((v) => v.severity === "HIGH").length || 0}
+                            {project.assessment.vulnerabilities?.filter((v: any) => v.severity === "HIGH").length || 0}
                           </Badge>
                         </td>
                       ))}
@@ -297,7 +296,7 @@ export default function ComparePage() {
                       {selectedProjectsData.map((project) => (
                         <td key={project.id} className="py-3 px-4">
                           <Badge variant="secondary">
-                            {project.assessment.vulnerabilities?.filter((v) => v.severity === "MEDIUM").length || 0}
+                            {project.assessment.vulnerabilities?.filter((v: any) => v.severity === "MEDIUM").length || 0}
                           </Badge>
                         </td>
                       ))}
@@ -307,8 +306,8 @@ export default function ComparePage() {
                       {selectedProjectsData.map((project) => {
                         const avgCVSS =
                           project.assessment.vulnerabilities.length > 0
-                            ? project.assessment.vulnerabilities.reduce((sum, v) => sum + v.cvss, 0) /
-                              project.assessment.vulnerabilities.length
+                            ? project.assessment.vulnerabilities.reduce((sum: number, v: any) => sum + v.cvss, 0) /
+                            project.assessment.vulnerabilities.length
                             : 0
                         return (
                           <td key={project.id} className="py-3 px-4">
@@ -330,7 +329,7 @@ export default function ComparePage() {
                   <div key={project.id} className="space-y-3">
                     <h4 className="font-semibold">{project.name}</h4>
                     <div className="space-y-2">
-                      {project.assessment.recommendations?.slice(0, 5).map((rec, idx) => (
+                      {project.assessment.recommendations?.slice(0, 5).map((rec: string, idx: number) => (
                         <div key={idx} className="p-3 bg-muted rounded-lg text-sm">
                           {rec}
                         </div>

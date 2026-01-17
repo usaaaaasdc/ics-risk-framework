@@ -1,13 +1,18 @@
 import type { RiskAssessment, SystemConfig } from "./risk-engine"
+import { translations } from "./i18n/translations"
 
-export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
+export function generatePDF(assessment: RiskAssessment, config: SystemConfig, lang: "ar" | "en" | "de" | "tr" = "ar") {
+  const t = translations[lang] || translations.ar
+  const isRTL = lang === 'ar'
+  const dir = isRTL ? 'rtl' : 'ltr'
+
   // Create a comprehensive report document
   const doc = `
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="${dir}" lang="${lang}">
 <head>
   <meta charset="UTF-8">
-  <title>ICS Security Assessment Report</title>
+  <title>${t.title} - ${t.results}</title>
   <style>
     @page { 
       size: A4; 
@@ -17,7 +22,7 @@ export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       color: #333;
-      direction: rtl;
+      direction: ${dir};
     }
     .header {
       text-align: center;
@@ -68,7 +73,7 @@ export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
     th, td {
       border: 1px solid #e5e7eb;
       padding: 12px;
-      text-align: right;
+      text-align: ${isRTL ? 'right' : 'left'};
     }
     th {
       background-color: #1e40af;
@@ -84,7 +89,7 @@ export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
     .severity-low { color: #16a34a; font-weight: bold; }
     ul {
       list-style-type: disc;
-      padding-right: 25px;
+      padding-${isRTL ? 'right' : 'left'}: 25px;
     }
     li {
       margin: 8px 0;
@@ -111,131 +116,99 @@ export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
       color: #666;
       font-size: 12px;
     }
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>تقرير تقييم أمن النظام الصناعي</h1>
-    <h2 style="margin: 10px 0;">ICS Security Assessment Report</h2>
-    <p>تاريخ التقرير: ${new Date().toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}</p>
+    <h1>${t.appTitle}</h1>
+    <h2 style="margin: 10px 0;">${t.results}</h2>
+    <p>${t.date}: ${new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : lang === 'tr' ? 'tr-TR' : lang === 'de' ? 'de-DE' : 'en-US', { year: "numeric", month: "long", day: "numeric" })}</p>
   </div>
 
   <div class="risk-score">
-    <h2>${assessment.riskScore.toFixed(1)}/10</h2>
-    <p>مستوى المخاطر: ${assessment.riskLevel}</p>
+    <h2>${assessment.riskScore.toFixed(1)}/100</h2>
+    <p>${t.riskScore}: ${assessment.riskLevel}</p>
   </div>
 
   <div class="section">
-    <h3>معلومات النظام (System Information)</h3>
+    <h3>${t.inputDetails}</h3>
     <div class="info-grid">
       <div class="info-item">
-        <strong>نوع الجهاز:</strong> ${config.deviceType}
+        <strong>${t.deviceType}:</strong> ${config.deviceType}
       </div>
       <div class="info-item">
-        <strong>الشركة المصنعة:</strong> ${config.manufacturer}
+        <strong>${t.manufacturer}:</strong> ${config.manufacturer}
       </div>
       <div class="info-item">
-        <strong>الموديل:</strong> ${config.model}
+        <strong>${t.model}:</strong> ${config.model}
       </div>
       <div class="info-item">
-        <strong>متصل بالإنترنت:</strong> ${config.internetConnected ? "نعم ⚠️" : "لا ✓"}
+        <strong>${t.internetConnected}:</strong> ${config.internetConnected ? (isRTL ? "نعم ⚠️" : "Yes ⚠️") : (isRTL ? "لا ✓" : "No ✓")}
       </div>
       <div class="info-item">
-        <strong>متصل بشبكة IT:</strong> ${config.connectedToIT ? "نعم" : "لا"}
+        <strong>${t.connectedToIT}:</strong> ${config.connectedToIT ? (isRTL ? "نعم" : "Yes") : (isRTL ? "لا" : "No")}
       </div>
       <div class="info-item">
-        <strong>جهاز قديم:</strong> ${config.isLegacy ? "نعم ⚠️" : "لا ✓"}
+        <strong>${t.legacyDevice}:</strong> ${config.isLegacy ? (isRTL ? "نعم ⚠️" : "Yes ⚠️") : (isRTL ? "لا ✓" : "No ✓")}
       </div>
     </div>
     <div class="info-item" style="margin-top: 10px;">
-      <strong>البروتوكولات النشطة:</strong> ${config.protocols.join("، ")}
+      <strong>${t.activeProtocols}:</strong> ${config.protocols.join(", ")}
     </div>
     <div class="info-item" style="margin-top: 10px;">
-      <strong>واجهات الاتصال:</strong> ${config.interfaces.join("، ")}
+      <strong>${t.interfaces}:</strong> ${config.interfaces.join(", ")}
     </div>
   </div>
 
   <div class="section">
-    <h3>سطح الهجوم (Attack Surface)</h3>
-    <p><strong>مستوى التعرض:</strong> <span class="severity-${assessment.attackSurface.exposureLevel.toLowerCase()}">${assessment.attackSurface.exposureLevel}</span></p>
-    <p><strong>النقاط الحرجة:</strong></p>
+    <h3>${t.attackSurface}</h3>
+    <p><strong>${t.exposureLevel}:</strong> <span class="severity-${assessment.attackSurface.exposureLevel.toLowerCase()}">${assessment.attackSurface.exposureLevel}</span></p>
+    <p><strong>${t.criticalPoints}:</strong></p>
     <ul>
       ${assessment.attackSurface.criticalPoints.map((point) => `<li>${point}</li>`).join("")}
     </ul>
   </div>
 
   <div class="section">
-    <h3>الثغرات المكتشفة (${assessment.vulnerabilities.length}) Identified Vulnerabilities</h3>
+    <h3>${t.vulnerabilities} (${assessment.vulnerabilities.length})</h3>
     <table>
       <thead>
         <tr>
-          <th>CVE ID</th>
-          <th>الوصف</th>
-          <th>CVSS</th>
-          <th>الخطورة</th>
-          <th>التصنيف</th>
+          <th>${t.cveId}</th>
+          <th>${t.description}</th>
+          <th>${t.cvss}</th>
+          <th>${t.severity}</th>
+          <th>${t.category}</th>
         </tr>
       </thead>
       <tbody>
         ${assessment.vulnerabilities
-          .map(
-            (vuln) => `
+      .map(
+        (vuln) => `
           <tr>
             <td style="font-family: monospace;">${vuln.id}</td>
-            <td>${vuln.description_ar}</td>
+            <td>${lang === 'ar' ? vuln.description_ar : vuln.description}</td>
             <td><strong>${vuln.cvss}</strong></td>
             <td class="severity-${vuln.severity.toLowerCase()}">${vuln.severity}</td>
             <td>${vuln.category}</td>
           </tr>
         `,
-          )
-          .join("")}
+      )
+      .join("")}
       </tbody>
     </table>
   </div>
 
   <div class="section">
-    <h3>توصيات التخفيف (Mitigation Recommendations)</h3>
+    <h3>${t.recommendations}</h3>
     <ul>
-      ${assessment.recommendations_ar.map((rec) => `<li>${rec}</li>`).join("")}
+      ${(lang === 'ar' ? assessment.recommendations_ar : assessment.recommendations).map((rec) => `<li>${rec}</li>`).join("")}
     </ul>
   </div>
 
-  <div class="section">
-    <h3>التوصيات المخصصة للثغرات (Vulnerability-Specific Recommendations)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>CVE ID</th>
-          <th>التوصية</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${assessment.vulnerabilities
-          .map(
-            (vuln) => `
-          <tr>
-            <td style="font-family: monospace;">${vuln.id}</td>
-            <td>${vuln.recommendation_ar}</td>
-          </tr>
-        `,
-          )
-          .join("")}
-      </tbody>
-    </table>
-  </div>
-
   <div class="footer">
-    <p><strong>ملاحظة:</strong> هذا التقرير للتقييم الأولي فقط. يُنصح بإجراء تقييم أمني شامل من قبل متخصصين.</p>
-    <p>This report is for preliminary assessment only. A comprehensive security audit by professionals is recommended.</p>
-    <p style="margin-top: 10px;">تم إنشاؤه بواسطة: ICS Security Assessment Tool | جميع البيانات محلية ولا يتم إرسالها خارج الجهاز</p>
+    <p><strong>${t.low}:</strong> ${t.footerText}</p>
+    <p style="margin-top: 10px;">ICS Security Assessment Tool | ${t.designedBy}</p>
   </div>
 </body>
 </html>
@@ -246,7 +219,7 @@ export function generatePDF(assessment: RiskAssessment, config: SystemConfig) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
-  link.download = `ICS-Security-Report-${Date.now()}.html`
+  link.download = `ICS-Security-Report-${lang.toUpperCase()}-${Date.now()}.html`
   link.click()
   URL.revokeObjectURL(url)
 }

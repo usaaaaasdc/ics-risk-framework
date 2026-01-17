@@ -13,7 +13,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-const supportedLanguages = ["ar", "en", "de"] as const
+const supportedLanguages = ["ar", "en", "de", "tr"] as const
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("ar")

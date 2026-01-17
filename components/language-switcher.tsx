@@ -9,6 +9,7 @@ const languageNames = {
   ar: "العربية",
   en: "English",
   de: "Deutsch",
+  tr: "Türkçe",
 } as const
 
 type SupportedLanguage = keyof typeof languageNames
