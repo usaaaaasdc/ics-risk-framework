@@ -117,7 +117,20 @@ export function MitigationAlternativesModal({ open, onClose, cveId, alternatives
       none: "Kostenlos",
       completed: "Abgeschlossen",
     },
-  }[language]
+  }[language as 'ar' | 'en' | 'de'] || {
+    title: "Mitigation Alternatives",
+    subtitle: "Alternative solutions when firmware updates are not possible",
+    effectiveness: "Effectiveness",
+    complexity: "Complexity",
+    cost: "Cost",
+    steps: "Implementation Steps",
+    copySteps: "Copy Steps",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+    none: "Free",
+    completed: "Completed",
+  }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

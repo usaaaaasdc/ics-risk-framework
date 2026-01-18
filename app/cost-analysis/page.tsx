@@ -15,7 +15,6 @@ import { calculateCostEstimation, industryPresets, type CostEstimationInput } fr
 
 export default function CostAnalysisPage() {
   const { translations, isRTL } = useLanguage()
-  const t = translations.costAnalysis
   const [selectedProject, setSelectedProject] = useState<string>("")
   const [industryType, setIndustryType] = useState<string>("Manufacturing")
   const [costInput, setCostInput] = useState<CostEstimationInput>({
@@ -23,7 +22,7 @@ export default function CostAnalysisPage() {
     ...industryPresets.Manufacturing,
     industryType: "Manufacturing",
   })
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<ReturnType<typeof calculateCostEstimation> | null>(null)
 
   const projects = ProjectManager.getAllProjects()
 
@@ -88,13 +87,13 @@ export default function CostAnalysisPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">{t.title}</h1>
-            <p className="text-slate-400">{t.subtitle}</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Cost Analysis & ROI Calculator</h1>
+            <p className="text-slate-400">Calculate the financial impact of industrial cybersecurity incidents</p>
           </div>
           <Link href="/">
             <Button variant="outline" className="gap-2 bg-transparent">
               <ArrowLeft className="w-4 h-4" />
-              {translations.header?.backToHome || "Back to Home"}
+              {translations.backToHome || "Back to Home"}
             </Button>
           </Link>
         </div>
@@ -109,16 +108,16 @@ export default function CostAnalysisPage() {
             <Card className="bg-slate-900/50 border-slate-800 p-6">
               <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-blue-400" />
-                {t.inputParameters}
+                Input Parameters
               </h2>
 
               <div className="space-y-4">
                 {/* Project Selection */}
                 <div>
-                  <Label className="text-slate-300">{t.selectProject}</Label>
+                  <Label className="text-slate-300">Select Project</Label>
                   <Select value={selectedProject} onValueChange={setSelectedProject}>
                     <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                      <SelectValue placeholder={t.selectProjectPlaceholder} />
+                      <SelectValue placeholder="Choose a project to analyze" />
                     </SelectTrigger>
                     <SelectContent>
                       {projects.map((project) => (
@@ -132,7 +131,7 @@ export default function CostAnalysisPage() {
 
                 {/* Industry Type */}
                 <div>
-                  <Label className="text-slate-300">{t.industryType}</Label>
+                  <Label className="text-slate-300">Industry Type</Label>
                   <Select value={industryType} onValueChange={handleIndustryChange}>
                     <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
                       <SelectValue />
@@ -149,7 +148,7 @@ export default function CostAnalysisPage() {
 
                 {/* Daily Revenue */}
                 <div>
-                  <Label className="text-slate-300">{t.dailyRevenue}</Label>
+                  <Label className="text-slate-300">Daily Revenue (€)</Label>
                   <Input
                     type="number"
                     value={costInput.dailyRevenue}
@@ -162,7 +161,7 @@ export default function CostAnalysisPage() {
 
                 {/* Downtime Cost Per Hour */}
                 <div>
-                  <Label className="text-slate-300">{t.downtimeCost}</Label>
+                  <Label className="text-slate-300">Downtime Cost/Hour (€)</Label>
                   <Input
                     type="number"
                     value={costInput.downtimeCostPerHour}
@@ -175,7 +174,7 @@ export default function CostAnalysisPage() {
 
                 {/* Recovery Time */}
                 <div>
-                  <Label className="text-slate-300">{t.recoveryTime}</Label>
+                  <Label className="text-slate-300">Recovery Time (hours)</Label>
                   <Input
                     type="number"
                     value={costInput.recoveryTimeHours}
@@ -188,7 +187,7 @@ export default function CostAnalysisPage() {
 
                 {/* Data Loss Impact */}
                 <div>
-                  <Label className="text-slate-300">{t.dataLoss}</Label>
+                  <Label className="text-slate-300">Data Loss Impact (€)</Label>
                   <Input
                     type="number"
                     value={costInput.dataLossImpact}
@@ -201,7 +200,7 @@ export default function CostAnalysisPage() {
 
                 {/* Reputation Impact */}
                 <div>
-                  <Label className="text-slate-300">{t.reputationDamage}</Label>
+                  <Label className="text-slate-300">Reputation Damage (€)</Label>
                   <Input
                     type="number"
                     value={costInput.reputationImpact}
@@ -214,7 +213,7 @@ export default function CostAnalysisPage() {
 
                 {/* Regulatory Fines */}
                 <div>
-                  <Label className="text-slate-300">{t.regulatoryFines}</Label>
+                  <Label className="text-slate-300">Regulatory Fines (€)</Label>
                   <Input
                     type="number"
                     value={costInput.regulatoryFines}
@@ -227,7 +226,7 @@ export default function CostAnalysisPage() {
 
                 <Button onClick={handleCalculate} disabled={!selectedProject} className="w-full">
                   <Calculator className="w-4 h-4 mr-2" />
-                  {t.calculate}
+                  Calculate Cost Impact
                 </Button>
               </div>
             </Card>
@@ -238,7 +237,7 @@ export default function CostAnalysisPage() {
             {!result && (
               <Card className="bg-slate-900/50 border-slate-800 p-12 text-center">
                 <PieChart className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                <p className="text-slate-400">{t.selectProjectAndCalculate}</p>
+                <p className="text-slate-400">Select a project and click Calculate to see cost analysis</p>
               </Card>
             )}
 
@@ -248,12 +247,12 @@ export default function CostAnalysisPage() {
                 <Card className="bg-gradient-to-br from-red-500/10 to-orange-500/10 border-2 border-red-500/20 p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-white mb-1">{t.totalFinancialRisk}</h2>
-                      <p className="text-sm text-slate-400">{t.potentialLoss}</p>
+                      <h2 className="text-lg font-semibold text-white mb-1">Total Financial Risk</h2>
+                      <p className="text-sm text-slate-400">Potential loss per incident</p>
                     </div>
                     <div className="text-right">
                       <div className="text-4xl font-bold text-red-400">{formatCurrency(result.totalFinancialRisk)}</div>
-                      <div className="text-xs text-slate-400 mt-1">{t.perIncident}</div>
+                      <div className="text-xs text-slate-400 mt-1">Per Incident</div>
                     </div>
                   </div>
                 </Card>
@@ -262,17 +261,17 @@ export default function CostAnalysisPage() {
                 <Card className="bg-slate-900/50 border-slate-800 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <PieChart className="w-5 h-5 text-blue-400" />
-                    {t.costBreakdown}
+                    Cost Breakdown
                   </h3>
 
                   <div className="space-y-3">
                     {[
-                      { label: t.downtimeCost, value: result.breakdown.downtimeCost },
-                      { label: t.dataLoss, value: result.breakdown.dataLossCost },
-                      { label: t.reputationDamage, value: result.breakdown.reputationCost },
-                      { label: t.regulatoryFines, value: result.breakdown.regulatoryCost },
-                      { label: t.incidentResponse, value: result.breakdown.incidentResponseCost },
-                      { label: t.recovery, value: result.breakdown.recoveryAndRemediationCost },
+                      { label: "Downtime Cost", value: result.breakdown.downtimeCost },
+                      { label: "Data Loss", value: result.breakdown.dataLossCost },
+                      { label: "Reputation Damage", value: result.breakdown.reputationCost },
+                      { label: "Regulatory Fines", value: result.breakdown.regulatoryCost },
+                      { label: "Incident Response", value: result.breakdown.incidentResponseCost },
+                      { label: "Recovery & Remediation", value: result.breakdown.recoveryAndRemediationCost },
                     ].map((item, index) => {
                       const percentage = (item.value / result.totalFinancialRisk) * 100
                       return (
@@ -296,7 +295,7 @@ export default function CostAnalysisPage() {
                 <Card className="bg-slate-900/50 border-slate-800 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <TrendingDown className="w-5 h-5 text-orange-400" />
-                    {t.annualizedLoss}
+                    Annualized Loss Expectancy
                   </h3>
 
                   <div className="grid md:grid-cols-2 gap-4">
@@ -304,14 +303,14 @@ export default function CostAnalysisPage() {
                       <div className="text-2xl font-bold text-orange-400">
                         {formatCurrency(result.annualizedLossExpectancy)}
                       </div>
-                      <div className="text-sm text-slate-400 mt-1">{t.expectedAnnualLoss}</div>
+                      <div className="text-sm text-slate-400 mt-1">Expected Annual Loss</div>
                     </div>
 
                     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
                       <div className="text-2xl font-bold text-green-400">
                         {formatCurrency(result.returnOnSecurityInvestment.recommendedBudget)}
                       </div>
-                      <div className="text-sm text-slate-400 mt-1">{t.recommendedBudget}</div>
+                      <div className="text-sm text-slate-400 mt-1">Recommended Security Budget</div>
                     </div>
                   </div>
                 </Card>
@@ -320,19 +319,19 @@ export default function CostAnalysisPage() {
                 <Card className="bg-slate-900/50 border-slate-800 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-green-400" />
-                    {t.roi}
+                    Return on Investment
                   </h3>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                      <div className="text-slate-400 text-sm mb-2">{t.costBenefitRatio}</div>
+                      <div className="text-slate-400 text-sm mb-2">Cost-Benefit Ratio</div>
                       <div className="text-2xl font-bold text-white">
                         {result.returnOnSecurityInvestment.costBenefitRatio.toFixed(2)}:1
                       </div>
                     </div>
 
                     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                      <div className="text-slate-400 text-sm mb-2">{t.paybackPeriod}</div>
+                      <div className="text-slate-400 text-sm mb-2">Payback Period</div>
                       <div className="text-2xl font-bold text-white">
                         {result.returnOnSecurityInvestment.paybackPeriod}
                       </div>
@@ -344,27 +343,26 @@ export default function CostAnalysisPage() {
                 <Card className="bg-slate-900/50 border-slate-800 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                    {t.industryBenchmark}
+                    Industry Benchmark
                   </h3>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                      <div className="text-slate-400 text-sm mb-2">{t.industryAverage}</div>
+                      <div className="text-slate-400 text-sm mb-2">Industry Average</div>
                       <div className="text-2xl font-bold text-white">
                         {formatCurrency(result.industryBenchmark.averageCost)}
                       </div>
                     </div>
 
                     <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                      <div className="text-slate-400 text-sm mb-2">{t.yourPosition}</div>
+                      <div className="text-slate-400 text-sm mb-2">Your Position</div>
                       <div
-                        className={`text-2xl font-bold ${
-                          result.industryBenchmark.yourPosition === "Below Average"
+                        className={`text-2xl font-bold ${result.industryBenchmark.yourPosition === "Below Average"
                             ? "text-green-400"
                             : result.industryBenchmark.yourPosition === "Average"
                               ? "text-yellow-400"
                               : "text-red-400"
-                        }`}
+                          }`}
                       >
                         {result.industryBenchmark.yourPosition}
                       </div>

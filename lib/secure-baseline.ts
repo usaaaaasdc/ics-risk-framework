@@ -246,7 +246,7 @@ export function compareWithBaseline(
   internetConnected: boolean,
   connectedToIT: boolean,
   protocols: string[],
-  firmwareVersion?: string,
+  _firmwareVersion?: string,
 ): BaselineComparisonResult {
   const baseline = getDeviceBaseline(manufacturer, model)
 

@@ -1,11 +1,11 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "@/lib/i18n/language-context"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+// Font variables are imported but not currently used in className
+// const geist = Geist({ subsets: ["latin"] })
+// const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "ICS-Risk Framework | Open-Source Industrial Security Assessment",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   manifest: "/manifest.json",
-    generator: 'v0.app'
+  generator: 'v0.app'
 }
 
 export const viewport: Viewport = {

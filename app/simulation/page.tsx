@@ -21,7 +21,21 @@ import { simulationScenarios, runSimulation } from "@/lib/simulation-engine"
 
 export default function SimulationPage() {
   const { translations, isRTL, language } = useLanguage()
-  const t = translations.simulation
+  const t = typeof translations.simulation === 'object' ? translations.simulation : {
+    title: "Attack Simulation Lab",
+    subtitle: "Simulate real-world ICS attack scenarios",
+    scenarios: "Attack Scenarios",
+    run: "Run",
+    selectScenario: "Select a scenario to start simulation",
+    running: "Running simulation...",
+    attackSuccess: "Attack Success Probability",
+    riskScore: "Risk Score",
+    attackPath: "Attack Progression Path",
+    detection: "Detection",
+    impact: "Cascading Impact",
+    detectionPoints: "Detection Opportunities",
+    prevention: "Prevention Measures"
+  }
 
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null)
   const [simulationResult, setSimulationResult] = useState<any>(null)
@@ -98,11 +112,10 @@ export default function SimulationPage() {
                 {simulationScenarios.map((scenario) => (
                   <Card
                     key={scenario.id}
-                    className={`p-4 cursor-pointer transition-all ${
-                      selectedScenario === scenario.id
+                    className={`p-4 cursor-pointer transition-all ${selectedScenario === scenario.id
                         ? "bg-blue-500/20 border-blue-500"
                         : "bg-slate-800/50 border-slate-700 hover:bg-slate-800"
-                    }`}
+                      }`}
                     onClick={() => handleRunSimulation(scenario.id)}
                   >
                     <h3 className="font-semibold text-white text-sm mb-2">
@@ -174,15 +187,14 @@ export default function SimulationPage() {
 
                         <div className="flex gap-4">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm z-10 ${
-                              step.impact_level === "critical"
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm z-10 ${step.impact_level === "critical"
                                 ? "bg-red-500/20 text-red-400"
                                 : step.impact_level === "high"
                                   ? "bg-orange-500/20 text-orange-400"
                                   : step.impact_level === "medium"
                                     ? "bg-yellow-500/20 text-yellow-400"
                                     : "bg-green-500/20 text-green-400"
-                            }`}
+                              }`}
                           >
                             {index + 1}
                           </div>

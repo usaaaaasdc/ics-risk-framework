@@ -33,10 +33,10 @@ export default function RemediationPlannerPage() {
     if (projects.length > 0) {
       const latest = projects[projects.length - 1]
       const generatedPlan = generateRemediationPlan(
-        latest.riskScore,
-        latest.vulnerabilities || [],
-        latest.devices || [],
-        language,
+        latest.assessment?.riskScore || 0,
+        latest.assessment?.vulnerabilities || [],
+        latest.config?.devices || [],
+        (language === 'ar' || language === 'de') ? language : 'en',
       )
       setPlan(generatedPlan)
     }
@@ -285,7 +285,7 @@ export default function RemediationPlannerPage() {
 
               {/* Tasks */}
               <div className="space-y-2">
-                {plan.tasks.map((task, index) => {
+                {plan.tasks.map((task) => {
                   const timelineEvent = plan.timeline.find((t) => t.taskId === task.id)
                   const startPercent = timelineEvent ? (timelineEvent.startDay / plan.totalDuration) * 100 : 0
                   const widthPercent = timelineEvent

@@ -8,7 +8,7 @@ import { AlertTriangle, Shield, Network, Power, Lock, Eye, FileText, ExternalLin
 import Link from "next/link"
 
 export default function IncidentResponsePage() {
-  const { t } = useLanguage()
+  const { language } = useLanguage()
 
   const immediateActions = [
     {
@@ -140,12 +140,11 @@ export default function IncidentResponsePage() {
     },
   ]
 
-  const lang = t.nav?.language || "en"
-  const getTitle = (item: any) => (lang === "ar" ? item.titleAr : lang === "de" ? item.titleDe : item.titleEn)
-  const getAction = (item: any) => (lang === "ar" ? item.actionAr : lang === "de" ? item.actionDe : item.actionEn)
-  const getType = (item: any) => (lang === "ar" ? item.typeAr : lang === "de" ? item.typeDe : item.typeEn)
-  const getName = (item: any) => (lang === "ar" ? item.nameAr : lang === "de" ? item.nameDe : item.nameEn)
-  const getDesc = (item: any) => (lang === "ar" ? item.descAr : lang === "de" ? item.descDe : item.descEn)
+  const getTitle = (item: any) => (language === "ar" ? item.titleAr : language === "de" ? item.titleDe : item.titleEn)
+  const getAction = (item: any) => (language === "ar" ? item.actionAr : language === "de" ? item.actionDe : item.actionEn)
+  const getType = (item: any) => (language === "ar" ? item.typeAr : language === "de" ? item.typeDe : item.typeEn)
+  const getName = (item: any) => (language === "ar" ? item.nameAr : language === "de" ? item.nameDe : item.nameEn)
+  const getDesc = (item: any) => (language === "ar" ? item.descAr : language === "de" ? item.descDe : item.descEn)
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
@@ -155,13 +154,13 @@ export default function IncidentResponsePage() {
           <div className="flex items-center justify-center gap-3">
             <AlertTriangle className="h-12 w-12 text-red-500 animate-pulse" />
             <h1 className="text-4xl md:text-5xl font-bold text-red-500">
-              {lang === "ar" ? "وضع الطوارئ" : lang === "de" ? "Notfallmodus" : "INCIDENT RESPONSE MODE"}
+              {language === "ar" ? "وضع الطوارئ" : language === "de" ? "Notfallmodus" : "INCIDENT RESPONSE MODE"}
             </h1>
           </div>
           <p className="text-xl text-gray-300">
-            {lang === "ar"
+            {language === "ar"
               ? "إجراءات فورية عند اكتشاف هجوم على أنظمة التحكم الصناعي"
-              : lang === "de"
+              : language === "de"
                 ? "Sofortmaßnahmen bei Angriffen auf industrielle Steuerungssysteme"
                 : "Immediate Actions for ICS/SCADA Security Incidents"}
           </p>
@@ -171,9 +170,9 @@ export default function IncidentResponsePage() {
         <Alert className="border-red-500 bg-red-500/10">
           <AlertTriangle className="h-5 w-5 text-red-500" />
           <AlertDescription className="text-lg">
-            {lang === "ar"
+            {language === "ar"
               ? "⚠️ هذه الإجراءات للطوارئ فقط. قد تؤدي لتوقف الإنتاج. تأكد من إخطار الإدارة فوراً."
-              : lang === "de"
+              : language === "de"
                 ? "⚠️ Nur für Notfälle. Kann zu Produktionsausfällen führen. Management sofort benachrichtigen."
                 : "⚠️ Emergency procedures only. May cause production downtime. Notify management immediately."}
           </AlertDescription>
@@ -183,9 +182,9 @@ export default function IncidentResponsePage() {
         <div>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <Shield className="h-6 w-6 text-red-500" />
-            {lang === "ar"
+            {language === "ar"
               ? "الإجراءات الفورية (5 دقائق)"
-              : lang === "de"
+              : language === "de"
                 ? "Sofortmaßnahmen (5 Minuten)"
                 : "Immediate Actions (5 Minutes)"}
           </h2>
@@ -220,9 +219,9 @@ export default function IncidentResponsePage() {
         {/* IOCs */}
         <div>
           <h2 className="text-2xl font-bold mb-4">
-            {lang === "ar"
+            {language === "ar"
               ? "مؤشرات الاختراق (IOCs)"
-              : lang === "de"
+              : language === "de"
                 ? "Kompromittierungsindikatoren (IOCs)"
                 : "Indicators of Compromise (IOCs)"}
           </h2>
@@ -251,9 +250,9 @@ export default function IncidentResponsePage() {
         {/* External Resources */}
         <div>
           <h2 className="text-2xl font-bold mb-4">
-            {lang === "ar"
+            {language === "ar"
               ? "موارد خارجية للمساعدة"
-              : lang === "de"
+              : language === "de"
                 ? "Externe Hilfsressourcen"
                 : "External Resources for Help"}
           </h2>
@@ -271,7 +270,7 @@ export default function IncidentResponsePage() {
                 <CardContent>
                   <Button asChild variant="outline" className="w-full bg-transparent">
                     <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                      {lang === "ar" ? "فتح الرابط" : lang === "de" ? "Link öffnen" : "Open Link"}
+                      {language === "ar" ? "فتح الرابط" : language === "de" ? "Link öffnen" : "Open Link"}
                     </a>
                   </Button>
                 </CardContent>
@@ -284,9 +283,9 @@ export default function IncidentResponsePage() {
         <div className="flex justify-center pt-8">
           <Button asChild size="lg" variant="outline">
             <Link href="/">
-              {lang === "ar"
+              {language === "ar"
                 ? "← العودة للصفحة الرئيسية"
-                : lang === "de"
+                : language === "de"
                   ? "← Zurück zur Startseite"
                   : "← Back to Home"}
             </Link>
@@ -296,3 +295,4 @@ export default function IncidentResponsePage() {
     </div>
   )
 }
+

@@ -101,7 +101,7 @@ export function generateAnalytics(): AnalyticsData {
 
     projectsOnDate.forEach((p) => {
       if (p.assessment) {
-        p.assessment.vulnerabilities?.forEach((v) => {
+        p.assessment.vulnerabilities?.forEach((v: any) => {
           if (v.severity === "CRITICAL") critical++
           else if (v.severity === "HIGH") high++
           else if (v.severity === "MEDIUM") medium++
@@ -141,7 +141,7 @@ export function generateAnalytics(): AnalyticsData {
   // Protocol usage
   const protocolMap = new Map<string, number>()
   projects.forEach((project) => {
-    project.config?.protocols?.forEach((protocol) => {
+    project.config?.protocols?.forEach((protocol: string) => {
       protocolMap.set(protocol, (protocolMap.get(protocol) || 0) + 1)
     })
   })
@@ -157,7 +157,7 @@ export function generateAnalytics(): AnalyticsData {
   // Top vulnerabilities
   const vulnMap = new Map<string, { count: number; totalCVSS: number; severity: string }>()
   projects.forEach((project) => {
-    project.assessment?.vulnerabilities?.forEach((v) => {
+    project.assessment?.vulnerabilities?.forEach((v: any) => {
       const existing = vulnMap.get(v.id) || { count: 0, totalCVSS: 0, severity: v.severity }
       vulnMap.set(v.id, {
         count: existing.count + 1,

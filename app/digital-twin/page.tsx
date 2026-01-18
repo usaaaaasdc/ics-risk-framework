@@ -224,7 +224,7 @@ export default function DigitalTwinPage() {
     return "text-red-600"
   }
 
-  const t = {
+  const translations = {
     ar: {
       title: "التوأم الرقمي للمخاطر",
       subtitle: "محاكاة حية لانتشار التهديدات عبر الشبكة الصناعية",
@@ -276,7 +276,9 @@ export default function DigitalTwinPage() {
       running: "Simulation läuft...",
       criticalAssets: "Kritische Assets gefährdet",
     },
-  }[language]
+  }
+
+  const t = translations[language as 'ar' | 'en' | 'de'] || translations.en
 
   if (!graph) {
     return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>

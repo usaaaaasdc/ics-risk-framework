@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/i18n/language-context"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { calculateVendorRisk, compareVendors, type VendorRiskProfile } from "@/lib/supply-chain-risk"
+import { compareVendors, type VendorRiskProfile } from "@/lib/supply-chain-risk"
 import { ArrowLeft, Package, Shield, AlertTriangle, TrendingUp, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
@@ -13,17 +13,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 export default function SupplyChainPage() {
   const { language } = useLanguage()
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null)
-  const [vendorProfile, setVendorProfile] = useState<VendorRiskProfile | null>(null)
+  const [vendorProfile] = useState<VendorRiskProfile | null>(null)
   const [comparisonMode, setComparisonMode] = useState(false)
   const [selectedVendors, setSelectedVendors] = useState<string[]>([])
 
   const vendors = ["Siemens", "Rockwell Automation", "Schneider Electric", "HollySys", "Mitsubishi", "ABB", "Honeywell"]
-
-  const handleVendorSelect = (vendor: string) => {
-    setSelectedVendor(vendor)
-    setVendorProfile(calculateVendorRisk(vendor))
-    setComparisonMode(false)
-  }
 
   const toggleVendorForComparison = (vendor: string) => {
     setSelectedVendors((prev) => (prev.includes(vendor) ? prev.filter((v) => v !== vendor) : [...prev, vendor]))
@@ -49,8 +43,6 @@ export default function SupplyChainPage() {
     if (score >= 70) return "bg-yellow-500"
     return "bg-red-500"
   }
-
-  const COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6"]
 
   return (
     <main className="min-h-screen bg-background" dir={language === "ar" ? "rtl" : "ltr"}>

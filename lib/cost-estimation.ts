@@ -48,7 +48,7 @@ const industryAverageCosts: Record<string, number> = {
 
 export function calculateCostEstimation(
   assessment: RiskAssessment,
-  config: SystemConfig,
+  _config: SystemConfig,
   input: CostEstimationInput,
 ): CostEstimationResult {
   // Calculate downtime cost

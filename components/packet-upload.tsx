@@ -40,6 +40,9 @@ export function PacketUpload() {
             const packets = TraficAnalyzer.parseImportedFile(jsonInput)
             const results = TraficAnalyzer.analyze(packets)
             setThreats(results)
+            if (typeof window !== "undefined") {
+                localStorage.setItem("detected-threats", JSON.stringify(results))
+            }
         } catch (e) {
             setError("Invalid JSON format. Please ensure it is an array of packets.")
         }

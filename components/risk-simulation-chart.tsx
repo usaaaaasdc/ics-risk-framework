@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { runMonteCarloSimulation, SimulationParams } from "@/lib/calculators/risk-engine"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LineChart, Line, Legend } from "recharts"
-import { MarkovEngine, MarkovStep, ManualSecurityState } from "@/lib/calculators/markov-engine"
+import { MarkovEngine, ManualSecurityState } from "@/lib/calculators/markov-engine"
 import { NetworkTopology } from "@/components/network-topology"
 import { PacketUpload } from "@/components/packet-upload"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -263,6 +263,6 @@ export default function RiskSimulationChart() {
                     </Tabs>
                 </div>
             </div>
-                </div>
+        </div>
     )
 }

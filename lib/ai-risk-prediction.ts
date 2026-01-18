@@ -85,7 +85,7 @@ export class AIRiskPredictor {
     const confidence = this.calculateConfidence()
 
     // Generate trends
-    const trends = this.generateTrends(currentDevices, industry)
+    const trends = this.generateTrends(currentDevices)
 
     // Generate recommendations
     const recommendations = this.generatePredictiveRecommendations(predictedRiskScore, trends)
@@ -166,7 +166,7 @@ export class AIRiskPredictor {
     return 95 // High confidence with lots of data
   }
 
-  private generateTrends(devices: HistoricalData["devices"], industry: string): PredictionResult["trends"] {
+  private generateTrends(devices: HistoricalData["devices"]): PredictionResult["trends"] {
     const trends: PredictionResult["trends"] = []
 
     // Internet exposure trend

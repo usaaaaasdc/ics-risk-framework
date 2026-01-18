@@ -1,12 +1,11 @@
 "use client"
 
-import { useLanguage } from "@/lib/i18n/language-context"
 import { Shield } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { DarkModeToggle } from "@/components/dark-mode-toggle"
+import { PdfReportGenerator } from "@/components/pdf-report-generator"
 
 export function HomepageHeader() {
-  const { language } = useLanguage()
 
   return (
     <header className="border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
@@ -25,6 +24,7 @@ export function HomepageHeader() {
         <div className="flex items-center gap-2">
           <DarkModeToggle />
           <LanguageSwitcher />
+          <PdfReportGenerator />
         </div>
       </div>
     </header>

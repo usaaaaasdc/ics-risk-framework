@@ -165,7 +165,7 @@ export default function ExamplesPage() {
           {examples.map((example) => (
             <Card key={example.id}>
               <CardHeader>
-                <CardTitle>{example.name[language]}</CardTitle>
+                <CardTitle>{example.name[language as 'en' | 'ar' | 'de'] || example.name.en}</CardTitle>
                 <CardDescription>
                   {example.config.manufacturer} {example.config.model}
                 </CardDescription>

@@ -75,7 +75,7 @@ export function performSTRIDEAnalysis(config: SystemConfig): STRIDEAnalysis {
     analysis.spoofing.push({
       threat: "Unauthorized device impersonation via internet",
       likelihood: "High",
-      impact: "Critical",
+      impact: "High",
       mitigation: "Use VPN with multi-factor authentication and device certificates",
     })
   }
@@ -131,7 +131,7 @@ export function performSTRIDEAnalysis(config: SystemConfig): STRIDEAnalysis {
     analysis.denialOfService.push({
       threat: "DDoS attacks from internet can disrupt operations",
       likelihood: "High",
-      impact: "Critical",
+      impact: "High",
       mitigation: "Implement DDoS protection, rate limiting, and redundant systems",
     })
   }
@@ -148,7 +148,7 @@ export function performSTRIDEAnalysis(config: SystemConfig): STRIDEAnalysis {
     analysis.elevationOfPrivilege.push({
       threat: "Unpatched vulnerabilities allow privilege escalation",
       likelihood: "High",
-      impact: "Critical",
+      impact: "High",
       mitigation: "Replace legacy devices or implement compensating controls like network isolation",
     })
   }
@@ -398,7 +398,7 @@ export function checkIEC62443Compliance(config: SystemConfig, assessment: RiskAs
   }
 }
 
-export function checkNISTCompliance(config: SystemConfig, assessment: RiskAssessment): ComplianceResult {
+export function checkNISTCompliance(config: SystemConfig, _assessment: RiskAssessment): ComplianceResult {
   const requirements: ComplianceRequirement[] = []
 
   // NIST SP 800-82r3: ICS Security

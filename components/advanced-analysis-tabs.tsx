@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { useLanguage } from "@/lib/i18n/language-context"
 import type { SystemConfig, RiskAssessment } from "@/lib/risk-engine"
 import {
   performSTRIDEAnalysis,
@@ -21,7 +20,6 @@ interface AdvancedAnalysisTabsProps {
 }
 
 export function AdvancedAnalysisTabs({ config, assessment }: AdvancedAnalysisTabsProps) {
-  const { t, language } = useLanguage()
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["root"]))
 
   const strideAnalysis = performSTRIDEAnalysis(config)
@@ -134,7 +132,7 @@ export function AdvancedAnalysisTabs({ config, assessment }: AdvancedAnalysisTab
                 <p className="text-sm text-muted-foreground ml-7">No significant threats identified</p>
               ) : (
                 <div className="space-y-3 ml-7">
-                  {threats.map((threat, idx) => (
+                  {threats.map((threat: any, idx: number) => (
                     <Card key={idx} className="p-4 border-l-4 border-l-destructive">
                       <div className="space-y-2">
                         <p className="font-medium">{threat.threat}</p>

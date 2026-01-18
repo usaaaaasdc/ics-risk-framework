@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useLanguage } from "@/lib/i18n/language-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +8,7 @@ import { Shield, Target, AlertTriangle, ChevronRight, Download, Search, Filter }
 import { MITRE_TACTICS, MITRE_TECHNIQUES, getTechniquesByTactic } from "@/lib/mitre-attack-ics"
 
 export default function MITREAttackPage() {
-  const { t } = useLanguage()
+  // const { t } = useLanguage() // Not used in this component
   const [selectedTactic, setSelectedTactic] = useState(MITRE_TACTICS[0].id)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -106,9 +105,8 @@ export default function MITREAttackPage() {
                     <button
                       key={tactic.id}
                       onClick={() => setSelectedTactic(tactic.id)}
-                      className={`w-full p-4 text-left hover:bg-accent transition-colors ${
-                        isSelected ? "bg-accent" : ""
-                      }`}
+                      className={`w-full p-4 text-left hover:bg-accent transition-colors ${isSelected ? "bg-accent" : ""
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">

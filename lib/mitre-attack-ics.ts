@@ -308,7 +308,7 @@ export function mapVulnerabilityToMITRE(vulnerability: Vulnerability): MITRETech
   return mapped
 }
 
-export function generateMITREReport(devices: any[]): {
+export function generateMITREReport(_devices: any[]): {
   tactics: { tactic: MITRETactic; techniques: MITRETechnique[]; riskLevel: string }[]
   overallCoverage: number
 } {

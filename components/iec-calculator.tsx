@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useLanguage } from "@/lib/i18n/language-context"
-import { iec62443Standards, SystemRequirement } from "@/lib/standards/iec62443"
+import { iec62443Standards } from "@/lib/standards/iec62443"
 import { calculateIECScore } from "@/lib/calculators/iec-score"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"

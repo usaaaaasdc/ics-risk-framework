@@ -145,7 +145,7 @@ export function findVulnerabilities(
 
 export function generateRecommendations(
   config: SystemConfig,
-  vulnerabilities: Vulnerability[],
+  _vulnerabilities: Vulnerability[],
 ): { en: string[]; ar: string[] } {
   const recommendationsEn: string[] = []
   const recommendationsAr: string[] = []

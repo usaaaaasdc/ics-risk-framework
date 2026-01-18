@@ -5,7 +5,22 @@
  * Licensed under MIT License
  *
  * Implements Discrete Time Markov Chain (DTMC) to predict attack progression.
+ * 
+ * Transition probabilities are externalized to lib/constants/markov-parameters.ts
+ * for maintainability and academic rigor (see NIST SP 800-82 citations).
  */
+
+import {
+    BASE_PROB_SECURE_TO_RECON,
+    SCALE_PROB_SECURE_TO_RECON,
+    BASE_PROB_RECON_TO_EXPLOIT,
+    SCALE_PROB_RECON_TO_EXPLOIT,
+    PROB_RECON_TO_SECURE,
+    BASE_PROB_EXPLOIT_TO_COMPROMISED,
+    SCALE_PROB_EXPLOIT_TO_COMPROMISED,
+    PROB_EXPLOIT_TO_RECON,
+    PROB_COMPROMISED_TO_SECURE,
+} from '../constants/markov-parameters';
 
 export type ManualSecurityState = 'Secure' | 'Reconnaissance' | 'Exploitation' | 'Compromised';
 
@@ -18,33 +33,62 @@ export class MarkovEngine {
     /**
      * Creates a transition matrix based on the current Risk Score (0-10).
      * Higher risk score increases the probability of moving to worse states.
+     * 
+     * All probability constants are defined in lib/constants/markov-parameters.ts
+     * with citations to NIST SP 800-82 and industry baselines.
+     * 
+     * @param riskScore - Current system risk score (0-10)
+     * @returns Transition probability matrix for all states
      */
     private static createTransitionMatrix(riskScore: number): Record<ManualSecurityState, Record<ManualSecurityState, number>> {
         // Normalize risk score to 0-1 factor
         const riskFactor = Math.min(Math.max(riskScore / 10, 0), 1);
 
-        // Base Transition Probabilities (Low Risk)
-        // Secure -> Secure: High, Secure -> Recon: Low
-        // With High Risk: Secure -> Recon increases significantly.
-
-        const pSecureToRecon = 0.05 + (riskFactor * 0.25); // 0.05 to 0.30
+        // =====================================================================
+        // SECURE STATE TRANSITIONS
+        // =====================================================================
+        // Base probability: 5% attack initiation (low risk)
+        // Max probability: 30% attack initiation (high risk)
+        const pSecureToRecon = BASE_PROB_SECURE_TO_RECON + (riskFactor * SCALE_PROB_SECURE_TO_RECON);
         const pSecureToSecure = 1 - pSecureToRecon;
 
-        const pReconToExploit = 0.10 + (riskFactor * 0.40); // 0.10 to 0.50
-        const pReconToRecon = 1 - pReconToExploit - 0.1; // Remaining probability (some chance to go back to Secure?) - Simplified: Stay or Advance
-        // Let's allow regression to Secure (Defender action)
-        const pReconToSecure = 0.1;
-        const _pReconToRecon = 1 - pReconToExploit - pReconToSecure;
+        // =====================================================================
+        // RECONNAISSANCE STATE TRANSITIONS
+        // =====================================================================
+        // Base probability: 10% escalation to exploitation (low risk)
+        // Max probability: 50% escalation (high risk)
+        const pReconToExploit = BASE_PROB_RECON_TO_EXPLOIT + (riskFactor * SCALE_PROB_RECON_TO_EXPLOIT);
 
-        const pExploitToCompromised = 0.15 + (riskFactor * 0.55); // 0.15 to 0.70
-        const pExploitToRecon = 0.1; // Regression
-        const _pExploitToExploit = 1 - pExploitToCompromised - pExploitToRecon;
+        // Defender regression: 10% chance of returning to Secure state
+        const pReconToSecure = PROB_RECON_TO_SECURE;
 
-        // Compromised is an "Absorbing State" in this simple model, 
-        // or highly sticky until remediation (which we can simulate as low prob exit)
-        const pCompromisedToSecure = 0.01; // Remediation chance
-        const _pCompromisedToCompromised = 1 - pCompromisedToSecure;
+        // Remaining probability: stay in Reconnaissance state
+        const pReconToRecon = 1 - pReconToExploit - pReconToSecure;
 
+        // =====================================================================
+        // EXPLOITATION STATE TRANSITIONS
+        // =====================================================================
+        // Base probability: 15% successful compromise (low risk)
+        // Max probability: 70% successful compromise (high risk)
+        const pExploitToCompromised = BASE_PROB_EXPLOIT_TO_COMPROMISED + (riskFactor * SCALE_PROB_EXPLOIT_TO_COMPROMISED);
+
+        // Defender regression: 10% chance of dropping back to Reconnaissance
+        const pExploitToRecon = PROB_EXPLOIT_TO_RECON;
+
+        // Remaining probability: stay in Exploitation state
+        const pExploitToExploit = 1 - pExploitToCompromised - pExploitToRecon;
+
+        // =====================================================================
+        // COMPROMISED STATE TRANSITIONS (Absorbing State)
+        // =====================================================================
+        // Remediation: 1% chance per time step of full recovery
+        // (Reflects typical ICS incident response timelines: weeks to months)
+        const pCompromisedToSecure = PROB_COMPROMISED_TO_SECURE;
+        const pCompromisedToCompromised = 1 - pCompromisedToSecure;
+
+        // =====================================================================
+        // CONSTRUCT TRANSITION MATRIX
+        // =====================================================================
         return {
             'Secure': {
                 'Secure': pSecureToSecure,
@@ -54,29 +98,34 @@ export class MarkovEngine {
             },
             'Reconnaissance': {
                 'Secure': pReconToSecure,
-                'Reconnaissance': Math.max(0, _pReconToRecon),
+                'Reconnaissance': Math.max(0, pReconToRecon),
                 'Exploitation': pReconToExploit,
                 'Compromised': 0
             },
             'Exploitation': {
                 'Secure': 0,
                 'Reconnaissance': pExploitToRecon,
-                'Exploitation': Math.max(0, _pExploitToExploit),
+                'Exploitation': Math.max(0, pExploitToExploit),
                 'Compromised': pExploitToCompromised
             },
             'Compromised': {
                 'Secure': pCompromisedToSecure,
                 'Reconnaissance': 0,
                 'Exploitation': 0,
-                'Compromised': _pCompromisedToCompromised
+                'Compromised': pCompromisedToCompromised
             }
         };
     }
 
     /**
      * Simulates the system state over N time steps (hours).
-     * @param riskScore Current risk score (0-10)
-     * @param hours Duration to simulate (e.g., 24)
+     * 
+     * Uses matrix multiplication to compute probability distributions:
+     * P(t+1) = P(t) × TransitionMatrix
+     * 
+     * @param riskScore - Current risk score (0-10)
+     * @param hours - Duration to simulate (default: 24 hours)
+     * @returns Array of probability distributions for each time step
      */
     static simulateAttackProgression(riskScore: number, hours: number = 24): MarkovStep[] {
         const matrix = this.createTransitionMatrix(riskScore);
@@ -111,7 +160,7 @@ export class MarkovEngine {
                 }
             }
 
-            // Normalize slightly to prevent floating point drift
+            // Normalize to prevent floating-point drift
             const sum = Object.values(nextState).reduce((a, b) => a + b, 0);
             for (const k of Object.keys(nextState) as ManualSecurityState[]) {
                 nextState[k] /= sum;

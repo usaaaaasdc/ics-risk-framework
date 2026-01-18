@@ -47,8 +47,8 @@ export interface TimelineEvent {
 
 export function generateRemediationPlan(
   riskScore: number,
-  vulnerabilities: any[],
-  devices: any[],
+  _vulnerabilities: any[],
+  _devices: any[],
   language: "ar" | "en" | "de" = "en",
 ): RemediationPlan {
   const tasks: RemediationTask[] = []
