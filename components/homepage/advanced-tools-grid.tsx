@@ -248,7 +248,7 @@ export function AdvancedToolsGrid() {
 
           {categories.map(cat => (
             <TabsContent key={cat.id} value={cat.id} className="mt-0">
-              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {tools[cat.id as keyof typeof tools].map((tool: any) => {
                   const Icon = tool.icon
                   return (

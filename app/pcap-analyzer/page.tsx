@@ -21,6 +21,7 @@ import {
 import Link from "next/link"
 import { PCAPAnalyzer, type PCAPAnalysisResult } from "@/lib/pcap-analyzer"
 import { Progress } from "@/components/ui/progress"
+import { jsPDF } from "jspdf"
 
 export default function PCAPAnalyzerPage() {
   const { language } = useLanguage()
@@ -53,24 +54,63 @@ export default function PCAPAnalyzerPage() {
     }
   }
 
-  const analyzeFile = async () => {
+const analyzeFile = async () => {
     if (!file) return
 
     setAnalyzing(true)
     setError(null)
 
     try {
-      const analyzer = new PCAPAnalyzer()
-      await analyzer.parsePCAPFile(file)
-      const analysisResult = analyzer.analyze()
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await fetch("/api/pcap-analyze", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || "Service error")
+      }
+
+     const raw = await response.json()
+
+const analysisResult: PCAPAnalysisResult = {
+  totalPackets: raw.total_packets ?? 0,
+  duration: raw.duration_seconds ?? 0,
+  protocols: raw.protocols ?? {},
+  topSources: raw.top_sources ?? [],
+  topDestinations: raw.top_destinations ?? [],
+  riskScore: raw.risk_score ?? 0,
+  recommendations: raw.recommendations ?? [],
+  industrialProtocols: (raw.ics_protocols_found ?? []).map((name: string) => ({
+    protocol: name,
+    packets: raw.protocols?.[name] ?? 0,
+    percentage: raw.total_packets > 0
+      ? ((raw.protocols?.[name] ?? 0) / raw.total_packets) * 100
+      : 0,
+    commands: [],
+    anomalies: [],
+  })),
+  suspiciousPatterns: (raw.alerts ?? []).map((alert: any) => ({
+    type: alert.alert_type ?? "UNKNOWN",
+    severity: alert.severity ?? "medium",
+    description: alert.description ?? "",
+    count: alert.count ?? 1,
+    affectedIPs: alert.affected_ips ?? [],
+  })),
+}
+
+
       setResult(analysisResult)
     } catch (err) {
       setError(
         language === "ar"
-          ? "فشل تحليل الملف. يرجى التأكد من صحة الملف."
+          ? "فشل تحليل الملف. تأكد ان خدمة Python شغالة على المنفذ 8000."
           : language === "de"
-            ? "Fehler beim Analysieren der Datei. Bitte überprüfen Sie die Datei."
-            : "Failed to analyze file. Please check the file is valid.",
+            ? "Fehler. Stellen Sie sicher, dass der Python-Dienst auf Port 8000 läuft."
+            : "Failed to analyze. Make sure Python service is running on port 8000.",
       )
     } finally {
       setAnalyzing(false)
@@ -461,13 +501,135 @@ export default function PCAPAnalyzerPage() {
                 {language === "en" && "Analyze Another File"}
                 {language === "de" && "Weitere Datei analysieren"}
               </Button>
-              <Button variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                {language === "ar" && "تحميل التقرير"}
-                {language === "en" && "Download Report"}
-                {language === "de" && "Bericht herunterladen"}
-              </Button>
-            </div>
+<Button
+  variant="outline"
+  onClick={() => {
+    if (!result) return
+
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    let y = 20
+
+    const addLine = (text: string, size = 11, bold = false, color = [0, 0, 0] as [number, number, number]) => {
+      if (y > 270) {
+        doc.addPage()
+        y = 20
+      }
+      doc.setFontSize(size)
+      doc.setFont("helvetica", bold ? "bold" : "normal")
+      doc.setTextColor(color[0], color[1], color[2])
+      doc.text(text, 14, y)
+      y += size * 0.5 + 3
+    }
+
+    const addSeparator = () => {
+      doc.setDrawColor(200, 200, 200)
+      doc.line(14, y, pageWidth - 14, y)
+      y += 5
+    }
+
+    // Header
+    doc.setFillColor(15, 23, 42)
+    doc.rect(0, 0, pageWidth, 35, "F")
+    doc.setFontSize(18)
+    doc.setFont("helvetica", "bold")
+    doc.setTextColor(255, 255, 255)
+    doc.text("ICS-Risk Framework", 14, 15)
+    doc.setFontSize(11)
+    doc.setFont("helvetica", "normal")
+    doc.text("PCAP Network Traffic Analysis Report", 14, 25)
+    doc.setFontSize(9)
+    doc.text("Generated: " + new Date().toLocaleString(), pageWidth - 80, 25)
+    y = 45
+
+    // Risk Score Box
+    const riskColor: [number, number, number] =
+      result.riskScore >= 8 ? [220, 38, 38] :
+      result.riskScore >= 6 ? [249, 115, 22] :
+      result.riskScore >= 3 ? [234, 179, 8] :
+      [34, 197, 94]
+
+    doc.setFillColor(...riskColor)
+    doc.roundedRect(14, y, pageWidth - 28, 22, 3, 3, "F")
+    doc.setFontSize(13)
+    doc.setFont("helvetica", "bold")
+    doc.setTextColor(255, 255, 255)
+    const riskLabel =
+      result.riskScore >= 8 ? "CRITICAL" :
+      result.riskScore >= 6 ? "HIGH" :
+      result.riskScore >= 3 ? "MEDIUM" : "LOW"
+    doc.text(
+      "Risk Level: " + riskLabel + "   |   Score: " + result.riskScore.toFixed(1) + " / 10",
+      pageWidth / 2, y + 14,
+      { align: "center" }
+    )
+    y += 30
+
+    // Summary
+    addLine("SUMMARY", 13, true, [15, 23, 42])
+    addSeparator()
+    addLine("Total Packets   : " + result.totalPackets.toLocaleString())
+    addLine("Duration        : " + Math.floor(result.duration) + " seconds")
+    addLine("Suspicious Patterns : " + result.suspiciousPatterns.length)
+    addLine("Industrial Protocols: " + result.industrialProtocols.length)
+    y += 5
+
+    // Protocols
+    addLine("PROTOCOL DISTRIBUTION", 13, true, [15, 23, 42])
+    addSeparator()
+    Object.entries(result.protocols)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+      .forEach(([proto, count]) => {
+        const pct = ((count / result.totalPackets) * 100).toFixed(1)
+        addLine("  " + proto + " : " + count + " packets (" + pct + "%)")
+      })
+    y += 5
+
+    // Suspicious Patterns
+    if (result.suspiciousPatterns.length > 0) {
+      addLine("SUSPICIOUS PATTERNS DETECTED", 13, true, [15, 23, 42])
+      addSeparator()
+      result.suspiciousPatterns.forEach((p) => {
+        const sevColor: [number, number, number] =
+          p.severity === "critical" ? [220, 38, 38] :
+          p.severity === "high" ? [249, 115, 22] :
+          p.severity === "medium" ? [234, 179, 8] :
+          [34, 197, 94]
+        addLine("[" + p.severity.toUpperCase() + "] " + p.type, 11, true, sevColor)
+        const lines = doc.splitTextToSize("  " + p.description, pageWidth - 30) as string[]
+        lines.forEach((line: string) => addLine(line, 10, false, [80, 80, 80]))
+        addLine("  Count: " + p.count + "   |   Affected IPs: " + p.affectedIPs.length, 10)
+        y += 3
+      })
+      y += 5
+    }
+
+    // Recommendations
+    addLine("SECURITY RECOMMENDATIONS", 13, true, [15, 23, 42])
+    addSeparator()
+    result.recommendations.forEach((rec, i) => {
+      const lines = doc.splitTextToSize((i + 1) + ". " + rec, pageWidth - 30) as string[]
+      lines.forEach((line: string) => addLine(line, 10))
+      y += 2
+    })
+    y += 5
+
+    // Footer
+    addSeparator()
+    addLine("ICS-Risk Framework v2.0  |  Author: Osama Ali  |  " + new Date().getFullYear(), 9, false, [120, 120, 120])
+
+    // Save
+    const filename = "ICS-Risk-Report-" + new Date().toISOString().slice(0, 10) + ".pdf"
+    doc.save(filename)
+  }}
+>
+  <Download className="w-4 h-4 mr-2" />
+  {language === "ar" && "تحميل التقرير PDF"}
+  {language === "en" && "Download PDF Report"}
+  {language === "de" && "PDF-Bericht herunterladen"}
+</Button>
+                           </div>
           </div>
         )}
       </div>

@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { runMonteCarloSimulation, SimulationParams } from "@/lib/calculators/risk-engine"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LineChart, Line, Legend } from "recharts"
 import { MarkovEngine, ManualSecurityState } from "@/lib/calculators/markov-engine"
 import { NetworkTopology } from "@/components/network-topology"
 import { PacketUpload } from "@/components/packet-upload"
+import { DetectedThreat } from "@/lib/calculators/pcap-ingestor"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
@@ -16,6 +17,8 @@ import { RotateCcw, TrendingDown } from "lucide-react"
 
 export default function RiskSimulationChart() {
     const { language } = useLanguage()
+
+    // Simulation parameters state
     const [params, setParams] = useState<SimulationParams>({
         baseImpact: 7,
         baseLikelihood: 0.6,
@@ -23,6 +26,68 @@ export default function RiskSimulationChart() {
         uncertainty: 0.2,
         iterations: 2000
     })
+
+    // LIFTED STATE: Detected threats from Traffic Analyzer
+    const [detectedThreats, setDetectedThreats] = useState<DetectedThreat[]>([])
+
+    // REACTIVE LOGIC: Auto-update simulation parameters based on detected threats
+    useEffect(() => {
+        if (detectedThreats.length === 0) {
+            setParams({
+                baseImpact: 3,
+                baseLikelihood: 0.2,
+                mitigationFactor: 0.8,
+                uncertainty: 0.2,
+                iterations: 2000
+            });
+            return;
+        }
+
+        // Analyze threat severity levels
+        const hasCritical = detectedThreats.some(t => t.severity === 'Critical');
+        const hasHigh = detectedThreats.some(t => t.severity === 'High');
+
+        console.log('🚨 Threat Detection Triggered!');
+        console.log(`   Critical Threats: ${detectedThreats.filter(t => t.severity === 'Critical').length}`);
+        console.log(`   High Threats: ${detectedThreats.filter(t => t.severity === 'High').length}`);
+
+        // Auto-adjust parameters based on threat severity
+        if (hasCritical) {
+            console.log('⚠️ CRITICAL THREAT DETECTED - Auto-setting MAXIMUM RISK parameters');
+            setParams({
+                baseImpact: 9.5,           // Maximum impact
+                baseLikelihood: 0.95,      // 95% likelihood
+                mitigationFactor: 0.1,     // Minimal mitigation (10%)
+                uncertainty: 0.2,
+                iterations: 2000
+            });
+        } else if (hasHigh) {
+            console.log('⚠️ HIGH THREAT DETECTED - Auto-setting HIGH RISK parameters');
+            setParams({
+                baseImpact: 7.0,           // High impact
+                baseLikelihood: 0.70,      // 70% likelihood
+                mitigationFactor: 0.3,     // Low mitigation (30%)
+                uncertainty: 0.2,
+                iterations: 2000
+            });
+        } else {
+            // Medium/Low threats
+            console.log('ℹ️ Medium/Low threats detected - Setting moderate risk parameters');
+            setParams({
+                baseImpact: 4.0,
+                baseLikelihood: 0.40,
+                mitigationFactor: 0.6,
+                uncertainty: 0.2,
+                iterations: 2000
+            });
+        }
+    }, [detectedThreats]);
+
+    // Callback function to receive threats from PacketUpload component
+    const handleThreatsDetected = (threats: DetectedThreat[]) => {
+        console.log('📡 Received threats from Traffic Analyzer:', threats.length);
+        setDetectedThreats(threats);
+    };
 
     // Memoize calculation so it doesn't run on every render unless params change
     const stats = useMemo(() => runMonteCarloSimulation(params), [params])
@@ -258,7 +323,7 @@ export default function RiskSimulationChart() {
 
                         {/* TAB 4: Traffic Analysis */}
                         <TabsContent value="traffic">
-                            <PacketUpload />
+                            <PacketUpload onThreatsDetected={handleThreatsDetected} />
                         </TabsContent>
                     </Tabs>
                 </div>

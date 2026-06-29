@@ -1,0 +1,200 @@
+[
+    {
+        "timestamp": "2026-02-09T10:00:00.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 3,
+        "length": 64,
+        "info": "Read Holding Registers - Engineering Workstation querying sensor data"
+    },
+    {
+        "timestamp": "2026-02-09T10:00:15.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 4,
+        "length": 72,
+        "info": "Read Input Registers - Monitoring pressure values"
+    },
+    {
+        "timestamp": "2026-02-09T10:00:30.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 3,
+        "length": 68,
+        "info": "Read Holding Registers - Temperature monitoring"
+    },
+    {
+        "timestamp": "2026-02-09T10:00:45.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 5,
+        "length": 56,
+        "info": "Write Single Coil - Authorized valve adjustment"
+    },
+    {
+        "timestamp": "2026-02-09T10:01:00.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 3,
+        "length": 64,
+        "info": "Read Holding Registers - Status verification"
+    },
+    {
+        "timestamp": "2026-02-09T10:01:15.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 4,
+        "length": 70,
+        "info": "Read Input Registers - Flow rate check"
+    },
+    {
+        "timestamp": "2026-02-09T10:01:30.000Z",
+        "source_ip": "192.168.1.10",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 3,
+        "length": 66,
+        "info": "Read Holding Registers - System diagnostics"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:00.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 502 (Modbus)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:01.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 80 (HTTP)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:02.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 443 (HTTPS)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:03.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 102 (S7Comm)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:04.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 8080 (HTTP-Alt)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:05.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 21 (FTP)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:06.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 22 (SSH)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:07.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 23 (Telnet)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:08.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 161 (SNMP)"
+    },
+    {
+        "timestamp": "2026-02-09T10:05:09.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "TCP",
+        "function_code": 0,
+        "length": 40,
+        "info": "SYN scan - Port 20000 (DNP3)"
+    },
+    {
+        "timestamp": "2026-02-09T10:10:00.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 15,
+        "length": 84,
+        "info": "UNAUTHORIZED - Write Multiple Coils - Safety interlock bypass attempt"
+    },
+    {
+        "timestamp": "2026-02-09T10:10:05.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 15,
+        "length": 92,
+        "info": "UNAUTHORIZED - Write Multiple Coils - Emergency shutdown override"
+    },
+    {
+        "timestamp": "2026-02-09T10:10:10.000Z",
+        "source_ip": "192.168.1.20",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 15,
+        "length": 88,
+        "info": "UNAUTHORIZED - Write Multiple Coils - Pressure relief valve manipulation (Compromised HMI)"
+    },
+    {
+        "timestamp": "2026-02-09T10:10:15.000Z",
+        "source_ip": "192.168.1.20",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 16,
+        "length": 96,
+        "info": "UNAUTHORIZED - Write Multiple Registers - Critical setpoint modification (Compromised HMI)"
+    },
+    {
+        "timestamp": "2026-02-09T10:10:20.000Z",
+        "source_ip": "45.33.22.11",
+        "dest_ip": "192.168.1.100",
+        "protocol": "Modbus",
+        "function_code": 15,
+        "length": 90,
+        "info": "UNAUTHORIZED - Write Multiple Coils - Alarm suppression attempt"
+    }
+]
