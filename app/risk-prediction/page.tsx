@@ -19,11 +19,11 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "@/lib/i18n/language-context"
-import { AIRiskPredictor } from "@/lib/ai-risk-prediction"
+import { RiskPredictor } from "@/lib/risk-prediction"
 
-export default function AIPredictionPage() {
+export default function RiskPredictionPage() {
   const { language } = useLanguage()
-  const [predictor] = useState(() => new AIRiskPredictor())
+  const [predictor] = useState(() => new RiskPredictor())
   const [prediction, setPrediction] = useState<any>(null)
   const [statistics, setStatistics] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -115,9 +115,9 @@ export default function AIPredictionPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="w-6 h-6" />
-              {language === "ar" && "توقع المخاطر بالذكاء الاصطناعي"}
-              {language === "en" && "AI Risk Prediction"}
-              {language === "de" && "KI-Risikovorhersage"}
+              {language === "ar" && "تحليل المخاطر التنبؤي"}
+              {language === "en" && "Predictive Risk Analysis"}
+              {language === "de" && "Prädiktive Risikoanalyse"}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -125,11 +125,11 @@ export default function AIPredictionPage() {
               <Info className="w-4 h-4" />
               <AlertDescription>
                 {language === "ar" &&
-                  "لا توجد بيانات تاريخية كافية للتوقع. يرجى إجراء تقييمات أمنية أولاً لتمكين الذكاء الاصطناعي من التعلم والتوقع."}
+                  "لا توجد بيانات تاريخية كافية للتوقع. يرجى إجراء تقييمات أمنية أولاً لتمكين التوقع الإحصائي."}
                 {language === "en" &&
-                  "Insufficient historical data for prediction. Please perform security assessments first to enable AI learning and prediction."}
+                  "Insufficient historical data for prediction. Please perform security assessments first to enable statistical forecasting."}
                 {language === "de" &&
-                  "Unzureichende historische Daten für Vorhersagen. Bitte führen Sie zuerst Sicherheitsbewertungen durch, um KI-Lernen und Vorhersagen zu ermöglichen."}
+                  "Unzureichende historische Daten für Vorhersagen. Bitte führen Sie zuerst Sicherheitsbewertungen durch, um statistische Prognosen zu ermöglichen."}
               </AlertDescription>
             </Alert>
 
@@ -164,14 +164,14 @@ export default function AIPredictionPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
           <Brain className="w-8 h-8 text-primary" />
-          {language === "ar" && "توقع المخاطر بالذكاء الاصطناعي"}
-          {language === "en" && "AI-Powered Risk Prediction"}
-          {language === "de" && "KI-gestützte Risikovorhersage"}
+          {language === "ar" && "تحليل المخاطر التنبؤي"}
+          {language === "en" && "Predictive Risk Analysis"}
+          {language === "de" && "Prädiktive Risikoanalyse"}
         </h1>
         <p className="text-muted-foreground">
-          {language === "ar" && "تحليل متقدم باستخدام الذكاء الاصطناعي لتوقع المخاطر المستقبلية"}
-          {language === "en" && "Advanced AI analysis to predict future security risks"}
-          {language === "de" && "Fortgeschrittene KI-Analyse zur Vorhersage zukünftiger Sicherheitsrisiken"}
+          {language === "ar" && "تحليل إحصائي للبيانات التاريخية لتوقع المخاطر الأمنية المستقبلية"}
+          {language === "en" && "Statistical analysis of historical assessments to forecast future security risks"}
+          {language === "de" && "Statistische Analyse historischer Bewertungen zur Prognose zukünftiger Sicherheitsrisiken"}
         </p>
       </div>
 
@@ -393,14 +393,14 @@ export default function AIPredictionPage() {
         </Card>
       )}
 
-      {/* AI Recommendations */}
+      {/* Forecast Recommendations */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="w-5 h-5" />
-            {language === "ar" && "توصيات الذكاء الاصطناعي"}
-            {language === "en" && "AI Recommendations"}
-            {language === "de" && "KI-Empfehlungen"}
+            {language === "ar" && "توصيات التوقع الإحصائي"}
+            {language === "en" && "Forecast Recommendations"}
+            {language === "de" && "Prognoseempfehlungen"}
           </CardTitle>
         </CardHeader>
         <CardContent>

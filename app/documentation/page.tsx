@@ -155,7 +155,7 @@ Generate compliance reports for IEC 62443 and NIST framework requirements.
 ## 6. Future Enhancements
 
 - Integration with live CVE feeds (NVD API)
-- Machine learning for risk prediction
+- Statistical risk forecasting
 - Network topology visualization
 - Automated report generation
 - Support for additional compliance frameworks (ISO 27001, NERC CIP)

@@ -1,5 +1,5 @@
 /**
- * ICS-Risk Framework - AI-Powered Risk Prediction Engine
+ * ICS-Risk Framework - Statistical Risk Forecasting Engine
  * Copyright (c) 2025 Osama Ali
  * Licensed under MIT License
  */
@@ -34,7 +34,7 @@ interface PredictionResult {
   }[]
 }
 
-export class AIRiskPredictor {
+export class RiskPredictor {
   private historicalData: HistoricalData[] = []
 
   // Load historical data from localStorage

@@ -114,7 +114,7 @@ Before adding to database:
 ### Version 2.0 (Q3 2025)
 - [ ] Automated NVD API integration
 - [ ] Real-time CVE updates
-- [ ] Machine learning-based classification
+- [ ] Statistical classification
 - [ ] Community contribution system
 
 ## Accuracy Disclaimer

@@ -114,7 +114,13 @@ def create_test_pcap() -> bytes:
 
 if __name__ == "__main__":
     import sys
-    sys.path.insert(0, "/home/claude/ics-pcap-service")
+    from pathlib import Path
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    service_dir = Path(__file__).resolve().parent
+    sys.path.insert(0, str(service_dir))
     from main import ICSPCAPAnalyzer
     from dataclasses import asdict
     import json
@@ -163,7 +169,8 @@ if __name__ == "__main__":
     print("✅ ALL TESTS PASSED — Engine is functional")
     print("=" * 60)
 
-    # Save sample output
-   with open("sample_output.json", "w") as f:
-        json.dump(asdict(result), f, indent=2)
+    # Save the diagnostic output next to this script, regardless of the caller's cwd.
+    output_path = service_dir / "sample_output.json"
+    with output_path.open("w", encoding="utf-8") as output_file:
+        json.dump(asdict(result), output_file, indent=2)
     print("\n📄 Full JSON output saved to sample_output.json")

@@ -215,14 +215,14 @@ export const translations = {
     limitation4: "قاعدة البيانات تحتاج تحديثات دورية يدوية",
     validationFuture: "خطة البحث المستقبلية (ماجستير)",
     futureResearch: "سيتم توسيع هذا الإطار خلال دراستي للماجستير في الأمن السيبراني الصناعي لتتضمن:",
-    futureGoal1: "كشف الشذوذ باستخدام التعلم الآلي (ML-based Anomaly Detection)",
+    futureGoal1: "كشف الشذوذ باستخدام التحليل الإحصائي",
     futureGoal2: "تكامل مع أدوات مسح الشبكة (Nmap, Wireshark)",
     futureGoal3: "نظام توصيات ذكي يستخدم NLP لتحليل تقارير ICS-CERT",
     futureGoal4: "منصة تعاونية لمشاركة الثغرات والحلول بين المهندسين",
     futureGoal5: "نموذج تنبؤي للهجمات المستقبلية على أنظمة ICS",
     researchGap: "الفجوة البحثية المستهدفة",
     researchGapText:
-      "معظم حلول الأمن السيبراني الصناعي تتطلب اتصالاً مستمراً بالإنترنت وتعتمد على بيانات سحابية. هذا الإطار يعالج الفجوة في الأمن التنبؤي للأنظمة الصناعية غير المتصلة بالإنترنت (air-gapped systems) من خلال التحليل المحلي والتعلم الآلي.",
+      "معظم حلول الأمن السيبراني الصناعي تتطلب اتصالاً مستمراً بالإنترنت وتعتمد على بيانات سحابية. هذا الإطار يعالج الفجوة في الأمن التنبؤي للأنظمة الصناعية غير المتصلة بالإنترنت (air-gapped systems) من خلال التحليل المحلي والأساليب الإحصائية.",
 
     // Common
     date: "التاريخ",
@@ -456,14 +456,14 @@ export const translations = {
     validationFuture: "Future Research Plan (Master's Thesis)",
     futureResearch:
       "This framework will be extended during my Master's studies in Industrial Cybersecurity to include:",
-    futureGoal1: "ML-based anomaly detection for predictive security",
+    futureGoal1: "Statistical anomaly detection for predictive security",
     futureGoal2: "Integration with network scanning tools (Nmap, Wireshark)",
     futureGoal3: "Intelligent recommendation system using NLP for ICS-CERT report analysis",
     futureGoal4: "Collaborative platform for vulnerability and solution sharing among engineers",
     futureGoal5: "Predictive model for future attacks on ICS systems",
     researchGap: "Targeted Research Gap",
     researchGapText:
-      "Most industrial cybersecurity solutions require continuous internet connectivity and rely on cloud-based data. This framework addresses the gap in predictive security for offline industrial systems (air-gapped systems) through local analysis and machine learning.",
+      "Most industrial cybersecurity solutions require continuous internet connectivity and rely on cloud-based data. This framework addresses the gap in predictive security for offline industrial systems (air-gapped systems) through local analysis and statistical forecasting.",
 
     // Common
     date: "Date",

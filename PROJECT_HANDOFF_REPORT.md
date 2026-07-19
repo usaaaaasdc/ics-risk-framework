@@ -1,0 +1,401 @@
+# ICS-Risk Framework Technical Handoff Report
+
+## 1. Repository and publication state
+
+| Field | Value |
+| --- | --- |
+| Repository | https://github.com/usaaaaasdc/ics-risk-framework |
+| Handoff branch | `project/project-handoff-2026-07-19` |
+| Target branch | `main` |
+| Base SHA | `59d5f60f81a066554c092c1432cc24b1f63179f7` |
+| `origin/main` after fetch | `59d5f60f81a066554c092c1432cc24b1f63179f7` |
+| Final SHA | The PR head/commit containing this report. The exact value is supplied in the final publication response because a Git commit cannot contain its own SHA without changing that SHA. |
+| Report date | 2026-07-19 |
+
+The checkout was initially clean on `main`; there were no modified, staged, or untracked project files and no local commits ahead of `origin/main`. The handoff branch was created directly from the fetched base. Git metadata attributes the latest pre-handoff commit to project author Osama Ali.
+
+## 2. Executive summary
+
+ICS-Risk Framework is a Next.js 16 research prototype for industrial control system risk assessment. It combines a deterministic static assessment formula, JSON-based vulnerability matching, browser-side traffic heuristics, Monte Carlo residual-risk simulation, a discrete-time Markov attack-progression model, topology/digital-twin visualizations, local browser persistence, and client-generated reports.
+
+The latest pre-handoff commit added a real FastAPI/dpkt PCAP analysis path. A PCAP uploaded in the browser is posted to a Next.js route, forwarded to a Python service on port 8000, parsed with dpkt, scored with rule-based threat logic, and returned to the PCAP page. This path is operational and was verified with a synthetic PCAP, but it is not connected to the static assessment/project record or to the Monte Carlo/Markov dashboard. The browser JSON analyzer is the traffic path that currently adjusts Monte Carlo inputs.
+
+The project builds and its six Vitest tests pass after small validation blockers were corrected. Lint now runs with ESLint 9 but exposes existing code-quality errors. The repository has no valid Playwright E2E suite. Production dependencies contain four known audit findings, including a vulnerable direct Next.js version. The vulnerability data file contains five records while metadata and verification documentation claim 70 fully verified CVEs.
+
+## 3. Current architecture
+
+### Next.js frontend
+
+- Next.js 16 App Router with React 19 and TypeScript.
+- Static pages cover assessment, simulations, topology, digital twin, analytics, compliance, incident response, remediation, reports, and supporting documentation.
+- The app builds 31 routes; `/api/pcap-analyze` is the only repository-defined dynamic API route.
+- UI components use Radix primitives, Tailwind CSS, Recharts, Lucide icons, and jsPDF.
+
+### Browser JSON traffic analyzer
+
+- `components/packet-upload.tsx` accepts pasted JSON or a JSON file.
+- `lib/calculators/pcap-ingestor.ts` parses arrays and applies rule-based detection.
+- Modbus write authorization uses a hardcoded three-address engineering/SCADA whitelist.
+- Browser port-scan detection triggers at 20 or more unique destination ports.
+- Results are stored under `detected-threats` in localStorage and passed to `RiskSimulationChart`.
+
+### Static assessment and vulnerability matching
+
+- `lib/risk-engine.ts` computes a 0-10 score from average CVSS, internet exposure, and legacy-device weight.
+- Matching combines device/manufacturer substring matching, protocol equality, and a confidence heuristic from `lib/improved-matching.ts`.
+- The current vulnerability file has five entries. Generic IDs referenced by the risk engine are not present in that file, so the generic internet/legacy additions are currently inactive.
+
+### Monte Carlo engine
+
+- `lib/calculators/risk-engine.ts` performs Box-Muller sampling.
+- Residual risk is calculated as impact x likelihood x 10 x remaining mitigation.
+- Its natural output range is approximately 0-100, despite other parts of the app using 0-10.
+- JSON traffic severity sets hardcoded simulation parameter profiles before the simulation runs.
+
+### Markov engine
+
+- `lib/calculators/markov-engine.ts` implements Secure, Reconnaissance, Exploitation, and Compromised states.
+- Transition constants are in `lib/constants/markov-parameters.ts`.
+- The engine documents and expects a 0-10 risk input, then normalizes it to 0-1.
+- The UI currently seeds it with the Monte Carlo-style formula that can reach about 100, causing many realistic parameter sets to clamp to maximum Markov risk.
+
+### Network topology and digital twin
+
+- `lib/network-topology.ts` creates zones, nodes, links, layouts, and graph search attack paths.
+- Device-to-device links are randomly generated, so the same project can produce different topology edges between runs.
+- `app/digital-twin/page.tsx` uses a separate risk-propagation graph and falls back to a hardcoded demo graph.
+- Project-derived digital-twin risk offsets and encryption flags also use random values.
+
+### FastAPI/dpkt PCAP service
+
+- `ics-pcap-service/main.py` parses Ethernet/IPv4 TCP and UDP PCAP records with dpkt.
+- It recognizes traffic by common ICS ports and parses basic Modbus TCP and DNP3 fields.
+- It detects dangerous Modbus function codes, broad port scans, and external-source DNP3 traffic.
+- It returns packet counts, protocol counts, top endpoints, limited event details, alerts, recommendations, and an independent 0-10 risk score.
+- It accepts `.pcap`, `.pcapng`, and `.cap` names, but the parser only instantiates `dpkt.pcap.Reader`; PCAPNG support is therefore advertised but not implemented.
+
+### Next.js PCAP proxy route
+
+- `POST /api/pcap-analyze` reads browser multipart form data and forwards the file to `http://localhost:8000/analyze`.
+- `GET /api/pcap-analyze` proxies the Python `/health` endpoint.
+- The service URL is hardcoded and has no environment-variable override.
+
+### Persistence
+
+- Projects use localStorage key `ics-security-projects`.
+- Other keys include `ics-risk-history`, `detected-threats`, `quick-config`, `app-language`, `theme`, and `lastAssessment`.
+- `lib/storage-encryption.ts` contains AES-GCM/PBKDF2 support, but it is not wired into project persistence and its exported instance is disabled.
+
+### PDF and report generation
+
+- Assessment export creates a downloadable HTML report through `lib/pdf-generator.tsx` despite the function name `generatePDF`.
+- The homepage report component and PCAP page use jsPDF for PDF downloads.
+- PCAP reports can include network endpoints and alert descriptions; these exports should be handled as potentially sensitive artifacts.
+
+## 4. Latest changed files and purpose
+
+### Pre-handoff commit `59d5f60`
+
+| File | Change purpose or observation |
+| --- | --- |
+| `Technical_Report_AR.md` | Added an Arabic technical report describing the architecture and detection logic. Several claims now diverge from code/data. |
+| `app/api/pcap-analyze/ICS-Risk-PCAP-Report.txt.crdownload` | Tracked incomplete browser-download artifact containing a generated PCAP report. Not application source. |
+| `app/api/pcap-analyze/ICS_Test_Raporu.pdf` | Tracked generated PDF inside the API source folder. Not required by the route. |
+| `app/api/pcap-analyze/route.ts` | Added the Next.js multipart proxy and health proxy for the Python service. |
+| `app/pcap-analyzer/page.tsx` | Replaced the active random browser PCAP path with the API proxy response and added a jsPDF report action. |
+| `components/homepage/advanced-tools-grid.tsx` | Increased grid gap spacing. |
+| `components/homepage/hero-section.tsx` | Restyled the hero and changed the primary CTA from assessment to risk simulation. |
+| `components/packet-upload.tsx` | Added JSON file upload, flexible wrapper extraction, callback delivery, and localStorage persistence. |
+| `components/risk-simulation-chart.tsx` | Connected browser JSON threat severity to hardcoded Monte Carlo parameter profiles. |
+| `demo_attack_scenario.json` | Added a 22-packet synthetic traffic scenario. |
+| `ics-pcap-service/__pycache__/main.cpython-314.pyc` | Tracked generated Python bytecode. |
+| `ics-pcap-service/main.py` | Added the FastAPI/dpkt analyzer and three endpoints. |
+| `ics-pcap-service/requirements.txt` | Added four pinned Python runtime dependencies. |
+| `ics-pcap-service/test_engine.py` | Added a synthetic Modbus/scan integration script; it originally had a syntax indentation error and a machine-specific path. |
+| `lib/utils copy.ts` | Added an exact duplicate of the existing utility helper under a suspicious filename. |
+| `package-lock.json` | Updated lock data for the jsPDF patch release. |
+| `package.json` | Raised jsPDF from `^4.0.0` to `^4.2.1`. |
+
+### Handoff branch fixes
+
+| File | Purpose |
+| --- | --- |
+| `.gitignore` | Ignores Python caches, bytecode, local virtual environments, and generated PCAP test output. Existing tracked artifacts remain tracked. |
+| `app/assessment/page.tsx` | Makes `useSearchParams()` access null-safe for the installed Next.js types. |
+| `app/pcap-analyzer/page.tsx` | Removes the unused runtime `PCAPAnalyzer` import while retaining its result type. |
+| `ics-pcap-service/test_engine.py` | Uses the script directory instead of a hardcoded Linux path, fixes indentation, configures UTF-8 output on Windows, and writes output predictably. |
+| `package.json` | Replaces the removed `next lint` command with ESLint 9 CLI commands. |
+| `eslint.config.mjs` | Adds the required flat configuration for Next.js 16/ESLint 9. |
+| `playwright.config.ts` | Restricts Playwright discovery to `e2e/**/*.spec.ts` so it no longer imports Vitest files. |
+| `PROJECT_HANDOFF_REPORT.md` | Records this technical handoff. |
+| `app/risk-prediction/page.tsx` | Renames the predictive-risk route and presents the feature as statistical forecasting. |
+| `lib/risk-prediction.ts` | Renames the deterministic forecasting engine and its exported class to `RiskPredictor`. |
+| `components/homepage/advanced-tools-grid.tsx` | Updates the predictive-risk link and multilingual labels. |
+| `app/about/page.tsx` | Replaces learning-model claims with statistical forecasting terminology. |
+| `app/documentation/page.tsx` | Updates the future-enhancement description to statistical risk forecasting. |
+| `lib/i18n/translations.ts` | Aligns Arabic and English research text with statistical analysis terminology. |
+| `VERIFICATION.md` | Renames the planned classification capability to statistical classification. |
+| `__tests__/risk-prediction.test.ts` | Verifies the renamed deterministic forecasting engine and import path. |
+
+## 5. Data flows
+
+### Static assessment flow
+
+1. User selects a device/configuration in the browser.
+2. `assessSystem` matches the five bundled vulnerability records.
+3. Static 0-10 risk is calculated from CVSS, exposure, and legacy weight.
+4. Recommendations, attack-surface points, baseline comparison, and matching confidence are produced.
+5. Results are rendered and can be saved to localStorage/project data or exported.
+
+### Browser JSON traffic flow
+
+1. User pastes or uploads JSON packet records.
+2. `TraficAnalyzer` parses the array and applies Modbus whitelist and port-count rules.
+3. Alerts are displayed, persisted to localStorage, and sent to `RiskSimulationChart`.
+4. Alert severity selects a hardcoded Monte Carlo parameter profile.
+5. Monte Carlo results are calculated.
+6. A derived score seeds the Markov engine, which updates the topology visualization.
+7. The homepage PDF component can include the persisted detected threats.
+
+### Real PCAP flow
+
+1. User selects a capture in `/pcap-analyzer`.
+2. The browser posts the file to Next.js `POST /api/pcap-analyze`.
+3. Next.js reads multipart form data and forwards the file to FastAPI `POST /analyze`.
+4. FastAPI reads the full file, validates extension/size, parses PCAP records, applies heuristics, and calculates its own 0-10 risk.
+5. Next.js returns the Python JSON to the browser.
+6. The page maps it into the legacy `PCAPAnalysisResult` UI shape and displays alerts, score, protocol charts, recommendations, and a PDF export.
+7. This result is not persisted into a project and does not update static assessment, Monte Carlo, Markov, or digital-twin state.
+
+## 6. Feature implementation inventory
+
+| Category | Features |
+| --- | --- |
+| Real implementation | Static formula and matching; browser JSON parsing; Monte Carlo sampling; Markov matrix multiplication; graph path search; localStorage projects; Next.js multipart proxy; dpkt PCAP parsing; health endpoint; jsPDF/HTML exports. |
+| Simulated | Browser `lib/pcap-analyzer.ts` random packet generation; attack simulation scenarios; demo topology/digital twin; sample traffic; randomly generated topology links and digital-twin properties. |
+| Heuristic/rule-based | All traffic threat detection; static risk; confidence matching; Predictive Risk Analysis; recommendation selection; PCAP risk score; risk-propagation behavior. |
+| Hardcoded | PCAP service URL; browser whitelist; scan thresholds; Markov constants; Monte Carlo severity profiles; many demo devices/graphs; report labels. |
+| Mocked | `mock-attack-traffic.json`, `demo_attack_scenario.json`, sample packet loader, demo project/graph fallbacks. |
+| Incomplete | PCAPNG parsing; real-PCAP integration with central risk; production auth/authorization; configurable whitelist; rate limiting/streaming; encrypted project persistence; NVD synchronization; E2E tests; consistent database evidence; unified risk scale. |
+
+`RiskPredictor` is a deterministic forecasting heuristic using weighted device attributes, recent localStorage averages, threshold-based confidence, and fixed future-risk probabilities. It has no fitted statistical model, training data, evaluation methodology, or calibration evidence.
+
+## 7. Data inventory and documentation inconsistencies
+
+Actual bundled data counts:
+
+- Vulnerabilities: 5.
+- Devices: 32.
+- Protocols: 24.
+- Interfaces: 7.
+- Industries: 12.
+
+Material inconsistencies:
+
+- `database-metadata.json`, `VERIFICATION.md`, and the Database Status page claim 70 total and 70 fully verified CVEs; `vulnerabilities.json` contains 5 records.
+- Metadata vendor/region/industry counts total far more records than the bundled vulnerability file can support.
+- The repository contains no automated NVD synchronization or evidence bundle that verifies the 70-record claim.
+- README describes browser/client-side architecture and states that all analysis remains client-side. Real PCAP bytes pass through both Next.js and FastAPI server processes.
+- README and Python detect scans above 10 unique ports; browser JSON logic and the Arabic technical report use 20 or more.
+- Browser JSON logic treats three hardcoded addresses as authorized Modbus writers. Python PCAP logic labels every dangerous FC 5/6/15/16 event unauthorized regardless of source.
+- README documents FC 5 and 15 only; browser and Python PCAP logic also include FC 6 and 16.
+- FastAPI accepts `.pcapng`, but its parser uses only `dpkt.pcap.Reader`.
+- Static/Python/legacy PCAP scores are 0-10; Monte Carlo and attack simulation produce 0-100-style values; the Markov UI passes a possible 0-100 value into an engine documented for 0-10.
+
+## 8. Endpoints, ports, environment variables, and runtime
+
+### Endpoints
+
+| Component | Method/path | Purpose |
+| --- | --- | --- |
+| Next.js | `POST /api/pcap-analyze` | Receive browser PCAP and proxy it to FastAPI. |
+| Next.js | `GET /api/pcap-analyze` | Proxy FastAPI health state. |
+| FastAPI | `GET /health` | Service status. |
+| FastAPI | `POST /analyze` | Analyze an uploaded capture. |
+| FastAPI | `POST /analyze/json-traffic` | Analyze JSON traffic with a smaller, separate rule set. |
+
+### Ports and variables
+
+- Next.js development default: `3000`.
+- FastAPI expected by source: `8000`.
+- `PCAP_SERVICE_URL` is hardcoded to `http://localhost:8000`; no environment variable exists for it.
+- `PLAYWRIGHT_BASE_URL` is supported by the new Playwright config and defaults to `http://127.0.0.1:3000`.
+- No application authentication, API token, or database environment variable is defined.
+
+### Verified toolchain
+
+- Node.js `v20.19.6`.
+- npm `10.8.2`.
+- Python `3.13.7`.
+- Git `2.54.0.windows.1`.
+- Python requirements: FastAPI 0.115.0, Uvicorn 0.30.6, dpkt 1.9.8, python-multipart 0.0.12.
+
+## 9. Verification results
+
+| Command | Final result | Exit | Notes |
+| --- | --- | ---: | --- |
+| `npm ci` | PASS | 0 | First attempt failed with Windows/OneDrive `ENOTEMPTY` in `node_modules/next`; a clean generated dependency directory was installed successfully. |
+| `npm run type-check` | PASS | 0 | Baseline exposed null `searchParams` and an unused `PCAPAnalyzer` import. Rename validation required clearing the ignored `.next` route cache once; regenerated types pass. |
+| `npm test -- --run` | PASS | 0 | 3 files, 6 tests passed. |
+| `npm run lint` | FAIL | 1 | The obsolete command was fixed. ESLint now runs and reports 15 errors and 63 warnings, mainly React hook purity/set-state rules plus two simple style issues. These are pre-existing and were not mass-refactored. |
+| `npm run build` | PASS | 0 | 31 routes generated, including `/risk-prediction`; the retired route is absent. Warnings remain for old browser-baseline data and multiple parent lockfiles affecting inferred Turbopack root. |
+| `npm run test:e2e -- --list` | FAIL | 1 | Vitest mis-discovery is fixed. No `e2e/**/*.spec.ts` tests exist, so Playwright correctly reports zero tests. |
+| `npm audit --omit=dev` | FAIL | 1 | 4 production findings: 2 high and 2 moderate. |
+| `python -m compileall ics-pcap-service` | PASS | 0 | Python syntax compiles after fixing `test_engine.py`. |
+| `python test_engine.py` | PASS | 0 | Synthetic 24-packet capture: 4 dangerous Modbus events, 1 scan suspect, 2 alerts, risk 9/10. A dpkt deprecation warning remains. |
+| Python `import main` | PASS | 0 | FastAPI app imports without starting a server. |
+| FastAPI `/health` | PASS | 0 | Returned HTTP 200 and engine v2.0 status on temporary loopback port 18000; service was stopped and the port verified closed. |
+
+Failed-command details preserved for continuation:
+
+- Baseline `npm run lint`: exit 1, `next lint` interpreted `lint` as a directory under Next.js 16. Fixed by flat ESLint configuration and CLI script.
+- Final `npm run lint`: exit 1, 15 code errors/63 warnings remain. Not fixed because doing so requires multi-page behavioral refactoring or policy decisions.
+- Baseline `npm run build`: exit 1, nullable `useSearchParams()` access. Fixed; final build passes.
+- Baseline Playwright list: exit 1, Playwright imported Vitest files. Fixed discovery; final exit 1 is solely the missing E2E suite.
+- First Python engine execution after syntax/path repair: exit 1, Windows terminal could not encode Unicode output. Fixed by configuring UTF-8 stdout.
+
+## 10. Dependency audit
+
+No automatic major upgrade or `npm audit fix --force` was applied.
+
+All dependency audit findings: 15 total (1 low, 5 moderate, 8 high, 1 critical).
+
+- Direct critical: Vitest range installed by the lockfile.
+- Direct high: Next.js 16.0.7.
+- Direct moderate: PostCSS.
+- Transitive findings include DOMPurify, lodash, flatted, minimatch, picomatch, Rollup, Vite, WebSocket, AJV, brace-expansion, js-yaml, and Babel core.
+
+Production-only audit: 4 findings (2 high, 2 moderate): Next.js, lodash, DOMPurify, and PostCSS. npm proposes Next.js 16.2.10 for the Next/PostCSS path. Dependency upgrades should be handled in a dedicated PR with full regression and E2E coverage.
+
+Python packages were installed from the pinned requirements in an isolated environment and imported successfully. `pip-audit` was not installed or run, so this handoff does not claim that the Python dependency set is vulnerability-free.
+
+## 11. Security and privacy observations
+
+- No tracked `.env`, private key, credential file, or PCAP was found. Heuristic scans found no common access-token/private-key/connection-string signatures.
+- Existing sample/test/report files contain synthetic-looking RFC1918 and public endpoint data. Their exact values are intentionally omitted from this report.
+- FastAPI has no authentication, authorization, rate limiting, or audit logging.
+- CORS includes `*`, allowing arbitrary browser origins to call a locally exposed service.
+- `/analyze` reads the entire upload before enforcing the 100 MB limit; the Next.js proxy also materializes multipart form data. Public deployment is exposed to memory/CPU denial of service.
+- File validation is extension-based. No MIME or capture-magic validation happens before parsing.
+- The proxy returns Python service error text to the browser, which can disclose internal diagnostic details.
+- PCAP output includes endpoint addresses and payload hex snippets; UI/PDF/export handling must treat results as sensitive OT data.
+- localStorage project and history data are plaintext. The encryption module is disabled and unused.
+- Privacy claims saying no data leaves the browser are false for real PCAP analysis. A local two-process deployment still transmits bytes to server processes on the host.
+- The JSON endpoint has an operator-precedence defect: FC 15 text can increment the Modbus count even when the packet protocol is not Modbus.
+
+## 12. Repository hygiene
+
+Tracked generated/suspicious artifacts:
+
+- `app/api/pcap-analyze/ICS-Risk-PCAP-Report.txt.crdownload` (2,082 bytes).
+- `app/api/pcap-analyze/ICS_Test_Raporu.pdf` (221,290 bytes).
+- `ics-pcap-service/__pycache__/main.cpython-314.pyc` (29,605 bytes).
+- `lib/utils copy.ts` (166 bytes), an exact duplicate of `lib/utils.ts`.
+
+These files were not deleted because the task requires preserving tracked content unless removal is explicitly justified and approved. `.gitignore` now prevents future Python caches/bytecode, local virtual environments, and generated PCAP test output from being added accidentally.
+
+The local machine has parent-level `package-lock.json` files. Next.js therefore warns that it inferred a workspace root outside this repository. A repository-local `turbopack.root` setting or cleanup of unrelated parent lockfiles should be considered; parent files were not touched.
+
+## 13. Known bugs and technical debt
+
+### Blocker
+
+- CI cannot pass: lint has 15 errors and Playwright has no E2E tests.
+- Direct Next.js dependency is within a high-severity vulnerable range; production audit fails.
+
+### High
+
+- Vulnerability database claims 70 verified CVEs while runtime data contains 5.
+- Monte Carlo output/Markov input scale mismatch saturates the Markov risk factor.
+- Real PCAP results do not feed the main risk/project/simulation pipeline despite integration language in documentation.
+- Browser and Python Modbus authorization semantics conflict.
+- Privacy/offline/client-only claims conflict with the Next.js/FastAPI upload path.
+- Unauthenticated wildcard-CORS PCAP service can process large uploads and return sensitive OT endpoint data.
+
+### Medium
+
+- PCAPNG is accepted but parsed with the PCAP-only reader.
+- Browser and Python scan thresholds differ (20 versus more than 10).
+- JSON FastAPI endpoint has an `and`/`or` precedence bug for FC 15 detection.
+- `RiskPredictor` is a fixed forecasting heuristic with no fitted model, calibration evidence, or validation set.
+- Legacy simulated `PCAPAnalyzer` remains exported but unused by the active PCAP page.
+- Storage encryption is disabled and not used by project persistence.
+- Topology and digital-twin outputs are non-deterministic because they call `Math.random()`.
+- FastAPI buffers the upload before enforcing the size limit.
+- Lint failures indicate state/effect and render-purity issues across multiple pages/components.
+
+### Low
+
+- Generated artifacts and duplicate utility remain tracked.
+- dpkt test emits a deprecated `IP.off` warning.
+- Next.js emits stale browser-baseline and inferred-workspace-root warnings.
+- Assessment `generatePDF` actually downloads HTML; report naming is misleading.
+- Several caught error variables and broad `any` types remain.
+
+## 14. Recommended next steps
+
+1. Patch Next.js and the production dependency chain in a dedicated security PR; run full build, browser smoke tests, and new E2E tests.
+2. Decide and document one authoritative 0-10 or 0-100 risk scale, then add conversion contracts between static, Python, Monte Carlo, and Markov outputs.
+3. Choose one scan threshold and one configurable Modbus authorization model shared by browser and Python analyzers.
+4. Replace the hardcoded PCAP URL with a server-only environment variable; restrict CORS, add authentication/rate limiting, stream uploads, and redact sensitive response fields.
+5. Connect verified real-PCAP findings to project/risk state through a typed, explicit mapping rather than severity-profile constants.
+6. Reconcile the vulnerability data and metadata. Either supply the claimed 70 evidence-backed records or change all counts and verification language to five.
+7. Add a minimal Playwright suite for home, assessment, risk simulation, JSON upload, PCAP service-offline behavior, and project persistence.
+8. Resolve lint errors incrementally without suppressing the React rules globally.
+9. Implement real PCAPNG parsing or remove `.pcapng` from accepted extensions.
+10. Keep predictive features labeled as statistical forecasting unless a fitted and calibrated model is introduced.
+11. After owner approval, remove tracked download/PDF/bytecode/duplicate artifacts in a separate hygiene commit.
+
+## 15. Questions for the project owner
+
+1. Is the authoritative vulnerability scope 5 records or 70 verified records, and where is the evidence/source set for the larger claim?
+2. Should the canonical risk scale be 0-10 or 0-100?
+3. Should a PCAP critical alert override static risk, contribute a bounded factor, or remain a separate operational score?
+4. Is the Python service intended only for loopback use, an on-prem service, or a remotely deployed API?
+5. What is the authoritative port-scan threshold and time window?
+6. Should Modbus authorization be based on source address, unit ID, function code, role, or an external policy file?
+7. May the tracked generated artifacts and duplicate utility be removed?
+8. Should predictive risk remain a deterministic heuristic or be backed by a calibrated statistical model?
+9. What browsers and workflows must the first E2E suite support?
+
+## 16. Local run commands
+
+### Next.js
+
+```powershell
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+### Python PCAP service on Windows PowerShell
+
+From the repository root:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r .\ics-pcap-service\requirements.txt
+Push-Location .\ics-pcap-service
+..\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+Use a second terminal for Next.js. Stop Uvicorn with Ctrl+C, then run `Pop-Location` if needed.
+
+### Verification commands
+
+```powershell
+npm run type-check
+npm test -- --run
+npm run lint
+npm run build
+npm run test:e2e -- --list
+npm audit --omit=dev
+
+.\.venv\Scripts\python.exe -m compileall .\ics-pcap-service
+Push-Location .\ics-pcap-service
+..\.venv\Scripts\python.exe test_engine.py
+Pop-Location
+```
+
+Do not use production PCAP files for development verification. Use only approved, sanitized, or synthetic captures.

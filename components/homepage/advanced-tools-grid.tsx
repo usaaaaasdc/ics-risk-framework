@@ -117,15 +117,15 @@ export function AdvancedToolsGrid() {
         descDe: "Datenpaketanalyse",
       },
       {
-        href: "/ai-prediction",
+        href: "/risk-prediction",
         icon: Brain,
         color: "pink",
-        titleAr: "توقع المخاطر",
-        titleEn: "AI Prediction",
-        titleDe: "KI-Vorhersage",
-        descAr: "توقع ذكي للمخاطر",
-        descEn: "Smart risk forecasting",
-        descDe: "Intelligente Risikovorhersage",
+        titleAr: "تحليل المخاطر التنبؤي",
+        titleEn: "Predictive Risk Analysis",
+        titleDe: "Prädiktive Risikoanalyse",
+        descAr: "توقع إحصائي للمخاطر",
+        descEn: "Statistical risk forecasting",
+        descDe: "Statistische Risikoprognose",
       },
       {
         href: "/mitre-attack",
@@ -294,4 +294,3 @@ export function AdvancedToolsGrid() {
     </section>
   )
 }
-

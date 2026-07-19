@@ -6,6 +6,12 @@ node_modules/
 # Testing
 /coverage
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+ics-pcap-service/sample_output.json
+
 # Next.js
 /.next/
 /out/

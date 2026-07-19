@@ -366,9 +366,9 @@ export default function AboutPage() {
                 {language === "de" && "Netzwerk-Scanning-Unterstützung (Nmap-Integration)"}
               </li>
               <li>
-                ✓ {language === "ar" && "نماذج Machine Learning للتنبؤ بالهجمات"}
-                {language === "en" && "Machine Learning models for attack prediction"}
-                {language === "de" && "Machine-Learning-Modelle zur Angriffsprognose"}
+                ✓ {language === "ar" && "نماذج إحصائية للتنبؤ بالهجمات"}
+                {language === "en" && "Statistical models for attack forecasting"}
+                {language === "de" && "Statistische Modelle zur Angriffsprognose"}
               </li>
               <li>
                 ✓ {language === "ar" && "تكامل مع أنظمة SIEM"}
