@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function AssessmentPage() {
   const { t, language } = useLanguage()
   const searchParams = useSearchParams()
-  const projectId = searchParams.get("projectId")
+  const projectId = searchParams?.get("projectId") ?? null
 
   const [assessment, setAssessment] = useState<RiskAssessment | null>(null)
   const [currentConfig, setCurrentConfig] = useState<SystemConfig | null>(null)
