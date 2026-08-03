@@ -17,6 +17,10 @@ describe('Monte Carlo Risk Engine', () => {
         expect(result).toHaveProperty('mean')
         expect(result).toHaveProperty('p90')
         expect(result).toHaveProperty('p10')
+        expect(result).toHaveProperty('median')
+        expect(result).toHaveProperty('standardDeviation')
+        expect(result).toHaveProperty('confidenceInterval95')
+        expect(result.iterations).toBe(defaultParams.iterations)
         expect(result.data.length).toBeGreaterThan(0)
 
         // Mean should be roughly Impact * Likelihood * 10 
@@ -73,5 +77,15 @@ describe('Monte Carlo Risk Engine', () => {
             expect(bin.riskScore).toBeGreaterThanOrEqual(0)
             expect(bin.riskScore).toBeLessThanOrEqual(100)
         })
+    })
+
+    it('returns identical samples for the same deterministic seed', () => {
+        const first = runMonteCarloSimulation({ ...defaultParams, seed: 12345 })
+        const second = runMonteCarloSimulation({ ...defaultParams, seed: 12345 })
+        const differentSeed = runMonteCarloSimulation({ ...defaultParams, seed: 54321 })
+
+        expect(second.rawResults).toEqual(first.rawResults)
+        expect(second.mean).toBe(first.mean)
+        expect(differentSeed.rawResults).not.toEqual(first.rawResults)
     })
 })

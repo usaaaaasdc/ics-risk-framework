@@ -172,12 +172,18 @@ export const PROB_EXPLOIT_TO_RECON = 0.10;
 // ============================================================================
 
 /**
- * Probability of full remediation from Compromised state back to Secure.
+ * Legacy probability of full remediation from Compromised state back to Secure.
  * 
  * Represents the likelihood of successfully removing attacker access and
  * restoring the system to a secure state in a single time step.
  * 
  * Value: 0.01 (1% per time step)
+ *
+ * CURRENT MODEL NOTE:
+ * The publication-oriented 24-hour Markov forecast now treats Compromised as
+ * an absorbing state with row [0, 0, 0, 1]. This legacy remediation constant is
+ * retained for future incident-recovery models, but it is not used in the
+ * attack-progression matrix rendered by MarkovEngine.
  * 
  * JUSTIFICATION:
  * - Based on ICS-CERT incident response timelines: Full remediation typically

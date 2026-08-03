@@ -1,7 +1,20 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const projectRoot = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable React Strict Mode for better development experience
   reactStrictMode: true,
+
+  // The local app is usually opened as http://127.0.0.1:3000 inside Codex.
+  // Allow that origin so Next dev/HMR resources do not show a blocking overlay.
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+
+  turbopack: {
+    root: projectRoot,
+  },
 
   // Remove typescript.ignoreBuildErrors - we want to catch errors!
   // If there are TypeScript errors, we'll fix them properly

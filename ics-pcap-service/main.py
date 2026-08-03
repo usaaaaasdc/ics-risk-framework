@@ -12,15 +12,18 @@ from __future__ import annotations
 
 import io
 import ipaddress
+import os
 import socket
 import struct
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field, asdict
 from typing import Any
 
 import dpkt
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Constants — ICS Protocol Ports
@@ -60,6 +63,20 @@ DANGEROUS_MODBUS_FCS = {0x05, 0x06, 0x0F, 0x10}  # FC5, FC6, FC15, FC16
 
 # DNP3 Magic bytes
 DNP3_START = b"\x05\x64"
+
+MAX_UPLOAD_BYTES = int(os.getenv("PCAP_MAX_UPLOAD_BYTES", str(100 * 1024 * 1024)))
+MAX_PACKETS = int(os.getenv("PCAP_MAX_PACKETS", "250000"))
+MAX_JSON_PACKETS = int(os.getenv("PCAP_MAX_JSON_PACKETS", "50000"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("PCAP_RATE_LIMIT_WINDOW_SECONDS", "60"))
+RATE_LIMIT_MAX_REQUESTS = int(os.getenv("PCAP_RATE_LIMIT_MAX_REQUESTS", "30"))
+ALLOWED_EXTENSIONS = {".pcap", ".pcapng", ".cap"}
+
+
+def _allowed_origins() -> list[str]:
+    configured = os.getenv("PCAP_ALLOWED_ORIGINS")
+    if configured:
+        return [origin.strip() for origin in configured.split(",") if origin.strip()]
+    return ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Data Models
@@ -328,11 +345,18 @@ class ICSPCAPAnalyzer:
     def parse(self, data: bytes) -> None:
         """Parse raw PCAP bytes."""
         try:
-            pcap = dpkt.pcap.Reader(io.BytesIO(data))
+            stream = io.BytesIO(data)
+            if data.startswith(b"\x0a\x0d\x0d\x0a"):
+                pcap = dpkt.pcapng.Reader(stream)
+            else:
+                pcap = dpkt.pcap.Reader(stream)
         except Exception as e:
             raise ValueError(f"Invalid PCAP file: {e}") from e
 
-        for ts, buf in pcap:
+        for packet_index, (ts, buf) in enumerate(pcap, start=1):
+            if packet_index > MAX_PACKETS:
+                raise ValueError(f"PCAP packet limit exceeded (max {MAX_PACKETS}).")
+
             self.timestamps.append(ts)
             try:
                 eth = dpkt.ethernet.Ethernet(buf)
@@ -552,9 +576,41 @@ app = FastAPI(
     version="2.0.0",
 )
 
+_rate_limit_store: dict[str, tuple[int, float]] = {}
+
+
+@app.middleware("http")
+async def enforce_request_limits(request: Request, call_next):
+    if request.url.path in {"/analyze", "/analyze/json-traffic"}:
+        content_length = request.headers.get("content-length")
+        if content_length:
+            try:
+                parsed_length = int(content_length)
+            except ValueError:
+                return JSONResponse({"detail": "Invalid Content-Length."}, status_code=400)
+
+            if parsed_length > MAX_UPLOAD_BYTES + (1024 * 1024):
+                return JSONResponse({"detail": "Request body too large."}, status_code=413)
+
+        client_ip = request.client.host if request.client else "unknown"
+        now = time.monotonic()
+        count, reset_at = _rate_limit_store.get(client_ip, (0, now + RATE_LIMIT_WINDOW_SECONDS))
+
+        if now > reset_at:
+            count = 0
+            reset_at = now + RATE_LIMIT_WINDOW_SECONDS
+
+        if count >= RATE_LIMIT_MAX_REQUESTS:
+            return JSONResponse({"detail": "Too many requests."}, status_code=429)
+
+        _rate_limit_store[client_ip] = (count + 1, reset_at)
+
+    return await call_next(request)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_origins=_allowed_origins(),
     allow_methods=["POST", "GET", "OPTIONS"],
     allow_headers=["*"],
 )
@@ -574,18 +630,16 @@ async def analyze_pcap(file: UploadFile = File(...)) -> dict[str, Any]:
     if not file.filename:
         raise HTTPException(status_code=400, detail="No filename provided")
 
-    # Accept .pcap and .pcapng
-    allowed_ext = {".pcap", ".pcapng", ".cap"}
     ext = "." + file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    if ext not in allowed_ext:
+    if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{ext}'. Accepted: {allowed_ext}",
+            detail=f"Unsupported file type '{ext}'. Accepted: {sorted(ALLOWED_EXTENSIONS)}",
         )
 
-    raw = await file.read()
-    if len(raw) > 100 * 1024 * 1024:  # 100 MB limit
-        raise HTTPException(status_code=413, detail="File too large (max 100 MB).")
+    raw = await file.read(MAX_UPLOAD_BYTES + 1)
+    if len(raw) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail=f"File too large (max {MAX_UPLOAD_BYTES} bytes).")
 
     analyzer = ICSPCAPAnalyzer()
     try:
@@ -604,8 +658,11 @@ async def analyze_json_traffic(payload: dict[str, Any]) -> dict[str, Any]:
     ويحللها بنفس منطق الـ PCAP.
     """
     packets = payload.get("packets", [])
-    if not packets:
+    if not isinstance(packets, list) or not packets:
         raise HTTPException(status_code=400, detail="No packets in payload.")
+
+    if len(packets) > MAX_JSON_PACKETS:
+        raise HTTPException(status_code=413, detail=f"Too many packets (max {MAX_JSON_PACKETS}).")
 
     # Reuse existing detection logic on JSON packets
     modbus_dangerous_count = 0
@@ -613,15 +670,28 @@ async def analyze_json_traffic(payload: dict[str, Any]) -> dict[str, Any]:
     alerts = []
 
     for pkt in packets:
+        if not isinstance(pkt, dict):
+            continue
+
         proto = pkt.get("protocol", "")
-        dst_port = pkt.get("dst_port", 0)
+        dst_port = pkt.get("dst_port", pkt.get("destination_port", 0))
         src_ip = pkt.get("src_ip", "")
         payload_data = pkt.get("payload", "")
+        function_code = pkt.get("function_code")
+        try:
+            function_code = int(function_code) if function_code is not None else None
+        except (TypeError, ValueError):
+            function_code = None
 
-        port_map[src_ip].add(dst_port)
+        if src_ip:
+            port_map[src_ip].add(dst_port)
 
         # Modbus write detection from JSON
-        if proto == "Modbus" and "FC 05" in payload_data or "FC 15" in payload_data:
+        if str(proto).lower() == "modbus" and (
+            function_code in DANGEROUS_MODBUS_FCS
+            or "FC 05" in str(payload_data)
+            or "FC 15" in str(payload_data)
+        ):
             modbus_dangerous_count += 1
 
     if modbus_dangerous_count > 0:
@@ -645,6 +715,6 @@ async def analyze_json_traffic(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "total_packets": len(packets),
         "alerts": alerts,
-        "risk_level": "CRITICAL" if any(a["severity"] == "critical" for a in alerts) else "HIGH",
+        "risk_level": "CRITICAL" if any(a["severity"] == "critical" for a in alerts) else ("HIGH" if alerts else "LOW"),
         "analysis_engine": "ICS-Risk JSON Traffic Engine v2.0",
     }

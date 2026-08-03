@@ -19,14 +19,25 @@ import {
     BASE_PROB_EXPLOIT_TO_COMPROMISED,
     SCALE_PROB_EXPLOIT_TO_COMPROMISED,
     PROB_EXPLOIT_TO_RECON,
-    PROB_COMPROMISED_TO_SECURE,
+    PROBABILITY_TOLERANCE,
 } from '../constants/markov-parameters';
 
 export type ManualSecurityState = 'Secure' | 'Reconnaissance' | 'Exploitation' | 'Compromised';
+export const MARKOV_STATES: ManualSecurityState[] = ['Secure', 'Reconnaissance', 'Exploitation', 'Compromised'];
 
 export interface MarkovStep {
     step: number; // Hour 0-24
     probabilities: Record<ManualSecurityState, number>;
+}
+
+export type MarkovTransitionMatrix = Record<ManualSecurityState, Record<ManualSecurityState, number>>;
+
+export interface MarkovSummaryMetrics {
+    probabilityOfCompromiseAt24h: number;
+    timeTo50PercentCompromise: number | null;
+    peakReconnaissanceTime: number;
+    peakExploitationTime: number;
+    dominantFinalState: ManualSecurityState;
 }
 
 export class MarkovEngine {
@@ -40,7 +51,7 @@ export class MarkovEngine {
      * @param riskScore - Current system risk score (0-10)
      * @returns Transition probability matrix for all states
      */
-    private static createTransitionMatrix(riskScore: number): Record<ManualSecurityState, Record<ManualSecurityState, number>> {
+    static createTransitionMatrix(riskScore: number): MarkovTransitionMatrix {
         // Normalize risk score to 0-1 factor
         const riskFactor = Math.min(Math.max(riskScore / 10, 0), 1);
 
@@ -81,10 +92,13 @@ export class MarkovEngine {
         // =====================================================================
         // COMPROMISED STATE TRANSITIONS (Absorbing State)
         // =====================================================================
-        // Remediation: 1% chance per time step of full recovery
-        // (Reflects typical ICS incident response timelines: weeks to months)
-        const pCompromisedToSecure = PROB_COMPROMISED_TO_SECURE;
-        const pCompromisedToCompromised = 1 - pCompromisedToSecure;
+        // Equation policy for this build:
+        // Compromised is modeled as an absorbing state: [0, 0, 0, 1].
+        // This is a deliberate, documented change requested for publication-grade
+        // Markov validation. It means this 24-hour attack progression forecast
+        // models attack absorption, not post-incident remediation.
+        const pCompromisedToSecure = 0;
+        const pCompromisedToCompromised = 1;
 
         // =====================================================================
         // CONSTRUCT TRANSITION MATRIX
@@ -115,6 +129,15 @@ export class MarkovEngine {
                 'Compromised': pCompromisedToCompromised
             }
         };
+    }
+
+    static validateTransitionMatrix(matrix: MarkovTransitionMatrix): boolean {
+        return MARKOV_STATES.every((state) => {
+            const row = matrix[state];
+            const rowSum = MARKOV_STATES.reduce((sum, target) => sum + row[target], 0);
+            const probabilitiesValid = MARKOV_STATES.every((target) => row[target] >= 0 && row[target] <= 1);
+            return probabilitiesValid && Math.abs(rowSum - 1) <= PROBABILITY_TOLERANCE;
+        });
     }
 
     /**
@@ -171,5 +194,53 @@ export class MarkovEngine {
         }
 
         return history;
+    }
+
+    static summarize(history: MarkovStep[]): MarkovSummaryMetrics {
+        const finalStep = history[history.length - 1];
+        const finalProbabilities = finalStep?.probabilities ?? {
+            Secure: 1,
+            Reconnaissance: 0,
+            Exploitation: 0,
+            Compromised: 0,
+        };
+
+        const timeTo50PercentCompromise = history.find((step) => step.probabilities.Compromised >= 0.5)?.step ?? null;
+        const peakReconnaissance = history.reduce((best, step) =>
+            step.probabilities.Reconnaissance > best.probabilities.Reconnaissance ? step : best, history[0]);
+        const peakExploitation = history.reduce((best, step) =>
+            step.probabilities.Exploitation > best.probabilities.Exploitation ? step : best, history[0]);
+        const dominantFinalState = MARKOV_STATES.reduce((best, state) =>
+            finalProbabilities[state] > finalProbabilities[best] ? state : best, 'Secure' as ManualSecurityState);
+
+        return {
+            probabilityOfCompromiseAt24h: finalProbabilities.Compromised,
+            timeTo50PercentCompromise,
+            peakReconnaissanceTime: peakReconnaissance.step,
+            peakExploitationTime: peakExploitation.step,
+            dominantFinalState,
+        };
+    }
+
+    static historyToCsv(history: MarkovStep[]): string {
+        const rows = [
+            ['hour', ...MARKOV_STATES],
+            ...history.map((step) => [
+                step.step,
+                ...MARKOV_STATES.map((state) => step.probabilities[state]),
+            ]),
+        ];
+        return rows.map((row) => row.join(',')).join('\n');
+    }
+
+    static transitionMatrixToCsv(matrix: MarkovTransitionMatrix): string {
+        const rows = [
+            ['from_state', ...MARKOV_STATES],
+            ...MARKOV_STATES.map((state) => [
+                state,
+                ...MARKOV_STATES.map((target) => matrix[state][target]),
+            ]),
+        ];
+        return rows.map((row) => row.join(',')).join('\n');
     }
 }

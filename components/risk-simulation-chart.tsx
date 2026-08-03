@@ -1,329 +1,512 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { zipSync, strToU8 } from "fflate"
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ReferenceLine,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts"
+import { Download, Package, RotateCcw, TrendingDown } from "lucide-react"
 import { useLanguage } from "@/lib/i18n/language-context"
-import { runMonteCarloSimulation, SimulationParams } from "@/lib/calculators/risk-engine"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LineChart, Line, Legend } from "recharts"
-import { MarkovEngine, ManualSecurityState } from "@/lib/calculators/markov-engine"
+import {
+    MONTE_CARLO_EQUATION,
+    monteCarloDistributionToCsv,
+    monteCarloSummaryToCsv,
+    runMonteCarloSimulation,
+    type SimulationParams,
+} from "@/lib/calculators/risk-engine"
+import { MARKOV_STATES, MarkovEngine, type ManualSecurityState } from "@/lib/calculators/markov-engine"
+import { type DetectedThreat, type TrafficAnalysisResult } from "@/lib/calculators/pcap-ingestor"
+import { buildCaseStudyBundleFiles } from "@/lib/case-study-export"
+import { downloadJsonFile, downloadTextFile, triggerBrowserDownload } from "@/lib/browser-download"
 import { NetworkTopology } from "@/components/network-topology"
 import { PacketUpload } from "@/components/packet-upload"
-import { DetectedThreat } from "@/lib/calculators/pcap-ingestor"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { RotateCcw, TrendingDown } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+function percent(value: number) {
+    return `${Math.round(value * 100)}%`
+}
 
 export default function RiskSimulationChart() {
     const { language } = useLanguage()
+    const isArabic = language === "ar"
 
-    // Simulation parameters state
     const [params, setParams] = useState<SimulationParams>({
         baseImpact: 7,
         baseLikelihood: 0.6,
         mitigationFactor: 0.5,
         uncertainty: 0.2,
-        iterations: 2000
+        iterations: 2000,
+        seed: 20260630,
     })
-
-    // LIFTED STATE: Detected threats from Traffic Analyzer
     const [detectedThreats, setDetectedThreats] = useState<DetectedThreat[]>([])
+    const [trafficAnalysis, setTrafficAnalysis] = useState<TrafficAnalysisResult | null>(null)
+    const [publicationMode, setPublicationMode] = useState(false)
+    const [exportStatus, setExportStatus] = useState<string | null>(null)
 
-    // REACTIVE LOGIC: Auto-update simulation parameters based on detected threats
     useEffect(() => {
-        if (detectedThreats.length === 0) {
-            setParams({
-                baseImpact: 3,
-                baseLikelihood: 0.2,
-                mitigationFactor: 0.8,
-                uncertainty: 0.2,
-                iterations: 2000
-            });
-            return;
-        }
+        setParams((previous) => {
+            const shared = {
+                uncertainty: previous.uncertainty,
+                iterations: previous.iterations,
+                seed: previous.seed,
+            }
 
-        // Analyze threat severity levels
-        const hasCritical = detectedThreats.some(t => t.severity === 'Critical');
-        const hasHigh = detectedThreats.some(t => t.severity === 'High');
+            if (detectedThreats.length === 0) {
+                return {
+                    ...shared,
+                    baseImpact: 3,
+                    baseLikelihood: 0.2,
+                    mitigationFactor: 0.8,
+                }
+            }
 
-        console.log('🚨 Threat Detection Triggered!');
-        console.log(`   Critical Threats: ${detectedThreats.filter(t => t.severity === 'Critical').length}`);
-        console.log(`   High Threats: ${detectedThreats.filter(t => t.severity === 'High').length}`);
+            const hasCritical = detectedThreats.some((threat) => threat.severity === "Critical")
+            const hasHigh = detectedThreats.some((threat) => threat.severity === "High")
 
-        // Auto-adjust parameters based on threat severity
-        if (hasCritical) {
-            console.log('⚠️ CRITICAL THREAT DETECTED - Auto-setting MAXIMUM RISK parameters');
-            setParams({
-                baseImpact: 9.5,           // Maximum impact
-                baseLikelihood: 0.95,      // 95% likelihood
-                mitigationFactor: 0.1,     // Minimal mitigation (10%)
-                uncertainty: 0.2,
-                iterations: 2000
-            });
-        } else if (hasHigh) {
-            console.log('⚠️ HIGH THREAT DETECTED - Auto-setting HIGH RISK parameters');
-            setParams({
-                baseImpact: 7.0,           // High impact
-                baseLikelihood: 0.70,      // 70% likelihood
-                mitigationFactor: 0.3,     // Low mitigation (30%)
-                uncertainty: 0.2,
-                iterations: 2000
-            });
-        } else {
-            // Medium/Low threats
-            console.log('ℹ️ Medium/Low threats detected - Setting moderate risk parameters');
-            setParams({
-                baseImpact: 4.0,
-                baseLikelihood: 0.40,
+            if (hasCritical) {
+                return {
+                    ...shared,
+                    baseImpact: 9.5,
+                    baseLikelihood: 0.95,
+                    mitigationFactor: 0.1,
+                }
+            }
+
+            if (hasHigh) {
+                return {
+                    ...shared,
+                    baseImpact: 7,
+                    baseLikelihood: 0.7,
+                    mitigationFactor: 0.3,
+                }
+            }
+
+            return {
+                ...shared,
+                baseImpact: 4,
+                baseLikelihood: 0.4,
                 mitigationFactor: 0.6,
-                uncertainty: 0.2,
-                iterations: 2000
-            });
-        }
-    }, [detectedThreats]);
+            }
+        })
+    }, [detectedThreats])
 
-    // Callback function to receive threats from PacketUpload component
-    const handleThreatsDetected = (threats: DetectedThreat[]) => {
-        console.log('📡 Received threats from Traffic Analyzer:', threats.length);
-        setDetectedThreats(threats);
-    };
-
-    // Memoize calculation so it doesn't run on every render unless params change
     const stats = useMemo(() => runMonteCarloSimulation(params), [params])
 
-    // NEW: Run Markov Chain Simulation
-    const markovHistory = useMemo(() => {
-        // Calculate a linear risk score from params to seed the Markov Engine (approx 0-10)
-        // Risk = Impact * Likelihood * 10
-        const currentRisk = params.baseImpact * params.baseLikelihood * (1 - params.mitigationFactor) * 10;
-        return MarkovEngine.simulateAttackProgression(currentRisk, 24);
-    }, [params]);
+    const markovRiskScore = useMemo(
+        () => params.baseImpact * params.baseLikelihood * (1 - params.mitigationFactor),
+        [params.baseImpact, params.baseLikelihood, params.mitigationFactor],
+    )
+    const transitionMatrix = useMemo(() => MarkovEngine.createTransitionMatrix(markovRiskScore), [markovRiskScore])
+    const transitionMatrixValid = useMemo(() => MarkovEngine.validateTransitionMatrix(transitionMatrix), [transitionMatrix])
+    const markovHistory = useMemo(() => MarkovEngine.simulateAttackProgression(markovRiskScore, 24), [markovRiskScore])
+    const markovSummary = useMemo(() => MarkovEngine.summarize(markovHistory), [markovHistory])
 
-    // Determine current most likely state at Hour 12 (mid-simulation) for Topology Coloring
-    const currentSimState = useMemo(() => {
-        const midPoint = markovHistory[12];
-        if (!midPoint) return 'Secure';
-        const probs = midPoint.probabilities;
-        if (probs.Compromised > 0.4) return 'Compromised';
-        if (probs.Exploitation > 0.4) return 'Exploitation';
-        if (probs.Reconnaissance > 0.4) return 'Reconnaissance';
-        return 'Secure';
-    }, [markovHistory]);
+    const currentSimState = useMemo<ManualSecurityState>(() => {
+        const midPoint = markovHistory[12]
+        if (!midPoint) return "Secure"
+        const probs = midPoint.probabilities
+        if (probs.Compromised > 0.4) return "Compromised"
+        if (probs.Exploitation > 0.4) return "Exploitation"
+        if (probs.Reconnaissance > 0.4) return "Reconnaissance"
+        return "Secure"
+    }, [markovHistory])
 
-    const t = {
-        title: language === 'ar' ? 'نمذجة المخاطر (مونت كارلو)' :
-            language === 'de' ? 'Monte-Carlo-Risikosimulation' :
-                language === 'tr' ? 'Monte Carlo Risk Simülasyonu' :
-                    'Monte Carlo Risk Simulation',
-        desc: language === 'ar' ? 'محاكاة 2000 سيناريو محتمل لتقدير المخاطر المتبقية بدقة' :
-            language === 'de' ? 'Simulation von 2000 Szenarien zur präzisen Risikoschätzung' :
-                language === 'tr' ? 'Kalan riski doğru tahmin etmek için 2000 senaryo simülasyonu' :
-                    'Simulating 2000 potential scenarios to estimate residual risk accuracy',
-        impact: language === 'ar' ? 'الأثر المتوقع ($)' :
-            language === 'de' ? 'Erwartete Auswirkung ($)' :
-                language === 'tr' ? 'Beklenen Etki ($)' :
-                    'Expected Impact ($)',
-        likelihood: language === 'ar' ? 'الاحتمالية' :
-            language === 'de' ? 'Wahrscheinlichkeit' :
-                language === 'tr' ? 'Olasılık' :
-                    'Likelihood',
-        mitigation: language === 'ar' ? 'فعالية الحماية' :
-            language === 'de' ? 'Schutzwirksamkeit' :
-                language === 'tr' ? 'Azaltma Etkinliği' :
-                    'Mitigation Efficacy',
-        uncertainty: language === 'ar' ? 'عامل عدم اليقين' :
-            language === 'de' ? 'Unsicherheitsfaktor' :
-                language === 'tr' ? 'Belirsizlik Faktörü' :
-                    'Uncertainty Factor',
-        mean: language === 'ar' ? 'المتوسط' :
-            language === 'de' ? 'Durchschnitt' :
-                language === 'tr' ? 'Ortalama Risk' :
-                    'Mean Risk',
-        p90: language === 'ar' ? 'الحد الأعلى (90%)' :
-            language === 'de' ? 'Worst Case (P90)' :
-                language === 'tr' ? 'En Kötü Durum (P90)' :
-                    'Worst Case (P90)',
-        p10: language === 'ar' ? 'متفائل (P10)' :
-            language === 'de' ? 'Optimistisch (P10)' :
-                language === 'tr' ? 'İyimser (P10)' :
-                    'Optimistic (P10)',
-        run: language === 'ar' ? 'تشغيل المحاكاة' :
-            language === 'de' ? 'Simulation starten' :
-                language === 'tr' ? 'Simülasyonu Çalıştır' :
-                    'Run Simulation'
+    const labels = {
+        title: isArabic ? "محاكاة المخاطر الصناعية" : "Industrial Risk Simulation",
+        params: isArabic ? "معاملات المحاكاة" : "Simulation Parameters",
+        impact: isArabic ? "الأثر" : "Impact",
+        likelihood: isArabic ? "الاحتمالية" : "Likelihood",
+        mitigation: isArabic ? "فعالية التخفيف" : "Mitigation Efficacy",
+        uncertainty: isArabic ? "عدم اليقين" : "Uncertainty",
+        iterations: isArabic ? "عدد التكرارات" : "Iterations",
+        seed: isArabic ? "Seed ثابت" : "Deterministic Seed",
+        recalculate: isArabic ? "إعادة حساب" : "Recalculate",
+        publication: isArabic ? "وضع النشر" : "Publication Mode",
+        exportBundle: isArabic ? "تصدير حزمة دراسة الحالة" : "Export Case Study Bundle",
+        exportStarted: isArabic ? "بدأ التصدير" : "export started",
+        exportFailed: isArabic ? "فشل التصدير" : "export failed",
+        tabs: {
+            risk: isArabic ? "محاكاة المخاطر" : "Risk Sim",
+            markov: isArabic ? "مسار الهجوم" : "Attack Path",
+            topology: isArabic ? "خريطة الشبكة" : "Network Map",
+            traffic: isArabic ? "تحليل المرور" : "Traffic Analysis",
+        },
+        monteCarloTitle: isArabic ? "Monte Carlo للمخاطر المتبقية" : "Monte Carlo Residual Risk",
+        markovTitle: isArabic ? "توقع تطور الهجوم (24 ساعة)" : "Attack Progression Forecast (24 Hours)",
+    }
+
+    const monteCarloCards = [
+        { label: "Mean", value: stats.mean.toFixed(2), className: "text-blue-600" },
+        { label: "Median", value: stats.median.toFixed(2), className: "text-slate-700 dark:text-slate-100" },
+        { label: "P10", value: stats.p10.toFixed(2), className: "text-green-600", icon: true },
+        { label: "P90", value: stats.p90.toFixed(2), className: "text-red-600" },
+        { label: "StdDev", value: stats.standardDeviation.toFixed(2), className: "text-slate-700 dark:text-slate-100" },
+        { label: "Min / Max", value: `${stats.minRisk.toFixed(1)} / ${stats.maxRisk.toFixed(1)}`, className: "text-slate-700 dark:text-slate-100" },
+        {
+            label: "95% CI",
+            value: `${stats.confidenceInterval95.lower.toFixed(2)} - ${stats.confidenceInterval95.upper.toFixed(2)}`,
+            className: "text-slate-700 dark:text-slate-100",
+        },
+        { label: "Iterations", value: stats.iterations.toLocaleString(), className: "text-slate-700 dark:text-slate-100" },
+    ]
+
+    const runExport = (label: string, action: () => void) => {
+        try {
+            action()
+            setExportStatus(`${label} ${labels.exportStarted}.`)
+        } catch (error) {
+            console.error(`${label} export failed`, error)
+            setExportStatus(`${label} ${labels.exportFailed}.`)
+        }
+    }
+
+    const exportMonteCarloCsv = () => runExport("Monte Carlo CSV", () => {
+        downloadTextFile("monte-carlo-summary.csv", monteCarloSummaryToCsv(stats), "text/csv;charset=utf-8")
+        downloadTextFile("monte-carlo-results.csv", monteCarloDistributionToCsv(stats), "text/csv;charset=utf-8")
+    })
+
+    const exportMonteCarloJson = () => runExport("Monte Carlo JSON", () => {
+        downloadJsonFile("monte-carlo-results.json", {
+            params,
+            equation: stats.equation,
+            summary: {
+                mean: stats.mean,
+                median: stats.median,
+                p10: stats.p10,
+                p90: stats.p90,
+                standardDeviation: stats.standardDeviation,
+                minRisk: stats.minRisk,
+                maxRisk: stats.maxRisk,
+                confidenceInterval95: stats.confidenceInterval95,
+                iterations: stats.iterations,
+            },
+            rawResults: stats.rawResults,
+        })
+    })
+
+    const exportMarkovCsv = () => runExport("Markov CSV", () => {
+        downloadTextFile("markov-probabilities.csv", MarkovEngine.historyToCsv(markovHistory), "text/csv;charset=utf-8")
+        downloadTextFile("transition-matrix.csv", MarkovEngine.transitionMatrixToCsv(transitionMatrix), "text/csv;charset=utf-8")
+    })
+
+    const exportMarkovJson = () => runExport("Markov JSON", () => {
+        downloadJsonFile("markov-forecast.json", {
+            equation: "P(t+1) = P(t) x TransitionMatrix; Compromised row = [0,0,0,1].",
+            markovRiskScore,
+            transitionMatrixValid,
+            transitionMatrix,
+            summary: markovSummary,
+            history: markovHistory,
+        })
+    })
+
+    const exportCaseStudyBundle = () => runExport("Case Study Bundle", () => {
+        const files = buildCaseStudyBundleFiles({
+            trafficAnalysis,
+            simulationParams: params,
+            monteCarloStats: stats,
+            markovHistory,
+            markovSummary,
+            transitionMatrix,
+        })
+        const zipped = zipSync(Object.fromEntries(
+            Object.entries(files).map(([filename, content]) => [filename, strToU8(content)]),
+        ))
+        const blob = new Blob([new Uint8Array(zipped)], { type: "application/zip" })
+        triggerBrowserDownload("ics-risk-case-study-bundle.zip", blob)
+    })
+
+    const handleAnalysisComplete = (analysis: TrafficAnalysisResult) => {
+        setTrafficAnalysis(analysis)
+        setDetectedThreats(analysis.threats)
     }
 
     return (
         <div className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-6">
-                {/* Controls */}
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 className="text-2xl font-semibold tracking-normal">{labels.title}</h2>
+                    {!publicationMode && (
+                        <p className="text-sm text-muted-foreground">
+                            {MONTE_CARLO_EQUATION}; Markov input risk (0-10) = Impact x Likelihood x (1 - Mitigation).
+                        </p>
+                    )}
+                </div>
+                <div className="flex items-center gap-3 rounded border px-3 py-2">
+                    <Label htmlFor="publication-mode">{labels.publication}</Label>
+                    <Switch id="publication-mode" checked={publicationMode} onCheckedChange={setPublicationMode} />
+                </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3">
                 <Card className="md:col-span-1">
                     <CardHeader>
-                        <CardTitle className="text-lg">
-                            {language === 'ar' ? 'معاملات المحاكاة' :
-                                language === 'de' ? 'Simulationsparameter' :
-                                    language === 'tr' ? 'Simülasyon Parametreleri' :
-                                        'Simulation Parameters'}
-                        </CardTitle>
+                        <CardTitle className="text-lg">{labels.params}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <Label>{t.impact}</Label>
+                                <Label>{labels.impact}</Label>
                                 <span className="text-sm text-muted-foreground">{params.baseImpact}</span>
                             </div>
-                            <Slider
-                                value={[params.baseImpact]}
-                                max={10} min={1} step={0.5}
-                                onValueChange={(v) => setParams(p => ({ ...p, baseImpact: v[0] }))}
-                            />
+                            <Slider value={[params.baseImpact]} max={10} min={1} step={0.5} onValueChange={(v) => setParams((p) => ({ ...p, baseImpact: v[0] }))} />
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <Label>{t.likelihood}</Label>
-                                <span className="text-sm text-muted-foreground">{Math.round(params.baseLikelihood * 100)}%</span>
+                                <Label>{labels.likelihood}</Label>
+                                <span className="text-sm text-muted-foreground">{percent(params.baseLikelihood)}</span>
                             </div>
-                            <Slider
-                                value={[params.baseLikelihood]}
-                                max={1} min={0.1} step={0.05}
-                                onValueChange={(v) => setParams(p => ({ ...p, baseLikelihood: v[0] }))}
-                            />
+                            <Slider value={[params.baseLikelihood]} max={1} min={0.1} step={0.05} onValueChange={(v) => setParams((p) => ({ ...p, baseLikelihood: v[0] }))} />
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <Label>{t.mitigation}</Label>
-                                <span className="text-sm text-muted-foreground">{Math.round(params.mitigationFactor * 100)}%</span>
+                                <Label>{labels.mitigation}</Label>
+                                <span className="text-sm text-muted-foreground">{percent(params.mitigationFactor)}</span>
                             </div>
-                            <Slider
-                                value={[params.mitigationFactor]}
-                                max={0.95} min={0} step={0.05}
-                                onValueChange={(v) => setParams(p => ({ ...p, mitigationFactor: v[0] }))}
-                            />
+                            <Slider value={[params.mitigationFactor]} max={0.95} min={0} step={0.05} onValueChange={(v) => setParams((p) => ({ ...p, mitigationFactor: v[0] }))} />
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <Label>{t.uncertainty}</Label>
-                                <span className="text-sm text-muted-foreground">{Math.round(params.uncertainty * 100)}%</span>
+                                <Label>{labels.uncertainty}</Label>
+                                <span className="text-sm text-muted-foreground">{percent(params.uncertainty)}</span>
                             </div>
-                            <Slider
-                                value={[params.uncertainty]}
-                                max={0.5} min={0.05} step={0.05}
-                                onValueChange={(v) => setParams(p => ({ ...p, uncertainty: v[0] }))}
-                            />
+                            <Slider value={[params.uncertainty]} max={0.5} min={0.05} step={0.05} onValueChange={(v) => setParams((p) => ({ ...p, uncertainty: v[0] }))} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                                <Label htmlFor="iterations">{labels.iterations}</Label>
+                                <Input
+                                    id="iterations"
+                                    type="number"
+                                    min={100}
+                                    step={100}
+                                    value={params.iterations}
+                                    onChange={(event) => setParams((p) => ({ ...p, iterations: Math.max(100, Number(event.target.value) || 100) }))}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="seed">{labels.seed}</Label>
+                                <Input
+                                    id="seed"
+                                    type="number"
+                                    value={params.seed ?? ""}
+                                    onChange={(event) => {
+                                        const nextSeed = Number(event.target.value)
+                                        setParams((p) => ({ ...p, seed: Number.isFinite(nextSeed) ? nextSeed : undefined }))
+                                    }}
+                                />
+                            </div>
                         </div>
 
                         <Button className="w-full" onClick={() => setParams({ ...params })}>
-                            <RotateCcw className="w-4 h-4 mr-2" />
-                            {language === 'ar' ? 'إعادة حساب' :
-                                language === 'de' ? 'Neu berechnen' :
-                                    language === 'tr' ? 'Yeniden Hesapla' :
-                                        'Recalculate'}
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            {labels.recalculate}
                         </Button>
+
+                        <Button variant="secondary" className="w-full" onClick={exportCaseStudyBundle}>
+                            <Package className="mr-2 h-4 w-4" />
+                            {labels.exportBundle}
+                        </Button>
+                        {exportStatus && (
+                            <div className="rounded border bg-muted px-3 py-2 text-sm text-muted-foreground" role="status" aria-live="polite">
+                                {exportStatus}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
-                {/* Chart */}
-                {/* Chart placeholder was here, now moved to Tabs */}
-
-                {/* Main Dashboard Area with Tabs */}
-                <div className="md:col-span-2 space-y-6">
+                <div className="space-y-6 md:col-span-2">
                     <Tabs defaultValue="monte-carlo">
                         <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="monte-carlo">Risk Sim</TabsTrigger>
-                            <TabsTrigger value="markov">Attack Path</TabsTrigger>
-                            <TabsTrigger value="topology">Network Map</TabsTrigger>
-                            <TabsTrigger value="traffic">Traffic Analysis</TabsTrigger>
+                            <TabsTrigger value="monte-carlo">{labels.tabs.risk}</TabsTrigger>
+                            <TabsTrigger value="markov">{labels.tabs.markov}</TabsTrigger>
+                            <TabsTrigger value="topology">{labels.tabs.topology}</TabsTrigger>
+                            <TabsTrigger value="traffic">{labels.tabs.traffic}</TabsTrigger>
                         </TabsList>
 
-                        {/* TAB 1: Monte Carlo (Original) */}
                         <TabsContent value="monte-carlo">
                             <Card>
-                                <CardHeader>
-                                    <CardTitle>{t.title}</CardTitle>
-                                    <CardDescription>{t.desc}</CardDescription>
+                                <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                    <div>
+                                        <CardTitle>{labels.monteCarloTitle}</CardTitle>
+                                        {!publicationMode && <CardDescription>{stats.equation}</CardDescription>}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" size="sm" onClick={exportMonteCarloCsv}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            CSV
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={exportMonteCarloJson}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            JSON
+                                        </Button>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="h-[300px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={stats.data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                            <BarChart data={stats.data} margin={{ top: 20, right: 30, left: 20, bottom: 26 }}>
                                                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                                                <XAxis dataKey="riskScore" label={{ value: 'Residual Risk Score', position: 'insideBottom', offset: -5 }} />
+                                                <XAxis dataKey="riskScore" label={{ value: "Residual Risk Score (0-100)", position: "insideBottom", offset: -12 }} />
                                                 <YAxis />
-                                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', color: '#fff' }} labelStyle={{ color: '#94a3b8' }} />
-                                                <ReferenceLine x={stats.mean} stroke="#3b82f6" label="Mean" strokeDasharray="3 3" />
-                                                <ReferenceLine x={stats.p90} stroke="#ef4444" label="P90" />
-                                                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                                <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "none", color: "#fff" }} labelStyle={{ color: "#94a3b8" }} />
+                                                <ReferenceLine x={stats.mean} stroke="#2563eb" label="Mean" strokeDasharray="3 3" />
+                                                <ReferenceLine x={stats.p90} stroke="#dc2626" label="P90" />
+                                                <Bar dataKey="count" fill="#2563eb" radius={[3, 3, 0, 0]} />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-4 mt-6">
-                                        <div className="p-4 bg-slate-100 dark:bg-slate-900 rounded-lg text-center">
-                                            <div className="text-sm text-muted-foreground">{t.mean}</div>
-                                            <div className="text-2xl font-bold text-blue-600">{stats.mean.toFixed(2)}</div>
-                                        </div>
-                                        <div className="p-4 bg-slate-100 dark:bg-slate-900 rounded-lg text-center border-l-4 border-red-500">
-                                            <div className="text-sm text-muted-foreground">{t.p90}</div>
-                                            <div className="text-2xl font-bold text-red-600">{stats.p90.toFixed(2)}</div>
-                                        </div>
-                                        <div className="p-4 bg-slate-100 dark:bg-slate-900 rounded-lg text-center">
-                                            <div className="text-sm text-muted-foreground flex items-center justify-center gap-2">
-                                                <TrendingDown className="h-4 w-4 text-green-500" />
-                                                {t.p10}
+
+                                    <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                        {monteCarloCards.map((card) => (
+                                            <div key={card.label} className="rounded border bg-muted/45 p-3 text-center">
+                                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                                                    {card.icon && <TrendingDown className="h-4 w-4 text-green-500" />}
+                                                    {card.label}
+                                                </div>
+                                                <div className={`text-xl font-semibold ${card.className}`}>{card.value}</div>
                                             </div>
-                                            <div className="text-2xl font-bold text-green-600">{stats.p10.toFixed(2)}</div>
-                                        </div>
+                                        ))}
                                     </div>
                                 </CardContent>
                             </Card>
                         </TabsContent>
 
-                        {/* TAB 2: Markov Chain */}
                         <TabsContent value="markov">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Attack Progression Forecast (24 Hours)</CardTitle>
-                                    <CardDescription>Probability of system state transition over time based on current risk.</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-[400px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={markovHistory} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                                                <XAxis dataKey="step" label={{ value: 'Time (Hours)', position: 'insideBottom', offset: -5 }} />
-                                                <YAxis label={{ value: 'Probability', angle: -90, position: 'insideLeft' }} />
-                                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', color: '#fff' }} />
-                                                <Legend />
-                                                <Line type="monotone" dataKey="probabilities.Secure" stroke="#22c55e" name="Secure" strokeWidth={2} dot={false} />
-                                                <Line type="monotone" dataKey="probabilities.Reconnaissance" stroke="#eab308" name="Reconnaissance" strokeWidth={2} dot={false} />
-                                                <Line type="monotone" dataKey="probabilities.Exploitation" stroke="#f97316" name="Exploitation" strokeWidth={2} dot={false} />
-                                                <Line type="monotone" dataKey="probabilities.Compromised" stroke="#ef4444" name="Compromised" strokeWidth={3} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                        <div>
+                                            <CardTitle>{labels.markovTitle}</CardTitle>
+                                            {!publicationMode && (
+                                                <CardDescription>
+                                                    P(t+1) = P(t) x TransitionMatrix; Compromised is absorbing [0,0,0,1].
+                                                </CardDescription>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button variant="outline" size="sm" onClick={exportMarkovCsv}>
+                                                <Download className="mr-2 h-4 w-4" />
+                                                CSV
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={exportMarkovJson}>
+                                                <Download className="mr-2 h-4 w-4" />
+                                                JSON
+                                            </Button>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="h-[360px] w-full">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <LineChart data={markovHistory} margin={{ top: 20, right: 30, left: 20, bottom: 24 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                                                    <XAxis dataKey="step" label={{ value: "Time (Hours)", position: "insideBottom", offset: -12 }} />
+                                                    <YAxis label={{ value: "Probability", angle: -90, position: "insideLeft" }} />
+                                                    <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "none", color: "#fff" }} />
+                                                    <Legend />
+                                                    <Line type="monotone" dataKey="probabilities.Secure" stroke="#22c55e" name="Secure" strokeWidth={2} dot={false} />
+                                                    <Line type="monotone" dataKey="probabilities.Reconnaissance" stroke="#eab308" name="Reconnaissance" strokeWidth={2} dot={false} />
+                                                    <Line type="monotone" dataKey="probabilities.Exploitation" stroke="#f97316" name="Exploitation" strokeWidth={2} dot={false} />
+                                                    <Line type="monotone" dataKey="probabilities.Compromised" stroke="#ef4444" name="Compromised" strokeWidth={3} dot={false} />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        </div>
 
-                        {/* TAB 3: Network Topology */}
-                        <TabsContent value="topology">
-                            <div className="space-y-4">
-                                <NetworkTopology
-                                    riskScore={stats.mean}
-                                    simulationState={currentSimState as ManualSecurityState}
-                                />
-                                <div className="p-4 bg-muted rounded text-sm text-center">
-                                    Topological view updates dynamically based on the <strong>Markov Simulation</strong> state.
-                                </div>
+                                        <div className="mt-6 grid gap-3 md:grid-cols-5">
+                                            <div className="rounded border p-3 text-center">
+                                                <div className="text-sm text-muted-foreground">Compromise @24h</div>
+                                                <div className="text-lg font-semibold">{percent(markovSummary.probabilityOfCompromiseAt24h)}</div>
+                                            </div>
+                                            <div className="rounded border p-3 text-center">
+                                                <div className="text-sm text-muted-foreground">Time to 50%</div>
+                                                <div className="text-lg font-semibold">{markovSummary.timeTo50PercentCompromise ?? "n/a"}</div>
+                                            </div>
+                                            <div className="rounded border p-3 text-center">
+                                                <div className="text-sm text-muted-foreground">Peak Recon</div>
+                                                <div className="text-lg font-semibold">h{markovSummary.peakReconnaissanceTime}</div>
+                                            </div>
+                                            <div className="rounded border p-3 text-center">
+                                                <div className="text-sm text-muted-foreground">Peak Exploit</div>
+                                                <div className="text-lg font-semibold">h{markovSummary.peakExploitationTime}</div>
+                                            </div>
+                                            <div className="rounded border p-3 text-center">
+                                                <div className="text-sm text-muted-foreground">Final State</div>
+                                                <div className="text-lg font-semibold">{markovSummary.dominantFinalState}</div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Transition Matrix</CardTitle>
+                                        {!publicationMode && (
+                                            <CardDescription>
+                                                Row validation: {transitionMatrixValid ? "all rows sum to 1" : "check row sums"}; Markov input risk = {markovRiskScore.toFixed(2)} / 10.
+                                            </CardDescription>
+                                        )}
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>From</TableHead>
+                                                    {MARKOV_STATES.map((state) => <TableHead key={state}>{state}</TableHead>)}
+                                                    <TableHead>Row Sum</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {MARKOV_STATES.map((state) => {
+                                                    const rowSum = MARKOV_STATES.reduce((sum, target) => sum + transitionMatrix[state][target], 0)
+                                                    return (
+                                                        <TableRow key={state}>
+                                                            <TableCell className="font-medium">{state}</TableCell>
+                                                            {MARKOV_STATES.map((target) => (
+                                                                <TableCell key={target}>{transitionMatrix[state][target].toFixed(3)}</TableCell>
+                                                            ))}
+                                                            <TableCell>{rowSum.toFixed(3)}</TableCell>
+                                                        </TableRow>
+                                                    )
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    </CardContent>
+                                </Card>
                             </div>
                         </TabsContent>
 
-                        {/* TAB 4: Traffic Analysis */}
+                        <TabsContent value="topology">
+                            <NetworkTopology
+                                riskScore={stats.mean}
+                                simulationState={currentSimState}
+                                attackPaths={trafficAnalysis?.attackPaths ?? []}
+                                publicationMode={publicationMode}
+                            />
+                        </TabsContent>
+
                         <TabsContent value="traffic">
-                            <PacketUpload onThreatsDetected={handleThreatsDetected} />
+                            <PacketUpload onThreatsDetected={setDetectedThreats} onAnalysisComplete={handleAnalysisComplete} />
                         </TabsContent>
                     </Tabs>
                 </div>

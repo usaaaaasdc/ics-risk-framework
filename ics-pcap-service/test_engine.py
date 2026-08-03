@@ -114,7 +114,12 @@ def create_test_pcap() -> bytes:
 
 if __name__ == "__main__":
     import sys
-    sys.path.insert(0, "/home/claude/ics-pcap-service")
+    from pathlib import Path
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
     from main import ICSPCAPAnalyzer
     from dataclasses import asdict
     import json
@@ -131,6 +136,7 @@ if __name__ == "__main__":
     analyzer = ICSPCAPAnalyzer()
     analyzer.parse(pcap_bytes)
     result = analyzer.build_result(file_size=len(pcap_bytes))
+    assert result.total_packets == 24, f"Expected 24 packets, got {result.total_packets}"
 
     print(f"\n📦 Total packets parsed:     {result.total_packets}")
     print(f"⏱  Duration:                 {result.duration_seconds:.2f}s")
@@ -139,15 +145,20 @@ if __name__ == "__main__":
 
     print(f"\n🔧 Modbus events found:       {len(result.modbus_events)}")
     dangerous = [e for e in result.modbus_events if e["is_dangerous"]]
+    assert len(dangerous) == 4, f"Expected 4 dangerous Modbus events, got {len(dangerous)}"
     print(f"⚠️  Dangerous Modbus events:   {len(dangerous)}")
     for e in dangerous:
         print(f"   → FC {e['function_code']:02X} ({e['function_name']}) from {e['src_ip']} → {e['dst_ip']}")
 
     print(f"\n🔍 Port scan suspects:        {len(result.port_scan_suspects)}")
+    assert result.port_scan_suspects, "Expected at least one port scan suspect"
     for s in result.port_scan_suspects:
         print(f"   → {s['ip']} contacted {s['unique_ports_contacted']} ports")
 
     print(f"\n🚨 ALERTS ({len(result.alerts)}):")
+    alert_types = {alert["alert_type"] for alert in result.alerts}
+    assert "MODBUS_UNAUTHORIZED_WRITE" in alert_types, "Expected Modbus write alert"
+    assert "PORT_SCAN_DETECTED" in alert_types, "Expected port scan alert"
     for alert in result.alerts:
         sev_emoji = {"low": "🟡", "medium": "🟠", "high": "🔴", "critical": "💀"}.get(alert["severity"], "❓")
         print(f"   {sev_emoji} [{alert['severity'].upper()}] {alert['alert_type']}")
@@ -164,6 +175,7 @@ if __name__ == "__main__":
     print("=" * 60)
 
     # Save sample output
-   with open("sample_output.json", "w") as f:
+    output_path = Path(__file__).resolve().with_name("sample_output.json")
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(asdict(result), f, indent=2)
-    print("\n📄 Full JSON output saved to sample_output.json")
+    print(f"\n📄 Full JSON output saved to {output_path}")

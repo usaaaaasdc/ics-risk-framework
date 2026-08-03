@@ -19,7 +19,7 @@ import {
   Download,
 } from "lucide-react"
 import Link from "next/link"
-import { PCAPAnalyzer, type PCAPAnalysisResult } from "@/lib/pcap-analyzer"
+import type { PCAPAnalysisResult } from "@/lib/pcap-analyzer"
 import { Progress } from "@/components/ui/progress"
 import { jsPDF } from "jspdf"
 
@@ -260,11 +260,11 @@ const analysisResult: PCAPAnalysisResult = {
                   {language === "de" && "Wichtiger Hinweis"}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {language === "ar" && "جميع التحليلات تتم محلياً في المتصفح. لا يتم رفع أي بيانات للخوادم الخارجية."}
+                  {language === "ar" && "يتم إرسال ملف PCAP إلى خدمة التحليل المحلية فقط. لا ترسل البيانات إلى خوادم خارجية."}
                   {language === "en" &&
-                    "All analysis is performed locally in your browser. No data is uploaded to external servers."}
+                    "PCAP files are sent only to the local analysis service. No data is uploaded to external servers."}
                   {language === "de" &&
-                    "Alle Analysen werden lokal in Ihrem Browser durchgeführt. Es werden keine Daten auf externe Server hochgeladen."}
+                    "PCAP-Dateien werden nur an den lokalen Analysedienst gesendet. Es werden keine Daten an externe Server hochgeladen."}
                 </p>
               </div>
             </div>

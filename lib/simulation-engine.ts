@@ -613,6 +613,188 @@ export const simulationScenarios: SimulationScenario[] = [
       ],
     },
   },
+  {
+    id: "scenario-4",
+    name: {
+      en: "Engineering Workstation Compromise",
+      ar: "اختراق محطة العمل الهندسية",
+      de: "Kompromittierung der Engineering-Workstation",
+    },
+    description: {
+      en: "Attacker compromises an engineering workstation and pushes unauthorized PLC logic changes",
+      ar: "يخترق المهاجم محطة هندسية ويدفع تغييرات غير مصرح بها إلى منطق PLC",
+      de: "Angreifer kompromittiert eine Engineering-Workstation und überträgt unautorisierte SPS-Logikänderungen",
+    },
+    targetDevice: "Engineering Workstation / PLC",
+    attackVector: {
+      en: "Endpoint - OT Engineering Access",
+      ar: "نقطة نهاية - وصول هندسي إلى OT",
+      de: "Endpunkt - OT-Engineering-Zugriff",
+    },
+    vulnerabilityCVE: "Tactic: Valid Accounts / Program Download",
+    steps: [
+      {
+        id: 1,
+        phase: {
+          en: "Initial Access",
+          ar: "الوصول الأولي",
+          de: "Erstzugang",
+        },
+        action: {
+          en: "Credential Theft",
+          ar: "سرقة بيانات الاعتماد",
+          de: "Diebstahl von Zugangsdaten",
+        },
+        description: {
+          en: "Attacker obtains engineering credentials through phishing or exposed remote access",
+          ar: "يحصل المهاجم على بيانات اعتماد هندسية عبر تصيد أو وصول بعيد مكشوف",
+          de: "Angreifer erlangt Engineering-Zugangsdaten über Phishing oder exponierten Fernzugriff",
+        },
+        success_probability: 0.68,
+        impact_level: "medium",
+        detectable: true,
+        detection_method: {
+          en: "Identity monitoring - Impossible travel or unusual login source",
+          ar: "مراقبة الهوية - مصدر دخول غير معتاد",
+          de: "Identitätsüberwachung - ungewöhnliche Anmeldequelle",
+        },
+      },
+      {
+        id: 2,
+        phase: {
+          en: "Execution",
+          ar: "التنفيذ",
+          de: "Ausführung",
+        },
+        action: {
+          en: "Engineering Software Abuse",
+          ar: "إساءة استخدام برنامج الهندسة",
+          de: "Missbrauch der Engineering-Software",
+        },
+        description: {
+          en: "Attacker uses legitimate engineering tools to connect to controllers",
+          ar: "يستخدم المهاجم أدوات هندسية شرعية للاتصال بالمتحكمات",
+          de: "Angreifer nutzt legitime Engineering-Tools zur Verbindung mit Steuerungen",
+        },
+        success_probability: 0.78,
+        impact_level: "high",
+        detectable: true,
+        detection_method: {
+          en: "OT asset monitoring - New engineering session to PLC",
+          ar: "مراقبة أصول OT - جلسة هندسية جديدة نحو PLC",
+          de: "OT-Asset-Monitoring - neue Engineering-Sitzung zur SPS",
+        },
+      },
+      {
+        id: 3,
+        phase: {
+          en: "Persistence",
+          ar: "الاستمرارية",
+          de: "Persistenz",
+        },
+        action: {
+          en: "Logic Download",
+          ar: "تحميل منطق تحكم",
+          de: "Logik-Download",
+        },
+        description: {
+          en: "Unauthorized project download changes timer, interlock, or alarm behavior",
+          ar: "تحميل مشروع غير مصرح به يغير المؤقتات أو interlocks أو الإنذارات",
+          de: "Unautorisierter Projektdownload verändert Timer, Verriegelungen oder Alarmverhalten",
+        },
+        success_probability: 0.62,
+        impact_level: "critical",
+        detectable: true,
+        detection_method: {
+          en: "PLC audit log - Program download or online edit event",
+          ar: "سجل تدقيق PLC - حدث تحميل برنامج أو تعديل مباشر",
+          de: "SPS-Audit-Log - Programmdownload oder Online-Edit",
+        },
+      },
+      {
+        id: 4,
+        phase: {
+          en: "Impact",
+          ar: "التأثير",
+          de: "Auswirkung",
+        },
+        action: {
+          en: "Process Degradation",
+          ar: "تدهور العملية",
+          de: "Prozessverschlechterung",
+        },
+        description: {
+          en: "Modified logic causes unsafe sequencing, nuisance trips, or quality loss",
+          ar: "يتسبب المنطق المعدل في تسلسل غير آمن أو توقفات متكررة أو فقدان جودة",
+          de: "Veränderte Logik verursacht unsichere Abläufe, Fehlauslösungen oder Qualitätsverlust",
+        },
+        success_probability: 0.74,
+        impact_level: "critical",
+        detectable: true,
+        detection_method: {
+          en: "Process historian - unexpected sequence and alarm pattern",
+          ar: "مؤرخ العمليات - تسلسل ونمط إنذارات غير متوقع",
+          de: "Prozesshistorian - unerwartete Sequenz- und Alarmmuster",
+        },
+      },
+    ],
+    impact: {
+      financial: 420000,
+      operational: {
+        en: "Unplanned shutdown and engineering rollback required",
+        ar: "توقف غير مخطط وحاجة إلى استرجاع هندسي",
+        de: "Ungeplanter Stillstand und Engineering-Rollback erforderlich",
+      },
+      safety: {
+        en: "High risk - unsafe process sequence or bypassed interlocks",
+        ar: "مخاطر عالية - تسلسل عملية غير آمن أو تجاوز interlocks",
+        de: "Hohes Risiko - unsichere Prozessfolge oder überbrückte Verriegelungen",
+      },
+    },
+    detectionPoints: {
+      en: [
+        "Identity logs - unusual engineering account use",
+        "EDR - suspicious process activity on engineering workstation",
+        "PLC audit trail - program download or online edit",
+        "Historian - process deviation after logic change",
+      ],
+      ar: [
+        "سجلات الهوية - استخدام غير معتاد لحساب هندسي",
+        "EDR - نشاط مريب على محطة العمل الهندسية",
+        "سجل PLC - تحميل برنامج أو تعديل مباشر",
+        "مؤرخ العمليات - انحراف بعد تغيير المنطق",
+      ],
+      de: [
+        "Identitätslogs - ungewöhnliche Nutzung eines Engineering-Kontos",
+        "EDR - verdächtige Prozesse auf der Engineering-Workstation",
+        "SPS-Audit-Trail - Programmdownload oder Online-Edit",
+        "Historian - Prozessabweichung nach Logikänderung",
+      ],
+    },
+    preventionMeasures: {
+      en: [
+        "Require MFA and privileged access workflows for engineering accounts",
+        "Use jump servers with session recording for OT engineering access",
+        "Enforce PLC change approval and offline project comparison",
+        "Monitor program downloads and online edits in real time",
+        "Maintain tested controller backups and rollback procedures",
+      ],
+      ar: [
+        "فرض MFA وسير عمل صلاحيات مميزة للحسابات الهندسية",
+        "استخدام jump servers مع تسجيل الجلسات للوصول الهندسي إلى OT",
+        "فرض موافقة على تغييرات PLC ومقارنة المشاريع offline",
+        "مراقبة تحميل البرامج والتعديلات المباشرة لحظيا",
+        "الحفاظ على نسخ احتياطية مختبرة وإجراءات استرجاع للمتحكمات",
+      ],
+      de: [
+        "MFA und privilegierte Workflows für Engineering-Konten erzwingen",
+        "Jump-Server mit Sitzungsaufzeichnung für OT-Engineering-Zugriff nutzen",
+        "SPS-Änderungsfreigabe und Offline-Projektvergleich erzwingen",
+        "Programmdownloads und Online-Edits in Echtzeit überwachen",
+        "Getestete Controller-Backups und Rollback-Verfahren pflegen",
+      ],
+    },
+  },
 ]
 
 export function runSimulation(
