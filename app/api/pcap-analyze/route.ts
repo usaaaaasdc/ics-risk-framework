@@ -8,6 +8,7 @@ const MULTIPART_OVERHEAD_BYTES = 1024 * 1024
 const ANALYSIS_TIMEOUT_MS = Number(process.env.PCAP_ANALYSIS_TIMEOUT_MS ?? 30_000)
 const RATE_LIMIT_WINDOW_MS = Number(process.env.PCAP_RATE_LIMIT_WINDOW_MS ?? 60_000)
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.PCAP_RATE_LIMIT_MAX_REQUESTS ?? 10)
+const RATE_LIMIT_MAX_CLIENTS = Number(process.env.PCAP_RATE_LIMIT_MAX_CLIENTS ?? 10_000)
 const ALLOWED_EXTENSIONS = new Set(['.pcap', '.pcapng', '.cap'])
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
@@ -22,6 +23,18 @@ function checkRateLimit(clientId: string) {
     const existing = rateLimitStore.get(clientId)
 
     if (!existing || existing.resetAt <= now) {
+        if (rateLimitStore.size >= RATE_LIMIT_MAX_CLIENTS) {
+            for (const [key, entry] of rateLimitStore) {
+                if (entry.resetAt <= now) rateLimitStore.delete(key)
+            }
+
+            while (rateLimitStore.size >= RATE_LIMIT_MAX_CLIENTS) {
+                const oldestKey = rateLimitStore.keys().next().value
+                if (oldestKey === undefined) break
+                rateLimitStore.delete(oldestKey)
+            }
+        }
+
         rateLimitStore.set(clientId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
         return true
     }
@@ -117,7 +130,7 @@ export async function POST(request: NextRequest) {
             filename: safeFilename(file.name),
         })
 
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'PCAP analysis service is unavailable.' },
             { status: 503 }

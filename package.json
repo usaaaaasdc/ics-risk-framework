@@ -15,7 +15,6 @@
   "homepage": "https://github.com/usaaaaasdc/ics-risk-framework",
   "overrides": {
     "@babel/core": "^7.29.7",
-    "ajv": "^8.20.0",
     "brace-expansion": "^5.0.7",
     "dompurify": "^3.4.11",
     "flatted": "^3.4.2",
@@ -36,8 +35,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:e2e": "playwright test",

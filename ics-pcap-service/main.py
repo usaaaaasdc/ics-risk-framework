@@ -69,6 +69,7 @@ MAX_PACKETS = int(os.getenv("PCAP_MAX_PACKETS", "250000"))
 MAX_JSON_PACKETS = int(os.getenv("PCAP_MAX_JSON_PACKETS", "50000"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("PCAP_RATE_LIMIT_WINDOW_SECONDS", "60"))
 RATE_LIMIT_MAX_REQUESTS = int(os.getenv("PCAP_RATE_LIMIT_MAX_REQUESTS", "30"))
+RATE_LIMIT_MAX_CLIENTS = int(os.getenv("PCAP_RATE_LIMIT_MAX_CLIENTS", "10000"))
 ALLOWED_EXTENSIONS = {".pcap", ".pcapng", ".cap"}
 
 
@@ -602,6 +603,20 @@ async def enforce_request_limits(request: Request, call_next):
 
         if count >= RATE_LIMIT_MAX_REQUESTS:
             return JSONResponse({"detail": "Too many requests."}, status_code=429)
+
+        if client_ip not in _rate_limit_store and len(_rate_limit_store) >= RATE_LIMIT_MAX_CLIENTS:
+            expired_clients = [
+                key for key, (_, client_reset_at) in _rate_limit_store.items()
+                if client_reset_at <= now
+            ]
+            for key in expired_clients:
+                _rate_limit_store.pop(key, None)
+
+            while len(_rate_limit_store) >= RATE_LIMIT_MAX_CLIENTS:
+                oldest_client = next(iter(_rate_limit_store), None)
+                if oldest_client is None:
+                    break
+                _rate_limit_store.pop(oldest_client, None)
 
         _rate_limit_store[client_ip] = (count + 1, reset_at)
 
