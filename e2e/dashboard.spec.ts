@@ -4,11 +4,14 @@ import { readFile } from "node:fs/promises";
 test("dashboard chart and asset search open the correct inspection records", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const hero = page.getByRole("img", { name: /3D industrial assembly cell/ });
-  await expect(hero).toBeVisible();
-  await expect(hero).toHaveAttribute("data-rendered", "true");
-  await page.getByRole("button", { name: "Pause scene animation", exact: true }).click();
+  // Chart/search behavior is independent of GPU throughput. Dedicated scene tests
+  // still exercise real WebGL rendering, animation, camera and mesh interaction.
+  await page.getByRole("button", { name: "Show 2D topology", exact: true }).click();
+  await expect(
+    page.getByRole("group", { name: "Industrial network topology", exact: true }).first()
+  ).toBeVisible();
   await expect(page.locator(".cc-industrial-viewer")).toHaveAttribute("data-motion", "paused");
   await page.getByRole("button", { name: "24H", exact: true }).click();
   await expect(

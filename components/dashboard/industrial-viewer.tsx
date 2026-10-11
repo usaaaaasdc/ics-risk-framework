@@ -15,7 +15,6 @@ import {
   Box,
   ChevronLeft,
   ChevronRight,
-  Cpu,
   Layers3,
   Maximize2,
   Minus,
@@ -29,6 +28,9 @@ import {
 } from "lucide-react";
 import type { DashboardAsset } from "@/lib/dashboard-data";
 import { sceneAssets, type CameraAction } from "@/lib/industrial-scene";
+import { TopologyMap } from "@/components/network/topology-map";
+import { overviewTopology } from "@/lib/overview-topology";
+import "@/app/network-map.css";
 
 const IndustrialCanvas = dynamic(() => import("./industrial-canvas"), {
   ssr: false,
@@ -71,55 +73,38 @@ export function SceneFallback({
   onInspect,
   onLaunch,
   unavailable = false,
+  selectedId,
+  risks = true,
+  network = true,
 }: {
   onInspect: (asset: DashboardAsset) => void;
   onLaunch: () => void;
   unavailable?: boolean;
+  selectedId?: string | null;
+  risks?: boolean;
+  network?: boolean;
 }) {
   return (
-    <div className="cc-2d-fallback">
+    <div className="cc-topology-fallback">
       <div className="cc-2d-heading">
-        <Network size={18} />
-        <div>
-          <strong>{unavailable ? "3D renderer unavailable" : "Assembly cell / 2D topology"}</strong>
-          <p>
-            {unavailable
-              ? "Asset inspection remains available below."
-              : "A lightweight asset view. Launch 3D to orbit the industrial cell."}
-          </p>
-        </div>
+        <Network size={15} />
+        <strong>{unavailable ? "3D renderer unavailable" : "Assembly cell / 2D topology"}</strong>
       </div>
-      <div className="cc-2d-map" aria-label="2D industrial network topology">
-        <svg viewBox="0 0 500 180" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M250 35 V85 M80 85 H420 M80 85 V135 M250 85 V135 M420 85 V135" />
-          <circle cx="250" cy="85" r="4" />
-        </svg>
-        <span className="cc-2d-switch">
-          <Network size={15} /> OT NETWORK
-        </span>
-        <div className="cc-2d-devices">
-          {[sceneAssets[0], sceneAssets[5], sceneAssets[4]].map((entry) => (
-            <button
-              key={entry.id}
-              onClick={() => onInspect(entry.asset)}
-              aria-label={`Inspect ${entry.id}, ${entry.asset.name}`}
-            >
-              <Cpu size={23} />
-              <strong>{entry.id}</strong>
-              <small>{entry.asset.name}</small>
-              <span>{entry.asset.risk.toFixed(1)} risk</span>
-            </button>
-          ))}
-        </div>
+      <TopologyMap
+        topology={overviewTopology}
+        selectedId={selectedId}
+        compact
+        risks={risks}
+        network={network}
+        onSelect={(node) => onInspect(sceneAssets.find((entry) => entry.id === node.id)!.asset)}
+      />
+      <div className="cc-topology-caption">
+        <span>2D topology · Demo data · Illustrative connections</span>
+        <button className="cc-button cc-button-secondary" onClick={onLaunch}>
+          <Box size={12} />
+          {unavailable ? "Retry 3D renderer" : "Launch interactive 3D"}
+        </button>
       </div>
-      <button className="cc-button cc-button-secondary cc-launch-3d" onClick={onLaunch}>
-        <Box size={14} />
-        {unavailable ? "Retry 3D renderer" : "Launch interactive 3D"}
-      </button>
-      <p className="cc-2d-note">
-        2D topology · Demo data ·{" "}
-        {unavailable ? "WebGL required for 3D" : "3D loads only when requested on mobile"}
-      </p>
     </div>
   );
 }
@@ -133,6 +118,8 @@ export function IndustrialViewer({
 }) {
   const mobile = useSyncExternalStore(subscribeViewport, mobileSnapshot, () => true);
   const reducedMotion = useReducedMotion();
+  const [mode, setMode] = useState<"2d" | "3d" | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [launched, setLaunched] = useState(false);
   const [visible, setVisible] = useState(false);
   const [activated, setActivated] = useState(false);
@@ -174,21 +161,42 @@ export function IndustrialViewer({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [expanded]);
-  const onFailure = useCallback(() => setFailed(true), []);
+  const onFailure = useCallback(() => {
+    setFailed(true);
+    setMode("2d");
+  }, []);
+  const inspect = (asset: DashboardAsset) => {
+    setSelectedId(asset.id);
+    onInspect(asset);
+  };
   const launch = () => {
     setFailed(false);
     setAttempt((value) => value + 1);
     setLaunched(true);
+    setMode("3d");
   };
   const send = (action: CameraAction) =>
     setCommand((current) => ({ action, sequence: (current?.sequence ?? 0) + 1 }));
-  const show3d = (!mobile || launched) && !failed && (activated || launched);
-  const animate = playing && !reducedMotion && visible && documentVisible && !suspended;
-  const fallback = <SceneFallback onInspect={onInspect} onLaunch={launch} unavailable={failed} />;
+  const activeMode = mode ?? (mobile ? "2d" : "3d");
+  const show3d = activeMode === "3d" && !failed;
+  const mount3d = ((!mobile && activated) || launched) && !failed;
+  const animate = show3d && playing && !reducedMotion && visible && documentVisible && !suspended;
+  const fallback = (
+    <SceneFallback
+      onInspect={inspect}
+      onLaunch={launch}
+      unavailable={failed}
+      selectedId={selectedId}
+      risks={risks}
+      network={network}
+    />
+  );
   return (
     <div
       ref={host}
       className={`cc-industrial-viewer ${expanded ? "is-expanded" : ""}`}
+      data-mode={show3d ? "3d" : "2d"}
+      data-selected-asset={selectedId ?? ""}
       data-motion={animate ? "running" : "paused"}
       data-quality={quality}
     >
@@ -199,43 +207,57 @@ export function IndustrialViewer({
             Production, under protection<span>.</span>
           </h2>
         </div>
-        <span className="cc-viewer-reference">
-          <span /> DEMO / ASSEMBLY CELL 01
-        </span>
+        <div className="cc-mode-switch" role="group" aria-label="Factory view">
+          <button
+            aria-label="Show 2D topology"
+            aria-pressed={!show3d}
+            onClick={() => setMode("2d")}
+          >
+            2D
+          </button>
+          <button
+            aria-label="Show interactive 3D"
+            aria-pressed={show3d}
+            onClick={() => {
+              if (failed || !mount3d) launch();
+              else setMode("3d");
+            }}
+          >
+            3D
+          </button>
+        </div>
       </div>
       <div className="cc-viewer-stage">
-        {show3d ? (
-          <RenderBoundary
-            onFailure={onFailure}
-            key={attempt}
-            fallback={<SceneFallback onInspect={onInspect} onLaunch={launch} unavailable />}
-          >
-            <IndustrialCanvas
-              efficient={mobile}
-              animate={animate}
-              network={network}
-              risks={risks}
-              command={command}
-              onInspect={onInspect}
-              onQuality={setQuality}
-              onFailure={onFailure}
-            />
-          </RenderBoundary>
-        ) : (
-          fallback
+        {mount3d && (
+          <div className="cc-mode-canvas" hidden={!show3d}>
+            <RenderBoundary onFailure={onFailure} key={attempt} fallback={fallback}>
+              <IndustrialCanvas
+                efficient={mobile}
+                animate={animate}
+                network={network}
+                risks={risks}
+                command={command}
+                selectedId={selectedId}
+                onInspect={inspect}
+                onQuality={setQuality}
+                onFailure={onFailure}
+              />
+            </RenderBoundary>
+          </div>
         )}
-        {show3d && (
-          <>
-            <div className="cc-viewer-layers" role="group" aria-label="3D scene layers">
-              <button aria-pressed={network} onClick={() => setNetwork(!network)}>
-                <Network size={12} />
-                Network
-              </button>
-              <button aria-pressed={risks} onClick={() => setRisks(!risks)}>
-                <ShieldAlert size={12} />
-                Risk overlay
-              </button>
-            </div>
+        {!show3d && fallback}
+        <>
+          <div className="cc-viewer-layers" role="group" aria-label="Factory scene layers">
+            <button aria-pressed={network} onClick={() => setNetwork(!network)}>
+              <Network size={12} />
+              Network
+            </button>
+            <button aria-pressed={risks} onClick={() => setRisks(!risks)}>
+              <ShieldAlert size={12} />
+              Risk overlay
+            </button>
+          </div>
+          {show3d && (
             <div className="cc-viewer-legend">
               <span>
                 <i /> CONTROL ZONE
@@ -246,12 +268,14 @@ export function IndustrialViewer({
                 </span>
               )}
             </div>
+          )}
+          {show3d && (
             <div className="cc-viewer-gesture">
               <Layers3 size={12} />
               Drag to orbit<span>·</span>Scroll to zoom
             </div>
-          </>
-        )}
+          )}
+        </>
       </div>
       <div className="cc-viewer-controls">
         <div className="cc-viewer-location">

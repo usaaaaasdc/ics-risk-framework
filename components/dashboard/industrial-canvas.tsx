@@ -41,6 +41,7 @@ export interface IndustrialCanvasProps {
   animate: boolean;
   network: boolean;
   risks: boolean;
+  selectedId?: string | null;
   command: { action: CameraAction; sequence: number } | null;
   onInspect: (asset: DashboardAsset) => void;
   onQuality: (quality: string) => void;
@@ -171,11 +172,13 @@ function NetworkConnections({ animate }: { animate: boolean }) {
 function SceneAsset({
   entry,
   risks,
+  selected,
   onInspect,
   children,
 }: {
   entry: (typeof sceneAssets)[number];
   risks: boolean;
+  selected?: boolean;
   onInspect: IndustrialCanvasProps["onInspect"];
   children: React.ReactNode;
 }) {
@@ -198,14 +201,14 @@ function SceneAsset({
       >
         {children}
       </group>
-      {risks && (
+      {(risks || selected) && (
         <mesh
           position={[entry.position[0], 0.08, entry.position[2]]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <ringGeometry args={[0.78, 0.8, 48]} />
           <meshBasicMaterial
-            color={entry.asset.risk >= 8 ? "#dbaa78" : "#7091bc"}
+            color={selected ? "#00c9ff" : entry.asset.risk >= 8 ? "#dbaa78" : "#7091bc"}
             transparent
             opacity={0.75}
             depthWrite={false}
@@ -326,7 +329,13 @@ function SceneWorld(
       <FactoryHall />
       <FactoryDetails />
       {sceneAssets.map((entry) => (
-        <SceneAsset key={entry.id} entry={entry} risks={props.risks} onInspect={props.onInspect}>
+        <SceneAsset
+          key={entry.id}
+          entry={entry}
+          selected={props.selectedId === entry.id}
+          risks={props.risks}
+          onInspect={props.onInspect}
+        >
           {entry.id === "PLC-01" ? (
             <PlcCabinet />
           ) : entry.id === "GW-02" ? (
@@ -422,6 +431,7 @@ export default function IndustrialCanvas(props: IndustrialCanvasProps) {
             }}
             className={`cc-3d-label ${entry.asset.risk >= 8 ? "is-high-risk" : ""}`}
             aria-label={`Inspect ${entry.id}, ${entry.name}`}
+            aria-pressed={props.selectedId === entry.asset.id}
             onClick={() => props.onInspect(entry.asset)}
           >
             <span className="cc-3d-label-dot" />

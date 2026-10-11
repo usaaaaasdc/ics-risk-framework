@@ -1,0 +1,180 @@
+.nt-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background: #040b12;
+  overflow: hidden;
+  border-radius: 5px;
+}
+.nt-map > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.nt-map > svg:active {
+  cursor: grabbing;
+}
+.nt-node {
+  cursor: pointer;
+  outline: none;
+}
+.nt-node:focus-visible > rect,
+.nt-node:hover > rect {
+  stroke: #66d9ff;
+  stroke-width: 2;
+  fill: #00bfff;
+  fill-opacity: 0.06;
+}
+.nt-radar-sweep {
+  transform-origin: 550px 330px;
+  animation: nt-sweep 16s linear infinite;
+}
+.nt-attack-line {
+  animation: nt-flow 1.4s linear infinite;
+}
+.nt-map-controls {
+  position: absolute;
+  bottom: 22px;
+  right: 14px;
+  display: grid;
+  border: 1px solid #294656;
+  background: #07121de8;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.nt-map-controls button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #9fc5df;
+  cursor: pointer;
+  border-bottom: 1px solid #243c4d;
+}
+.nt-map-controls button:last-child {
+  border: 0;
+}
+.nt-map-controls button:hover {
+  color: #5bdaff;
+  background: #102a3b;
+}
+.nt-map-controls button:focus-visible {
+  outline: 2px solid #5bdaff;
+  outline-offset: -3px;
+}
+@keyframes nt-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes nt-flow {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+.cc-mode-switch {
+  pointer-events: auto;
+  display: flex;
+  padding: 3px;
+  border: 1px solid #385064;
+  background: #080f18e8;
+  border-radius: 6px;
+  gap: 2px;
+}
+.cc-mode-switch button {
+  min-width: 36px;
+  min-height: 28px;
+  border-radius: 3px;
+  color: #9dafc3;
+  font:
+    11px Consolas,
+    monospace;
+  cursor: pointer;
+}
+.cc-mode-switch button[aria-pressed="true"] {
+  background: #123448;
+  color: #5cdfff;
+  box-shadow: inset 0 -1px #00bfff;
+}
+.cc-mode-switch button:focus-visible {
+  outline: 2px solid #5cdfff;
+}
+.cc-mode-canvas {
+  position: absolute;
+  inset: 0;
+}
+.cc-mode-canvas[hidden] {
+  display: none;
+}
+.cc-topology-fallback {
+  position: absolute;
+  inset: 74px 0 69px;
+  display: flex;
+  flex-direction: column;
+  background: #040b12;
+}
+.cc-topology-fallback .cc-2d-heading {
+  padding: 0 20px;
+  margin: 0;
+  font-size: 10px;
+  min-height: 24px;
+}
+.cc-topology-fallback .nt-map {
+  flex: 1;
+  min-height: 240px;
+}
+.cc-topology-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 18px;
+  font-size: 9px;
+  color: #92a8bd;
+}
+.cc-topology-caption .cc-button {
+  font-size: 9px;
+  padding: 6px;
+  min-height: 28px;
+}
+.cc-industrial-viewer[data-mode="2d"] .cc-viewer-layers {
+  top: 90px;
+  right: 16px;
+}
+.cc-3d-label[aria-pressed="true"] {
+  border-color: #00c9ff;
+  box-shadow: 0 0 14px #00bfff25;
+}
+@media (max-width: 760px) {
+  .cc-topology-fallback {
+    position: relative;
+    inset: auto;
+    min-height: 350px;
+  }
+  .cc-topology-fallback .nt-map {
+    min-height: 280px;
+  }
+  .cc-topology-fallback .nt-map > svg {
+    min-width: 560px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 560px;
+  }
+  .cc-topology-caption {
+    flex-wrap: wrap;
+  }
+  .cc-industrial-viewer[data-mode="2d"] .cc-viewer-layers {
+    top: 30px;
+    right: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nt-radar-sweep,
+  .nt-attack-line {
+    animation: none;
+  }
+}
