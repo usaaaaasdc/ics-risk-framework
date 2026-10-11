@@ -5,11 +5,14 @@ test("dashboard chart and asset search open the correct inspection records", asy
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
+  // Pause before waiting for WebGL startup. On a CPU renderer, waiting first
+  // lets continuous animation consume the chart/search test's time budget.
+  // The rendered-canvas assertions below still require genuine 3D output.
+  await page.getByRole("button", { name: "Pause scene animation", exact: true }).click();
+  await expect(page.locator(".cc-industrial-viewer")).toHaveAttribute("data-motion", "paused");
   const hero = page.getByRole("img", { name: /3D industrial assembly cell/ });
   await expect(hero).toBeVisible();
   await expect(hero).toHaveAttribute("data-rendered", "true");
-  await page.getByRole("button", { name: "Pause scene animation", exact: true }).click();
-  await expect(page.locator(".cc-industrial-viewer")).toHaveAttribute("data-motion", "paused");
   await page.getByRole("button", { name: "24H", exact: true }).click();
   await expect(
     page.getByRole("img", { name: /Overall risk trend over 24H: 7.1 to 6.4/ })
