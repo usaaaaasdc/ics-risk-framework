@@ -64,7 +64,7 @@ export function PacketUpload({ onThreatsDetected }: PacketUploadProps) {
 
                 // Safe JSON parsing with detailed error logging
                 console.log("📂 Parsing file:", file.name)
-                let parsedData = JSON.parse(content)
+                const parsedData = JSON.parse(content)
                 console.log("✅ JSON parsed successfully. Type:", Array.isArray(parsedData) ? "Array" : "Object")
 
                 // Check if it's already an array

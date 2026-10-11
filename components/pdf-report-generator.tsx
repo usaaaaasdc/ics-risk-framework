@@ -93,8 +93,7 @@ export function PdfReportGenerator() {
             })
 
             // Update Y Position based on table
-            // @ts-ignore
-            yPos = doc.lastAutoTable.finalY + 20
+            yPos = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 20
 
             // --- Section 3: Detected Threats ---
             doc.setFontSize(16)

@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
-import { generateAnalytics, type AnalyticsData } from "@/lib/analytics"
+import { generateAnalytics } from "@/lib/analytics"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, ArrowLeft, TrendingUp, AlertTriangle, CheckCircle2, BarChart3 } from "lucide-react"
@@ -12,12 +13,8 @@ import { Badge } from "@/components/ui/badge"
 
 export default function AnalyticsPage() {
   const { t, language } = useLanguage()
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-
-  useEffect(() => {
-    const data = generateAnalytics()
-    setAnalytics(data)
-  }, [])
+  const hydrated = useHydrated()
+  const analytics = useMemo(() => hydrated ? generateAnalytics() : null, [hydrated])
 
   if (!analytics) {
     return (

@@ -4,7 +4,8 @@ import { useLanguage } from "@/lib/i18n/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ProjectManager } from "@/lib/project-manager"
 import { RiskPropagationEngine, type RiskGraph, type RiskNode, type RiskEdge } from "@/lib/risk-propagation"
-import { useEffect, useState } from "react"
+import { useMemo, useState } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Play, RotateCcw, Zap, Shield } from "lucide-react"
@@ -12,40 +13,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 
-export default function DigitalTwinPage() {
-  const { language } = useLanguage()
-  const [graph, setGraph] = useState<RiskGraph | null>(null)
-  const [simulationRunning, setSimulationRunning] = useState(false)
-  const [selectedNode, setSelectedNode] = useState<RiskNode | null>(null)
-  const [attackPaths, setAttackPaths] = useState<string[][]>([])
-  const [resilience, setResilience] = useState(0)
-
-  useEffect(() => {
-    loadGraphFromProject()
-  }, [])
-
-  const loadGraphFromProject = () => {
-    const projects = ProjectManager.getAllProjects()
-    const latestProject = projects[projects.length - 1]
-
-    if (latestProject && latestProject.config.devices) {
-      const riskGraph = convertProjectToGraph(latestProject)
-      setGraph(riskGraph)
-
-      const paths = RiskPropagationEngine.findAttackPaths(riskGraph)
-      setAttackPaths(paths)
-
-      const res = RiskPropagationEngine.calculateNetworkResilience(riskGraph)
-      setResilience(res)
-    } else {
-      setGraph(createDemoGraph())
-      const paths = RiskPropagationEngine.findAttackPaths(createDemoGraph())
-      setAttackPaths(paths)
-      setResilience(65)
-    }
-  }
-
-  const convertProjectToGraph = (project: any): RiskGraph => {
+function convertProjectToGraph(project: any): RiskGraph {
     const nodes: RiskNode[] = []
     const edges: RiskEdge[] = []
     const zones = ["Enterprise", "DMZ", "Control", "Field"]
@@ -109,7 +77,7 @@ export default function DigitalTwinPage() {
     return { nodes, edges, zones }
   }
 
-  const createDemoGraph = (): RiskGraph => {
+function createDemoGraph(): RiskGraph {
     return {
       nodes: [
         {
@@ -190,6 +158,31 @@ export default function DigitalTwinPage() {
     }
   }
 
+function loadGraphFromProject() {
+  const projects = ProjectManager.getAllProjects()
+  const latestProject = projects[projects.length - 1]
+  const hasDevices = latestProject && latestProject.config.devices
+  const graph = hasDevices ? convertProjectToGraph(latestProject) : createDemoGraph()
+  return {
+    graph,
+    attackPaths: RiskPropagationEngine.findAttackPaths(graph),
+    resilience: hasDevices ? RiskPropagationEngine.calculateNetworkResilience(graph) : 65,
+  }
+}
+
+export default function DigitalTwinPage() {
+  const { language } = useLanguage()
+  const hydrated = useHydrated()
+  const initialData = useMemo(() => hydrated ? loadGraphFromProject() : null, [hydrated])
+  const [resetData, setResetData] = useState<ReturnType<typeof loadGraphFromProject> | null>(null)
+  const data = resetData ?? initialData
+  const [simulatedGraph, setGraph] = useState<RiskGraph | null>(null)
+  const graph = simulatedGraph ?? data?.graph ?? null
+  const attackPaths = data?.attackPaths ?? []
+  const resilience = data?.resilience ?? 0
+  const [simulationRunning, setSimulationRunning] = useState(false)
+  const [selectedNode, setSelectedNode] = useState<RiskNode | null>(null)
+
   const simulateAttack = () => {
     if (!graph) return
 
@@ -209,7 +202,8 @@ export default function DigitalTwinPage() {
   }
 
   const resetSimulation = () => {
-    loadGraphFromProject()
+    setResetData(loadGraphFromProject())
+    setGraph(null)
   }
 
   const getRiskColor = (risk: number) => {

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { DeviceInputForm } from "@/components/device-input-form"
 import { RiskDisplay } from "@/components/risk-display"
 import { AttackSurfaceMap } from "@/components/attack-surface-map"
@@ -27,30 +28,34 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function AssessmentPage() {
-  const { t, language } = useLanguage()
   const searchParams = useSearchParams()
   const projectId = searchParams.get("projectId")
+  const hydrated = useHydrated()
+  const project = useMemo(() => hydrated && projectId ? ProjectManager.getProject(projectId) : null, [hydrated, projectId])
 
-  const [assessment, setAssessment] = useState<RiskAssessment | null>(null)
-  const [currentConfig, setCurrentConfig] = useState<SystemConfig | null>(null)
-  const [currentProject, setCurrentProject] = useState<Project | null>(null)
+  // Mount once browser data is ready so hydration cannot reset the one-time handoff.
+  if (!hydrated) return null
+
+  return <AssessmentForm key={projectId ?? "new"} initialProject={project} />
+}
+
+function AssessmentForm({ initialProject }: { initialProject: Project | null }) {
+  const { t, language } = useLanguage()
+
+  const [assessment, setAssessment] = useState<RiskAssessment | null>(initialProject?.assessment ?? null)
+  const [currentConfig, setCurrentConfig] = useState<SystemConfig | null>(() => {
+    if (initialProject?.config) return initialProject.config
+    try {
+      const quickConfig = localStorage.getItem("quick-config")
+      return quickConfig ? JSON.parse(quickConfig) : null
+    } catch {
+      // DeviceInputForm reports malformed handoffs using its existing error handling.
+      return null
+    }
+  })
+  const [currentProject, setCurrentProject] = useState<Project | null>(initialProject)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
   const [exportLanguage, setExportLanguage] = useState<"ar" | "en" | "de" | "tr">("ar")
-
-  useEffect(() => {
-    if (projectId) {
-      const project = ProjectManager.getProject(projectId)
-      if (project) {
-        setCurrentProject(project)
-        if (project.config) {
-          setCurrentConfig(project.config)
-        }
-        if (project.assessment) {
-          setAssessment(project.assessment)
-        }
-      }
-    }
-  }, [projectId])
 
   const handleSubmit = (config: SystemConfig) => {
     const result = assessSystem(config, vulnerabilitiesData.vulnerabilities)

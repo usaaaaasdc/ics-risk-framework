@@ -18,7 +18,7 @@ export function calculateIECScore(checkedRequirements: string[]): CalculationRes
         // Standard approach: To achieve SL-T 1, all SL 1 requirements must be met.
 
         let achievedSL: SecurityLevel = 0
-        let totalReqs = fr.requirements.length
+        const totalReqs = fr.requirements.length
         let metReqs = 0
         const missing: string[] = []
 

@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ProjectManager, type Project } from "@/lib/project-manager"
@@ -27,17 +28,16 @@ import { Textarea } from "@/components/ui/textarea"
 export default function ProjectsPage() {
   const { t, language } = useLanguage()
   const router = useRouter()
-  const [projects, setProjects] = useState<Project[]>([])
+  const hydrated = useHydrated()
+  const initialProjects = useMemo(() => hydrated ? ProjectManager.getAllProjects() : [], [hydrated])
+  const [updatedProjects, setProjects] = useState<Project[] | null>(null)
+  const projects = updatedProjects ?? initialProjects
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [newProject, setNewProject] = useState({
     name: "",
     description: "",
     industry: "Manufacturing",
   })
-
-  useEffect(() => {
-    setProjects(ProjectManager.getAllProjects())
-  }, [])
 
   const handleCreateProject = () => {
     if (!newProject.name.trim()) return

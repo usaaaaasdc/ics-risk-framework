@@ -4,7 +4,8 @@ import { useLanguage } from "@/lib/i18n/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ProjectManager } from "@/lib/project-manager"
 import { TopologyGenerator, type NetworkTopology, type NetworkNode, type NetworkLink } from "@/lib/network-topology"
-import { useEffect, useState, useRef } from "react"
+import { useMemo, useState, useRef } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Download, ZoomIn, ZoomOut, Maximize2, AlertTriangle } from "lucide-react"
@@ -13,14 +14,14 @@ import { Badge } from "@/components/ui/badge"
 
 export default function NetworkTopologyPage() {
   const { language } = useLanguage()
-  const [topology, setTopology] = useState<NetworkTopology | null>(null)
   const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null)
   const [zoom, setZoom] = useState(1)
-  const [attackPaths, setAttackPaths] = useState<string[][]>([])
   const [showAttackPaths, setShowAttackPaths] = useState(false)
   const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
+  const hydrated = useHydrated()
+  const topology = useMemo<NetworkTopology | null>(() => {
+    if (!hydrated) return null
     // Load latest project or create demo
     const projects = ProjectManager.getAllProjects()
     const latestProject = projects[projects.length - 1]
@@ -28,10 +29,7 @@ export default function NetworkTopologyPage() {
     if (latestProject) {
       const topo = TopologyGenerator.generateFromProject(latestProject)
       const layoutTopo = TopologyGenerator.calculateLayout(topo)
-      setTopology(layoutTopo)
-
-      const paths = TopologyGenerator.getAttackPaths(layoutTopo)
-      setAttackPaths(paths)
+      return layoutTopo
     } else {
       // Create demo topology
       const demoProject = {
@@ -49,12 +47,10 @@ export default function NetworkTopologyPage() {
       }
       const topo = TopologyGenerator.generateFromProject(demoProject)
       const layoutTopo = TopologyGenerator.calculateLayout(topo)
-      setTopology(layoutTopo)
-
-      const paths = TopologyGenerator.getAttackPaths(layoutTopo)
-      setAttackPaths(paths)
+      return layoutTopo
     }
-  }, [])
+  }, [hydrated])
+  const attackPaths = useMemo(() => topology ? TopologyGenerator.getAttackPaths(topology) : [], [topology])
 
   const getRiskColor = (risk: number) => {
     if (risk >= 7) return "#ef4444" // red

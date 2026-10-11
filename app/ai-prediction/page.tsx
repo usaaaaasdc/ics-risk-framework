@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -23,18 +24,16 @@ import { AIRiskPredictor } from "@/lib/ai-risk-prediction"
 
 export default function AIPredictionPage() {
   const { language } = useLanguage()
-  const [predictor] = useState(() => new AIRiskPredictor())
-  const [prediction, setPrediction] = useState<any>(null)
-  const [statistics, setStatistics] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
+  const hydrated = useHydrated()
+  const loading = !hydrated
+  const { prediction, statistics } = useMemo(() => {
+    if (!hydrated) return { prediction: null, statistics: null }
+    const predictor = new AIRiskPredictor()
     // Load historical data
     predictor.loadHistoricalData()
 
     // Get statistics
     const stats = predictor.getStatistics()
-    setStatistics(stats)
 
     // Run prediction if we have data
     if (stats.totalAssessments > 0) {
@@ -61,12 +60,11 @@ export default function AIPredictionPage() {
         },
       ]
 
-      const result = predictor.predictRisk(sampleDevices, "Manufacturing")
-      setPrediction(result)
+      return { prediction: predictor.predictRisk(sampleDevices, "Manufacturing"), statistics: stats }
     }
 
-    setLoading(false)
-  }, [predictor])
+    return { prediction: null, statistics: stats }
+  }, [hydrated])
 
   const getTrendIcon = (severity: string) => {
     if (severity === "improving") return <TrendingDown className="w-4 h-4 text-green-500" />
@@ -97,7 +95,7 @@ export default function AIPredictionPage() {
     )
   }
 
-  if (!prediction || statistics.totalAssessments === 0) {
+  if (!prediction || !statistics || statistics.totalAssessments === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">

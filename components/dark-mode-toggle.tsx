@@ -2,16 +2,19 @@
 
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
+
+function subscribeToTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+  return () => observer.disconnect()
+}
+
+const getTheme = () => document.documentElement.classList.contains("dark")
+const getServerTheme = () => false
 
 export function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    // Check initial theme
-    const isDarkMode = document.documentElement.classList.contains("dark")
-    setIsDark(isDarkMode)
-  }, [])
+  const isDark = useSyncExternalStore(subscribeToTheme, getTheme, getServerTheme)
 
   const toggleDarkMode = () => {
     const html = document.documentElement
@@ -25,7 +28,6 @@ export function DarkModeToggle() {
       localStorage.setItem("theme", "light")
     }
 
-    setIsDark(newMode)
   }
 
   return (
