@@ -170,7 +170,7 @@ export function SimulationAttackMap({
   ];
   return (
     <div className="rs-attack-map">
-      <div className="rs-zones">
+      <div className="rs-zones" dir="ltr">
         {copy.zones.map((zone) => (
           <span key={zone}>{zone}</span>
         ))}

@@ -149,6 +149,12 @@ test("mobile and RTL layouts retain accessible map and scenario controls", async
         "dir",
         language === "ar" ? "rtl" : "ltr"
       );
+      await expect(page.locator(".rs-zones")).toHaveCSS("direction", "ltr");
+      for (const value of await page
+        .locator(".rs-gauge > span, .rs-metrics > div > strong")
+        .all()) {
+        await expect(value).toHaveCSS("direction", "ltr");
+      }
       const scenarios = page.locator(".rs-scenarios button");
       await scenarios.nth(2).click();
       await expect(scenarios.nth(2)).toHaveAttribute("aria-pressed", "true");

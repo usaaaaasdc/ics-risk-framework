@@ -586,6 +586,7 @@
   margin: 6px 0 7px;
 }
 .rs-metrics > div > strong {
+  direction: ltr;
   font-size: 28px;
   font-weight: 500;
   line-height: 1.2;
@@ -611,6 +612,7 @@
   display: block;
 }
 .rs-gauge > span {
+  direction: ltr;
   position: absolute;
   inset: 0;
   display: flex;
