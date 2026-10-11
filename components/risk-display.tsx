@@ -161,11 +161,11 @@ export function RiskDisplay({ assessment, onExportCSV, onExportPDF }: RiskDispla
                     <Badge className={getSeverityColor(vuln.severity)}>{vuln.severity}</Badge>
                   </TableCell>
                   <TableCell>
-                    {assessment.vulnerabilityConfidence && (
+                    {assessment.vulnerabilityConfidence?.has?.(vuln.id) ? (
                       <Badge className={getConfidenceColor(assessment.vulnerabilityConfidence.get(vuln.id) || 0)}>
                         {assessment.vulnerabilityConfidence.get(vuln.id) || 0}%
                       </Badge>
-                    )}
+                    ) : "—"}
                   </TableCell>
                   <TableCell className="text-sm">{vuln.category}</TableCell>
                   <TableCell className="max-w-md text-sm">

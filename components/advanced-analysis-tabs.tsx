@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import type { SystemConfig, RiskAssessment } from "@/lib/risk-engine"
+import { useLanguage } from "@/lib/i18n/language-context"
+import { assessmentCopy } from "@/lib/assessment-ui-copy"
 import {
   performSTRIDEAnalysis,
   generateAttackTree,
@@ -20,6 +22,8 @@ interface AdvancedAnalysisTabsProps {
 }
 
 export function AdvancedAnalysisTabs({ config, assessment }: AdvancedAnalysisTabsProps) {
+  const { language } = useLanguage()
+  const copy = assessmentCopy(language)
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["root"]))
 
   const strideAnalysis = performSTRIDEAnalysis(config)
@@ -108,7 +112,7 @@ export function AdvancedAnalysisTabs({ config, assessment }: AdvancedAnalysisTab
 
   return (
     <Card className="p-6">
-      <Tabs defaultValue="stride" className="w-full">
+      <Tabs defaultValue="stride" className="w-full" dir={language === "ar" ? "rtl" : "ltr"}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="stride">STRIDE</TabsTrigger>
           <TabsTrigger value="attack-tree">Attack Tree</TabsTrigger>
@@ -179,13 +183,13 @@ export function AdvancedAnalysisTabs({ config, assessment }: AdvancedAnalysisTab
               <Shield className="w-6 h-6 text-primary" />
               <div>
                 <h3 className="text-xl font-bold">{iec62443.standard}</h3>
-                <p className="text-sm text-muted-foreground">Industrial Automation Security Standard</p>
+                <p className="text-sm text-muted-foreground">{copy.iecIndicators}</p>
               </div>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold">{iec62443.overallScore}%</div>
               <div className={`text-sm ${iec62443.compliant ? "text-green-500" : "text-red-500"}`}>
-                {iec62443.compliant ? "Compliant" : "Non-Compliant"}
+                {iec62443.compliant ? copy.indicatorsPass : copy.indicatorsGap}
               </div>
             </div>
           </div>
