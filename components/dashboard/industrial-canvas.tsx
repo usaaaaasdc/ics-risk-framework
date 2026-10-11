@@ -1,6 +1,14 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { Matrix4, Mesh, Vector3 } from "three";
@@ -52,6 +60,7 @@ function CameraRig({ command, animate }: Pick<IndustrialCanvasProps, "command" |
         .join(",")
     );
   }, [camera, gl]);
+  useLayoutEffect(reportView, [reportView]);
   useEffect(() => {
     if (!command || !controls.current) return;
     const target = controls.current.target;
@@ -351,6 +360,7 @@ function SceneWorld(
 
 export default function IndustrialCanvas(props: IndustrialCanvasProps) {
   const [low, setLow] = useState(props.efficient ?? false);
+  const [rendererReady, setRendererReady] = useState(false);
   const labels = useRef<(HTMLButtonElement | null)[]>([]);
   const { onQuality } = props;
   const degrade = useCallback(() => {
@@ -372,8 +382,19 @@ export default function IndustrialCanvas(props: IndustrialCanvasProps) {
           </div>
         }
         onCreated={({ gl }) => {
+          // Software WebGL needs the efficient path before compiling the factory's
+          // shadows/reflections. Frame sampling cannot adapt a paused demand loop.
+          const context = gl.getContext();
+          const debug = context.getExtension("WEBGL_debug_renderer_info");
+          const renderer = context.getParameter(debug?.UNMASKED_RENDERER_WEBGL ?? context.RENDERER);
+          const software = /swiftshader|llvmpipe|softpipe|software rasterizer|basic render/i.test(
+            renderer
+          );
+          const efficient = !!props.efficient || software;
+          setLow(efficient);
+          setRendererReady(true);
           gl.domElement.tabIndex = 0;
-          onQuality(low ? "Efficient · 1×" : "Adaptive · ≤1.5×");
+          onQuality(efficient ? "Efficient · 1×" : "Adaptive · ≤1.5×");
           gl.domElement.setAttribute(
             "aria-label",
             "3D industrial assembly cell. Drag to orbit; scroll to zoom."
@@ -382,7 +403,7 @@ export default function IndustrialCanvas(props: IndustrialCanvasProps) {
         }}
       >
         <Suspense fallback={null}>
-          <SceneWorld {...props} labels={labels} low={low} onDegrade={degrade} />
+          {rendererReady && <SceneWorld {...props} labels={labels} low={low} onDegrade={degrade} />}
         </Suspense>
       </Canvas>
       <div className="cc-projected-labels">

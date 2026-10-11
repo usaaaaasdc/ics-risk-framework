@@ -1,9 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-test("dashboard chart, asset search, filtering and alert acknowledgement work", async ({
-  page,
-}) => {
+test("dashboard chart and asset search open the correct inspection records", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
@@ -31,8 +29,20 @@ test("dashboard chart, asset search, filtering and alert acknowledgement work", 
   await expect(page.getByRole("dialog")).toContainText("Moxa EDR-G9010");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
 
+test("asset filtering, CSV export and demo alert acknowledgement work", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
   await page.getByRole("button", { name: /Asset inventory/ }).click();
+  // Wait for the incoming inventory view before filtering; the outgoing overview
+  // also has a zone selector while its section transition completes.
+  await expect(
+    page.getByRole("heading", { name: "Asset intelligence", exact: true })
+  ).toBeVisible();
   await page.getByRole("combobox", { name: "Filter assets by zone" }).selectOption("DMZ");
   await expect(page.getByRole("row")).toHaveCount(2);
   await expect(page.getByRole("table")).toContainText("GW-02");
