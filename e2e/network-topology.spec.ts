@@ -9,9 +9,14 @@ test.beforeEach(async ({ page }) => {
 test("overview shares selection and risk layers between real 2D and retained 3D", async ({
   page,
 }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const viewer = page.locator(".cc-industrial-viewer");
+  // A single-target attribute assertion fails immediately on transient startup duplicates.
+  // Wait for uniqueness explicitly; a persistent duplicate must still fail this test.
+  await expect(viewer).toHaveCount(1);
   await expect(viewer).toHaveAttribute("data-mode", "2d");
   await expect(page.locator("canvas")).toHaveCount(0);
   await page
@@ -42,6 +47,8 @@ test("overview shares selection and risk layers between real 2D and retained 3D"
     "aria-pressed",
     "false"
   );
+  await expect(viewer).toHaveCount(1);
+  expect(errors).toEqual([]);
 });
 
 test("radar inspects nodes, exposes attack paths and exports self-contained SVG", async ({
