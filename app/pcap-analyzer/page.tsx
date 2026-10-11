@@ -19,7 +19,7 @@ import {
   Download,
 } from "lucide-react"
 import Link from "next/link"
-import { PCAPAnalyzer, type PCAPAnalysisResult } from "@/lib/pcap-analyzer"
+import type { PCAPAnalysisResult } from "@/lib/pcap-analyzer"
 import { Progress } from "@/components/ui/progress"
 import { jsPDF } from "jspdf"
 

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ProjectManager, type Project } from "@/lib/project-manager"
@@ -13,13 +14,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 export default function ComparePage() {
   const { t, language } = useLanguage()
-  const [projects, setProjects] = useState<Project[]>([])
+  const hydrated = useHydrated()
+  const projects = useMemo(() => hydrated ? ProjectManager.getAllProjects().filter((p) => p.assessment) : [], [hydrated])
   const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
   const [comparing, setComparing] = useState(false)
-
-  useEffect(() => {
-    setProjects(ProjectManager.getAllProjects().filter((p) => p.assessment))
-  }, [])
 
   const toggleProject = (projectId: string) => {
     setSelectedProjects((prev) => {

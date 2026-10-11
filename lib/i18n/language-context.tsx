@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useMemo, type ReactNode } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { translations, type Language } from "./translations"
 
 interface LanguageContextType {
@@ -16,20 +17,21 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const supportedLanguages = ["ar", "en", "de", "tr"] as const
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("ar")
-
-  // Load language from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
+  const hydrated = useHydrated()
+  const savedLanguage = useMemo<Language>(() => {
+    if (hydrated) {
       const saved = localStorage.getItem("app-language") as Language
-      if (saved && supportedLanguages.includes(saved as any)) {
-        setLanguageState(saved)
+      if (saved && supportedLanguages.includes(saved)) {
+        return saved
       }
     }
-  }, [])
+    return "ar"
+  }, [hydrated])
+  const [selectedLanguage, setLanguageState] = useState<Language | null>(null)
+  const language = selectedLanguage ?? savedLanguage
 
   const setLanguage = (lang: Language) => {
-    if (supportedLanguages.includes(lang as any)) {
+    if (supportedLanguages.includes(lang)) {
       setLanguageState(lang)
       if (typeof window !== "undefined") {
         localStorage.setItem("app-language", lang)

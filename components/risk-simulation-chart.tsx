@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { runMonteCarloSimulation, SimulationParams } from "@/lib/calculators/risk-engine"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LineChart, Line, Legend } from "recharts"
@@ -20,19 +20,16 @@ export default function RiskSimulationChart() {
 
     // Simulation parameters state
     const [params, setParams] = useState<SimulationParams>({
-        baseImpact: 7,
-        baseLikelihood: 0.6,
-        mitigationFactor: 0.5,
+        baseImpact: 3,
+        baseLikelihood: 0.2,
+        mitigationFactor: 0.8,
         uncertainty: 0.2,
         iterations: 2000
     })
 
-    // LIFTED STATE: Detected threats from Traffic Analyzer
-    const [detectedThreats, setDetectedThreats] = useState<DetectedThreat[]>([])
-
-    // REACTIVE LOGIC: Auto-update simulation parameters based on detected threats
-    useEffect(() => {
-        if (detectedThreats.length === 0) {
+    // Update parameters when traffic analysis reports detected threats.
+    const handleThreatsDetected = (threats: DetectedThreat[]) => {
+        if (threats.length === 0) {
             setParams({
                 baseImpact: 3,
                 baseLikelihood: 0.2,
@@ -44,12 +41,12 @@ export default function RiskSimulationChart() {
         }
 
         // Analyze threat severity levels
-        const hasCritical = detectedThreats.some(t => t.severity === 'Critical');
-        const hasHigh = detectedThreats.some(t => t.severity === 'High');
+        const hasCritical = threats.some(t => t.severity === 'Critical');
+        const hasHigh = threats.some(t => t.severity === 'High');
 
         console.log('🚨 Threat Detection Triggered!');
-        console.log(`   Critical Threats: ${detectedThreats.filter(t => t.severity === 'Critical').length}`);
-        console.log(`   High Threats: ${detectedThreats.filter(t => t.severity === 'High').length}`);
+        console.log(`   Critical Threats: ${threats.filter(t => t.severity === 'Critical').length}`);
+        console.log(`   High Threats: ${threats.filter(t => t.severity === 'High').length}`);
 
         // Auto-adjust parameters based on threat severity
         if (hasCritical) {
@@ -81,12 +78,6 @@ export default function RiskSimulationChart() {
                 iterations: 2000
             });
         }
-    }, [detectedThreats]);
-
-    // Callback function to receive threats from PacketUpload component
-    const handleThreatsDetected = (threats: DetectedThreat[]) => {
-        console.log('📡 Received threats from Traffic Analyzer:', threats.length);
-        setDetectedThreats(threats);
     };
 
     // Memoize calculation so it doesn't run on every render unless params change

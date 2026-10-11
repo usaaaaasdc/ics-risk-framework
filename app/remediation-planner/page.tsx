@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,29 +20,28 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import Link from "next/link"
-import { generateRemediationPlan, type RemediationPlan } from "@/lib/remediation-planner"
+import { generateRemediationPlan } from "@/lib/remediation-planner"
 import { loadProjects } from "@/lib/project-manager"
 
 export default function RemediationPlannerPage() {
   const { language } = useLanguage()
-  const [plan, setPlan] = useState<RemediationPlan | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
+  const hydrated = useHydrated()
+  const loading = !hydrated
+  const plan = useMemo(() => {
+    if (!hydrated) return null
     // Load latest project
     const projects = loadProjects()
     if (projects.length > 0) {
       const latest = projects[projects.length - 1]
-      const generatedPlan = generateRemediationPlan(
+      return generateRemediationPlan(
         latest.assessment?.riskScore || 0,
         latest.assessment?.vulnerabilities || [],
         latest.config?.devices || [],
         (language === 'ar' || language === 'de') ? language : 'en',
       )
-      setPlan(generatedPlan)
     }
-    setLoading(false)
-  }, [language])
+    return null
+  }, [hydrated, language])
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
