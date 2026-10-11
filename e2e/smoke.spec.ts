@@ -14,7 +14,7 @@ test('home page loads and the quick-start link opens the guided assessment', asy
     const response = await page.goto('/')
     expect(response?.ok()).toBe(true)
     await expect(page).toHaveTitle(/ICS-Risk Framework/)
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('ICS-Risk')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Industrial Command Center')
     await page.getByRole('link', { name: /Quick Start Guide/ }).click()
     await expect(page).toHaveURL(/\/simple-mode$/)
     await expect(page.getByRole('heading', { name: 'Simple Mode for Managers' })).toBeVisible()
