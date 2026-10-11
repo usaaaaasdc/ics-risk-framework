@@ -4,15 +4,15 @@ import { readFile } from "node:fs/promises";
 test("dashboard chart and asset search open the correct inspection records", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  // Pause before waiting for WebGL startup. On a CPU renderer, waiting first
-  // lets continuous animation consume the chart/search test's time budget.
-  // The rendered-canvas assertions below still require genuine 3D output.
-  await page.getByRole("button", { name: "Pause scene animation", exact: true }).click();
+  // Chart/search behavior is independent of GPU throughput. Dedicated scene tests
+  // still exercise real WebGL rendering, animation, camera and mesh interaction.
+  await page.getByRole("button", { name: "Show 2D topology", exact: true }).click();
+  await expect(
+    page.getByRole("group", { name: "Industrial network topology", exact: true }).first()
+  ).toBeVisible();
   await expect(page.locator(".cc-industrial-viewer")).toHaveAttribute("data-motion", "paused");
-  const hero = page.getByRole("img", { name: /3D industrial assembly cell/ });
-  await expect(hero).toBeVisible();
-  await expect(hero).toHaveAttribute("data-rendered", "true");
   await page.getByRole("button", { name: "24H", exact: true }).click();
   await expect(
     page.getByRole("img", { name: /Overall risk trend over 24H: 7.1 to 6.4/ })
@@ -32,6 +32,21 @@ test("dashboard chart and asset search open the correct inspection records", asy
   await expect(page.getByRole("dialog")).toContainText("Moxa EDR-G9010");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("dashboard 3D renders when animation is paused before WebGL startup", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  // Pause before waiting for WebGL startup so software rendering does not spend
+  // the test budget animating. Still require visible, genuinely rendered 3D.
+  await page.getByRole("button", { name: "Pause scene animation", exact: true }).click();
+  await expect(page.locator(".cc-industrial-viewer")).toHaveAttribute("data-motion", "paused");
+  const hero = page.getByRole("img", { name: /3D industrial assembly cell/ });
+  await expect(hero).toBeVisible();
+  await expect(hero).toHaveAttribute("data-rendered", "true");
   expect(errors).toEqual([]);
 });
 
