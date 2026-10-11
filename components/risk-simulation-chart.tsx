@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { riskSimulationCopy } from "@/lib/risk-simulation-copy"
 import { useLanguage } from "@/lib/i18n/language-context"
 import { runMonteCarloSimulation, SimulationParams } from "@/lib/calculators/risk-engine"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LineChart, Line, Legend } from "recharts"
@@ -107,14 +108,8 @@ export default function RiskSimulationChart() {
             language === 'de' ? 'Monte-Carlo-Risikosimulation' :
                 language === 'tr' ? 'Monte Carlo Risk Simülasyonu' :
                     'Monte Carlo Risk Simulation',
-        desc: language === 'ar' ? 'محاكاة 2000 سيناريو محتمل لتقدير المخاطر المتبقية بدقة' :
-            language === 'de' ? 'Simulation von 2000 Szenarien zur präzisen Risikoschätzung' :
-                language === 'tr' ? 'Kalan riski doğru tahmin etmek için 2000 senaryo simülasyonu' :
-                    'Simulating 2000 potential scenarios to estimate residual risk accuracy',
-        impact: language === 'ar' ? 'الأثر المتوقع ($)' :
-            language === 'de' ? 'Erwartete Auswirkung ($)' :
-                language === 'tr' ? 'Beklenen Etki ($)' :
-                    'Expected Impact ($)',
+        desc: riskSimulationCopy[language].disclaimer,
+        impact: riskSimulationCopy[language].impact,
         likelihood: language === 'ar' ? 'الاحتمالية' :
             language === 'de' ? 'Wahrscheinlichkeit' :
                 language === 'tr' ? 'Olasılık' :
@@ -276,16 +271,16 @@ export default function RiskSimulationChart() {
                         <TabsContent value="markov">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Attack Progression Forecast (24 Hours)</CardTitle>
-                                    <CardDescription>Probability of system state transition over time based on current risk.</CardDescription>
+                                    <CardTitle>{riskSimulationCopy[language].trend}</CardTitle>
+                                    <CardDescription>{riskSimulationCopy[language].modelNote}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="h-[400px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <LineChart data={markovHistory} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                                                <XAxis dataKey="step" label={{ value: 'Time (Hours)', position: 'insideBottom', offset: -5 }} />
-                                                <YAxis label={{ value: 'Probability', angle: -90, position: 'insideLeft' }} />
+                                                <XAxis dataKey="step" label={{ value: riskSimulationCopy[language].step, position: 'insideBottom', offset: -5 }} />
+                                                <YAxis label={{ value: riskSimulationCopy[language].weight, angle: -90, position: 'insideLeft' }} />
                                                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', color: '#fff' }} />
                                                 <Legend />
                                                 <Line type="monotone" dataKey="probabilities.Secure" stroke="#22c55e" name="Secure" strokeWidth={2} dot={false} />
