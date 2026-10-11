@@ -1,28 +1,74 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useLanguage } from "@/lib/i18n/language-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Shield, ArrowLeft, TrendingUp, TrendingDown, AlertCircle, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useLanguage } from "@/lib/i18n/language-context";
+import { CommandShell, ModeSwitch } from "@/components/assessment/command-shell";
+import { assessmentCopy } from "@/lib/assessment-ui-copy";
+import { Shield, TrendingUp, TrendingDown, AlertCircle, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function SimpleModePage() {
-  const { t, language } = useLanguage()
-  const [step, setStep] = useState(1)
+  const { language } = useLanguage();
+  const copy = assessmentCopy(language);
+  const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({
     systemAge: "",
     internetAccess: "",
     lastUpdate: "",
     externalConnections: "",
     securityTools: "",
-  })
-  const [result, setResult] = useState<string | null>(null)
+  });
+  const [result, setResult] = useState<string | null>(null);
 
   const questions = {
+    tr: {
+      systemAge: {
+        question: "Endüstriyel kontrol sisteminiz kaç yaşında?",
+        options: [
+          { value: "new", label: "2 yıldan az", risk: 1 },
+          { value: "medium", label: "2–5 yıl", risk: 2 },
+          { value: "old", label: "5–10 yıl", risk: 3 },
+          { value: "legacy", label: "10 yıldan fazla", risk: 4 },
+        ],
+      },
+      internetAccess: {
+        question: "Sisteminiz internete bağlı mı?",
+        options: [
+          { value: "no", label: "Hayır, tamamen izole", risk: 1 },
+          { value: "indirect", label: "Yalnızca güvenli ağ geçidi üzerinden", risk: 2 },
+          { value: "yes", label: "Evet, doğrudan bağlı", risk: 4 },
+        ],
+      },
+      lastUpdate: {
+        question: "Son güvenlik güncellemesi ne zaman uygulandı?",
+        options: [
+          { value: "recent", label: "Son 3 ay içinde", risk: 1 },
+          { value: "moderate", label: "3–12 ay önce", risk: 2 },
+          { value: "old", label: "1 yıldan fazla", risk: 3 },
+          { value: "never", label: "Hiç güncellenmedi", risk: 4 },
+        ],
+      },
+      externalConnections: {
+        question: "Harici tedarikçilerin uzaktan erişimi var mı?",
+        options: [
+          { value: "no", label: "Harici erişim yok", risk: 1 },
+          { value: "controlled", label: "Evet, sıkı denetim altında", risk: 2 },
+          { value: "uncontrolled", label: "Evet, sınırlı gözetimle", risk: 4 },
+        ],
+      },
+      securityTools: {
+        question: "Güvenlik izleme araçlarınız var mı?",
+        options: [
+          { value: "comprehensive", label: "Evet, kapsamlı izleme", risk: 1 },
+          { value: "basic", label: "Yalnızca temel güvenlik duvarı", risk: 2 },
+          { value: "none", label: "Güvenlik aracı yok", risk: 4 },
+        ],
+      },
+    },
     en: {
       systemAge: {
         question: "How old is your industrial control system?",
@@ -155,38 +201,77 @@ export default function SimpleModePage() {
         ],
       },
     },
-  }
+  };
 
-  const currentQuestions = questions[language as keyof typeof questions] || questions.en
+  const currentQuestions = questions[language as keyof typeof questions] || questions.en;
 
   const calculateRisk = () => {
     const riskScores = Object.entries(answers).map(([key, value]) => {
-      const question = currentQuestions[key as keyof typeof currentQuestions]
-      const option = question.options.find((o) => o.value === value)
-      return option?.risk || 0
-    })
+      const question = currentQuestions[key as keyof typeof currentQuestions];
+      const option = question.options.find((o) => o.value === value);
+      return option?.risk || 0;
+    });
 
-    const totalRisk = riskScores.reduce((sum, score) => sum + score, 0)
-    const avgRisk = totalRisk / riskScores.length
+    const totalRisk = riskScores.reduce((sum, score) => sum + score, 0);
+    const avgRisk = totalRisk / riskScores.length;
 
-    if (avgRisk <= 1.5) return "low"
-    if (avgRisk <= 2.5) return "medium"
-    return "high"
-  }
+    if (avgRisk <= 1.5) return "low";
+    if (avgRisk <= 2.5) return "medium";
+    return "high";
+  };
 
   const handleNext = () => {
-    const currentKey = Object.keys(currentQuestions)[step - 1]
+    const currentKey = Object.keys(currentQuestions)[step - 1];
     if (answers[currentKey as keyof typeof answers]) {
       if (step === 5) {
-        const riskLevel = calculateRisk()
-        setResult(riskLevel)
+        const riskLevel = calculateRisk();
+        setResult(riskLevel);
       } else {
-        setStep(step + 1)
+        setStep(step + 1);
       }
     }
-  }
+  };
 
   const resultContent = {
+    tr: {
+      low: {
+        title: "İyi Güvenlik Duruşu",
+        icon: CheckCircle,
+        color: "text-green-500",
+        message: "Yanıtlarınız temel güvenlik uygulamalarına işaret ediyor.",
+        recommendations: [
+          "Düzenli güvenlik güncellemelerini sürdürün",
+          "Mevcut izleme uygulamalarını koruyun",
+          "Güvenlik politikalarını yıllık gözden geçirin",
+        ],
+        action: "Güvenlik uygulamalarınızı üç ayda bir gözden geçirin.",
+      },
+      medium: {
+        title: "Orta Risk Seviyesi",
+        icon: AlertCircle,
+        color: "text-yellow-500",
+        message: "Yanıtlarınız incelenmesi gereken güvenlik boşluklarına işaret ediyor.",
+        recommendations: [
+          "Düzenli güncelleme planı uygulayın",
+          "Ağ bölümlemesi ekleyin",
+          "Temel izleme araçları kullanın",
+        ],
+        action: "Operasyon ve güvenlik ekibiyle iyileştirme planı hazırlayın.",
+      },
+      high: {
+        title: "Yüksek Risk — İnceleme Gerekli",
+        icon: AlertCircle,
+        color: "text-red-500",
+        message: "Yanıtlarınız öncelikli teknik inceleme ihtiyacına işaret ediyor.",
+        recommendations: [
+          "Kritik sistemlerin erişimini inceleyin",
+          "Güvenlik izlemesini geliştirin",
+          "Güvenlik denetimi planlayın",
+          "Güncellemeleri güvenli bakım pencerelerinde değerlendirin",
+        ],
+        action: "Nitel sonucu bir siber güvenlik uzmanıyla doğrulayın.",
+      },
+    },
     en: {
       low: {
         title: "Good Security Posture",
@@ -216,7 +301,8 @@ export default function SimpleModePage() {
         title: "High Risk - Action Required",
         icon: AlertCircle,
         color: "text-red-500",
-        message: "Your system has significant security vulnerabilities that require immediate attention.",
+        message:
+          "Your system has significant security vulnerabilities that require immediate attention.",
         recommendations: [
           "Isolate critical systems immediately",
           "Deploy comprehensive security monitoring",
@@ -244,7 +330,11 @@ export default function SimpleModePage() {
         icon: AlertCircle,
         color: "text-yellow-500",
         message: "نظامك يحتوي على بعض الثغرات الأمنية التي يجب معالجتها.",
-        recommendations: ["تنفيذ جدول تحديثات منتظم", "إضافة تقسيم للشبكة", "نشر أدوات مراقبة أساسية"],
+        recommendations: [
+          "تنفيذ جدول تحديثات منتظم",
+          "إضافة تقسيم للشبكة",
+          "نشر أدوات مراقبة أساسية",
+        ],
         action: "استثمر في تحسينات أمنية خلال 3-6 أشهر القادمة.",
       },
       high: {
@@ -290,7 +380,8 @@ export default function SimpleModePage() {
         title: "Hohes Risiko - Maßnahmen erforderlich",
         icon: AlertCircle,
         color: "text-red-500",
-        message: "Ihr System hat erhebliche Sicherheitslücken, die sofortige Aufmerksamkeit erfordern.",
+        message:
+          "Ihr System hat erhebliche Sicherheitslücken, die sofortige Aufmerksamkeit erfordern.",
         recommendations: [
           "Kritische Systeme sofort isolieren",
           "Umfassende Sicherheitsüberwachung bereitstellen",
@@ -300,194 +391,242 @@ export default function SimpleModePage() {
         action: "Kontaktieren Sie innerhalb von 2 Wochen einen Cybersecurity-Experten.",
       },
     },
-  }
+  };
 
   return (
-    <main className="min-h-screen bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Shield className="w-10 h-10 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold">
-                  {language === "ar" && "الوضع المبسط للمديرين"}
-                  {language === "en" && "Simple Mode for Managers"}
-                  {language === "de" && "Einfacher Modus für Manager"}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  {language === "ar" && "تقييم سريع بدون مصطلحات تقنية"}
-                  {language === "en" && "Quick assessment without technical jargon"}
-                  {language === "de" && "Schnelle Bewertung ohne Fachjargon"}
-                </p>
-              </div>
-            </div>
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
-        <Link href="/">
-          <Button variant="ghost" className="mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("backToHome")}
-          </Button>
-        </Link>
-
-        {!result ? (
-          <Card className="max-w-2xl mx-auto p-8">
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold">
-                  {language === "ar" && `السؤال ${step} من 5`}
-                  {language === "en" && `Question ${step} of 5`}
-                  {language === "de" && `Frage ${step} von 5`}
-                </h2>
-                <div className="text-sm text-muted-foreground">{Math.round((step / 5) * 100)}%</div>
-              </div>
-              <div className="w-full bg-secondary h-2 rounded-full">
-                <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${(step / 5) * 100}%` }} />
-              </div>
-            </div>
-
-            {Object.entries(currentQuestions).map(([key, question], index) => {
-              if (index + 1 !== step) return null
-
-              return (
-                <div key={key} className="space-y-6">
-                  <h3 className="text-lg font-medium">{question.question}</h3>
-                  <RadioGroup
-                    value={answers[key as keyof typeof answers]}
-                    onValueChange={(value) => setAnswers({ ...answers, [key]: value })}
-                  >
-                    {question.options.map((option) => (
-                      <div
-                        key={option.value}
-                        className="flex items-center space-x-3 space-x-reverse p-4 border border-border rounded-lg hover:bg-accent cursor-pointer"
-                      >
-                        <RadioGroupItem value={option.value} id={`${key}-${option.value}`} />
-                        <Label htmlFor={`${key}-${option.value}`} className="flex-1 cursor-pointer">
-                          {option.label}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-
-                  <div className="flex gap-4">
-                    {step > 1 && (
-                      <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
-                        {language === "ar" && "السابق"}
-                        {language === "en" && "Previous"}
-                        {language === "de" && "Zurück"}
-                      </Button>
-                    )}
-                    <Button onClick={handleNext} disabled={!answers[key as keyof typeof answers]} className="flex-1">
-                      {step === 5
-                        ? language === "ar"
-                          ? "عرض النتيجة"
-                          : language === "de"
-                            ? "Ergebnis anzeigen"
-                            : "Show Result"
-                        : language === "ar"
-                          ? "التالي"
-                          : language === "de"
-                            ? "Weiter"
-                            : "Next"}
-                    </Button>
+    <CommandShell
+      section="simple"
+      title={
+        language === "ar"
+          ? "الوضع المبسط للمديرين"
+          : language === "de"
+            ? "Einfacher Modus für Manager"
+            : language === "tr"
+              ? "Yöneticiler için Basit Mod"
+              : "Simple Mode for Managers"
+      }
+      subtitle={copy.simpleNote}
+    >
+      <div className="ac-toolbar">
+        <ModeSwitch simple />
+        <span className="ac-badge">
+          {copy.complete}: {Object.values(answers).filter(Boolean).length} / 5
+        </span>
+      </div>
+      <div className="ac-simple-grid">
+        <aside className="ac-panel ac-simple-context">
+          <Shield size={38} />
+          <h2>{copy.assessment}</h2>
+          <p>{copy.simpleNote}</p>
+          <ol>
+            {Object.keys(currentQuestions).map((key, i) => (
+              <li key={key} data-complete={!!answers[key as keyof typeof answers]}>
+                <span>
+                  {answers[key as keyof typeof answers] ? <CheckCircle size={15} /> : i + 1}
+                </span>
+                {currentQuestions[key as keyof typeof currentQuestions].question}
+              </li>
+            ))}
+          </ol>
+          <Link className="ac-text-button" href="/assessment">
+            {copy.advanced}
+          </Link>
+        </aside>
+        <div>
+          {!result ? (
+            <Card className="ac-simple-card p-8">
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-xl font-semibold">
+                    {language === "ar" && `السؤال ${step} من 5`}
+                    {language === "en" && `Question ${step} of 5`}
+                    {language === "de" && `Frage ${step} von 5`}
+                    {language === "tr" && `Soru ${step} / 5`}
+                  </h2>
+                  <div className="text-sm text-muted-foreground">
+                    {Math.round((step / 5) * 100)}%
                   </div>
                 </div>
-              )
-            })}
-          </Card>
-        ) : (
-          <div className="max-w-3xl mx-auto space-y-6">
-            {(() => {
-              const content =
-                resultContent[language as keyof typeof resultContent]?.[result as keyof typeof resultContent.en] ||
-                resultContent.en[result as keyof typeof resultContent.en]
-              const Icon = content.icon
+                <div className="w-full bg-secondary h-2 rounded-full">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{ width: `${(step / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
 
-              return (
-                <>
-                  <Card className="p-8 text-center">
-                    <Icon className={`w-20 h-20 mx-auto mb-4 ${content.color}`} />
-                    <h2 className="text-3xl font-bold mb-4">{content.title}</h2>
-                    <p className="text-lg text-muted-foreground mb-6">{content.message}</p>
-                    <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${result === "low" ? "bg-green-500/10 text-green-500" : result === "medium" ? "bg-yellow-500/10 text-yellow-500" : "bg-red-500/10 text-red-500"}`}
+              {Object.entries(currentQuestions).map(([key, question], index) => {
+                if (index + 1 !== step) return null;
+
+                return (
+                  <div key={key} className="space-y-6">
+                    <h3 className="text-lg font-medium">{question.question}</h3>
+                    <RadioGroup
+                      dir={language === "ar" ? "rtl" : "ltr"}
+                      value={answers[key as keyof typeof answers]}
+                      onValueChange={(value) => setAnswers({ ...answers, [key]: value })}
                     >
-                      {result === "low" && <TrendingUp className="w-5 h-5" />}
-                      {result === "medium" && <AlertCircle className="w-5 h-5" />}
-                      {result === "high" && <TrendingDown className="w-5 h-5" />}
-                      <span className="font-semibold">
-                        {result === "low" &&
-                          (language === "ar" ? "خطر منخفض" : language === "de" ? "Niedriges Risiko" : "Low Risk")}
-                        {result === "medium" &&
-                          (language === "ar" ? "خطر متوسط" : language === "de" ? "Mittleres Risiko" : "Medium Risk")}
-                        {result === "high" &&
-                          (language === "ar" ? "خطر عالي" : language === "de" ? "Hohes Risiko" : "High Risk")}
-                      </span>
-                    </div>
-                  </Card>
-
-                  <Card className="p-8">
-                    <h3 className="text-xl font-bold mb-4">
-                      {language === "ar" && "التوصيات"}
-                      {language === "en" && "Recommendations"}
-                      {language === "de" && "Empfehlungen"}
-                    </h3>
-                    <ul className="space-y-3">
-                      {content.recommendations.map((rec, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                          <span>{rec}</span>
-                        </li>
+                      {question.options.map((option) => (
+                        <div
+                          key={option.value}
+                          className="flex items-center space-x-3 space-x-reverse p-4 border border-border rounded-lg hover:bg-accent cursor-pointer"
+                        >
+                          <RadioGroupItem value={option.value} id={`${key}-${option.value}`} />
+                          <Label
+                            htmlFor={`${key}-${option.value}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            {option.label}
+                          </Label>
+                        </div>
                       ))}
-                    </ul>
-                  </Card>
+                    </RadioGroup>
 
-                  <Card className="p-8 bg-primary/5 border-primary/20">
-                    <h3 className="text-xl font-bold mb-4">
-                      {language === "ar" && "الخطوة التالية"}
-                      {language === "en" && "Next Step"}
-                      {language === "de" && "Nächster Schritt"}
-                    </h3>
-                    <p className="text-lg mb-6">{content.action}</p>
                     <div className="flex gap-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setResult(null)
-                          setStep(1)
-                          setAnswers({
-                            systemAge: "",
-                            internetAccess: "",
-                            lastUpdate: "",
-                            externalConnections: "",
-                            securityTools: "",
-                          })
-                        }}
-                      >
-                        {language === "ar" && "إعادة التقييم"}
-                        {language === "en" && "Retake Assessment"}
-                        {language === "de" && "Erneut bewerten"}
-                      </Button>
-                      <Link href="/">
-                        <Button>
-                          {language === "ar" && "الوضع المتقدم"}
-                          {language === "en" && "Advanced Mode"}
-                          {language === "de" && "Erweiterter Modus"}
+                      {step > 1 && (
+                        <Button
+                          variant="outline"
+                          onClick={() => setStep(step - 1)}
+                          className="flex-1"
+                        >
+                          {language === "ar" && "السابق"}
+                          {language === "en" && "Previous"}
+                          {language === "tr" && "Önceki"}
+                          {language === "de" && "Zurück"}
                         </Button>
-                      </Link>
+                      )}
+                      <Button
+                        onClick={handleNext}
+                        disabled={!answers[key as keyof typeof answers]}
+                        className="flex-1"
+                      >
+                        {step === 5
+                          ? language === "ar"
+                            ? "عرض النتيجة"
+                            : language === "de"
+                              ? "Ergebnis anzeigen"
+                              : language === "tr"
+                                ? "Sonucu Göster"
+                                : "Show Result"
+                          : language === "ar"
+                            ? "التالي"
+                            : language === "de"
+                              ? "Weiter"
+                              : language === "tr"
+                                ? "Sonraki"
+                                : "Next"}
+                      </Button>
                     </div>
-                  </Card>
-                </>
-              )
-            })()}
-          </div>
-        )}
+                  </div>
+                );
+              })}
+            </Card>
+          ) : (
+            <div className="ac-simple-results space-y-6">
+              {(() => {
+                const content =
+                  resultContent[language as keyof typeof resultContent]?.[
+                    result as keyof typeof resultContent.en
+                  ] || resultContent.en[result as keyof typeof resultContent.en];
+                const Icon = content.icon;
+
+                return (
+                  <>
+                    <Card className="p-8 text-center">
+                      <Icon className={`w-20 h-20 mx-auto mb-4 ${content.color}`} />
+                      <h2 className="text-3xl font-bold mb-4">{content.title}</h2>
+                      <p className="text-lg text-muted-foreground mb-6">{content.message}</p>
+                      <div
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${result === "low" ? "bg-green-500/10 text-green-500" : result === "medium" ? "bg-yellow-500/10 text-yellow-500" : "bg-red-500/10 text-red-500"}`}
+                      >
+                        {result === "low" && <TrendingUp className="w-5 h-5" />}
+                        {result === "medium" && <AlertCircle className="w-5 h-5" />}
+                        {result === "high" && <TrendingDown className="w-5 h-5" />}
+                        <span className="font-semibold">
+                          {result === "low" &&
+                            (language === "ar"
+                              ? "خطر منخفض"
+                              : language === "de"
+                                ? "Niedriges Risiko"
+                                : "Low Risk")}
+                          {result === "medium" &&
+                            (language === "ar"
+                              ? "خطر متوسط"
+                              : language === "de"
+                                ? "Mittleres Risiko"
+                                : "Medium Risk")}
+                          {result === "high" &&
+                            (language === "ar"
+                              ? "خطر عالي"
+                              : language === "de"
+                                ? "Hohes Risiko"
+                                : "High Risk")}
+                        </span>
+                      </div>
+                    </Card>
+
+                    <Card className="p-8">
+                      <h3 className="text-xl font-bold mb-4">
+                        {language === "ar" && "التوصيات"}
+                        {language === "en" && "Recommendations"}
+                        {language === "tr" && "Öneriler"}
+                        {language === "de" && "Empfehlungen"}
+                      </h3>
+                      <ul className="space-y-3">
+                        {content.recommendations.map((rec, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                            <span>{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Card>
+
+                    <Card className="p-8 bg-primary/5 border-primary/20">
+                      <h3 className="text-xl font-bold mb-4">
+                        {language === "ar" && "الخطوة التالية"}
+                        {language === "en" && "Next Step"}
+                        {language === "tr" && "Sonraki Adım"}
+                        {language === "de" && "Nächster Schritt"}
+                      </h3>
+                      <p className="text-lg mb-6">{content.action}</p>
+                      <div className="flex gap-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setResult(null);
+                            setStep(1);
+                            setAnswers({
+                              systemAge: "",
+                              internetAccess: "",
+                              lastUpdate: "",
+                              externalConnections: "",
+                              securityTools: "",
+                            });
+                          }}
+                        >
+                          {language === "ar" && "إعادة التقييم"}
+                          {language === "en" && "Retake Assessment"}
+                          {language === "tr" && "Yeniden Değerlendir"}
+                          {language === "de" && "Erneut bewerten"}
+                        </Button>
+                        <Link href="/assessment">
+                          <Button>
+                            {language === "ar" && "الوضع المتقدم"}
+                            {language === "en" && "Advanced Mode"}
+                            {language === "tr" && "Gelişmiş Mod"}
+                            {language === "de" && "Erweiterter Modus"}
+                          </Button>
+                        </Link>
+                      </div>
+                    </Card>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+        </div>
       </div>
-    </main>
-  )
+    </CommandShell>
+  );
 }

@@ -1,64 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useLanguage } from "@/lib/i18n/language-context"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from "react";
+import { CommandShell } from "@/components/assessment/command-shell";
+import { IndustrialEnvironment } from "@/components/assessment/industrial-environment";
+import { assessmentCopy } from "@/lib/assessment-ui-copy";
+import { useLanguage } from "@/lib/i18n/language-context";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   generateComplianceRoadmap,
   calculateComplianceProgress,
   IEC62443_REQUIREMENTS,
   type CompliancePhase,
-} from "@/lib/compliance-roadmap"
-import { ArrowLeft, Calendar, CheckCircle, Clock, DollarSign, Target } from "lucide-react"
-import Link from "next/link"
-import { Progress } from "@/components/ui/progress"
+} from "@/lib/compliance-roadmap";
+import { ArrowLeft, Calendar, CheckCircle, Clock, DollarSign, Target } from "lucide-react";
+import Link from "next/link";
+import { Progress } from "@/components/ui/progress";
 
 export default function ComplianceRoadmapPage() {
-  const { language } = useLanguage()
-  const [currentCompliance, setCurrentCompliance] = useState<{ [key: string]: boolean }>({})
-  const [roadmap, setRoadmap] = useState<CompliancePhase[]>([])
-  const [showRoadmap, setShowRoadmap] = useState(false)
+  const { language } = useLanguage();
+  const copy = assessmentCopy(language);
+  const [selectedZone, setSelectedZone] = useState("zone-2");
+  const [currentCompliance, setCurrentCompliance] = useState<{ [key: string]: boolean }>({});
+  const [roadmap, setRoadmap] = useState<CompliancePhase[]>([]);
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   const handleGenerateRoadmap = () => {
-    const generatedRoadmap = generateComplianceRoadmap(currentCompliance)
-    setRoadmap(generatedRoadmap)
-    setShowRoadmap(true)
-  }
+    const generatedRoadmap = generateComplianceRoadmap(currentCompliance);
+    setRoadmap(generatedRoadmap);
+    setShowRoadmap(true);
+  };
 
   const toggleCompliance = (id: string) => {
     setCurrentCompliance((prev) => ({
       ...prev,
       [id]: !prev[id],
-    }))
-  }
+    }));
+  };
 
-  const progress = calculateComplianceProgress(currentCompliance)
+  const progress = calculateComplianceProgress(currentCompliance);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "Critical":
-        return "bg-red-500"
+        return "bg-red-500";
       case "High":
-        return "bg-orange-500"
+        return "bg-orange-500";
       case "Medium":
-        return "bg-yellow-500"
+        return "bg-yellow-500";
       case "Low":
-        return "bg-blue-500"
+        return "bg-blue-500";
       default:
-        return "bg-gray-500"
+        return "bg-gray-500";
     }
-  }
+  };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount)
-  }
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  };
 
   return (
-    <main className="min-h-screen bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <CommandShell section="roadmap" title={copy.roadmap} subtitle={copy.disclaimer}>
+      <IndustrialEnvironment
+        compliance
+        assets={copy.zoneNames
+          .split("|")
+          .map((label, i) => ({
+            id: `zone-${i}`,
+            label,
+            kind: ["PLC", "SCADA", "PLC", "Sensor"][i],
+            zone: i,
+          }))}
+        selectedId={selectedZone}
+        onSelect={setSelectedZone}
+      />
+      <p className="ac-help">{copy.subset}</p>
+      <div className="ac-roadmap-body">
         <Link href="/">
           <Button variant="ghost" className="mb-6 gap-2">
             <ArrowLeft className="w-4 h-4" />
@@ -80,8 +99,10 @@ export default function ComplianceRoadmapPage() {
             </h1>
             <p className="text-muted-foreground">
               {language === "ar" && "خطة تنفيذية للوصول للامتثال الكامل مع IEC 62443"}
-              {language === "en" && "Implementation plan to achieve full IEC 62443 compliance"}
-              {language === "de" && "Implementierungsplan zur vollständigen Einhaltung von IEC 62443"}
+              {language === "en" &&
+                "Implementation planning support for selected IEC 62443-related controls"}
+              {language === "de" &&
+                "Implementierungsplan zur vollständigen Einhaltung von IEC 62443"}
             </p>
           </div>
         </div>
@@ -96,8 +117,10 @@ export default function ComplianceRoadmapPage() {
               </h2>
               <p className="text-sm text-muted-foreground">
                 {language === "ar" && `${progress.completed} من ${progress.total} متطلب مكتمل`}
-                {language === "en" && `${progress.completed} of ${progress.total} requirements completed`}
-                {language === "de" && `${progress.completed} von ${progress.total} Anforderungen erfüllt`}
+                {language === "en" &&
+                  `${progress.completed} of ${progress.total} requirements completed`}
+                {language === "de" &&
+                  `${progress.completed} von ${progress.total} Anforderungen erfüllt`}
               </p>
             </div>
             <div className="text-right">
@@ -132,7 +155,9 @@ export default function ComplianceRoadmapPage() {
                   {language === "en" && "Estimated Cost"}
                   {language === "de" && "Geschätzte Kosten"}
                 </div>
-                <div className="text-lg font-bold">{formatCurrency(progress.remainingCost.min)}</div>
+                <div className="text-lg font-bold">
+                  {formatCurrency(progress.remainingCost.min)}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {language === "ar" && "إلى "}
                   {language === "en" && "to "}
@@ -223,12 +248,17 @@ export default function ComplianceRoadmapPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4" />
-                        {formatCurrency(phase.totalCost.min)} - {formatCurrency(phase.totalCost.max)}
+                        {formatCurrency(phase.totalCost.min)} -{" "}
+                        {formatCurrency(phase.totalCost.max)}
                       </span>
                       <span className="flex items-center gap-1">
                         <CheckCircle className="w-4 h-4" />
                         {phase.requirements.length}{" "}
-                        {language === "ar" ? "متطلب" : language === "de" ? "Anforderungen" : "requirements"}
+                        {language === "ar"
+                          ? "متطلب"
+                          : language === "de"
+                            ? "Anforderungen"
+                            : "requirements"}
                       </span>
                     </div>
                   </div>
@@ -270,11 +300,19 @@ export default function ComplianceRoadmapPage() {
 
                       <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
                         <span>
-                          {language === "ar" ? "المدة: " : language === "de" ? "Dauer: " : "Duration: "}
+                          {language === "ar"
+                            ? "المدة: "
+                            : language === "de"
+                              ? "Dauer: "
+                              : "Duration: "}
                           {req.estimatedDays} {language === "ar" ? "يوم" : "days"}
                         </span>
                         <span>
-                          {language === "ar" ? "التكلفة: " : language === "de" ? "Kosten: " : "Cost: "}
+                          {language === "ar"
+                            ? "التكلفة: "
+                            : language === "de"
+                              ? "Kosten: "
+                              : "Cost: "}
                           {formatCurrency(req.cost.min)} - {formatCurrency(req.cost.max)}
                         </span>
                       </div>
@@ -295,13 +333,15 @@ export default function ComplianceRoadmapPage() {
               {language === "de" && "Glückwunsch!"}
             </h3>
             <p className="text-muted-foreground">
-              {language === "ar" && "لقد أكملت جميع متطلبات IEC 62443"}
-              {language === "en" && "You have completed all IEC 62443 requirements"}
-              {language === "de" && "Sie haben alle IEC 62443-Anforderungen erfüllt"}
+              {language === "ar" && "تم تحديد جميع عناصر قائمة التخطيط؛ يلزم تقييم مستقل"}
+              {language === "en" &&
+                "You have marked all items in this planning checklist complete; independent assessment is still required"}
+              {language === "de" &&
+                "Alle Punkte dieser Planungscheckliste sind markiert; eine unabhängige Bewertung ist weiterhin erforderlich"}
             </p>
           </Card>
         )}
       </div>
-    </main>
-  )
+    </CommandShell>
+  );
 }
