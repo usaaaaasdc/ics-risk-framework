@@ -57,8 +57,7 @@ export interface IndustryStats {
   averageRisk: number
 }
 
-export function generateAnalytics(): AnalyticsData {
-  const projects = ProjectManager.getAllProjects()
+export function generateAnalytics(projects = ProjectManager.getAllProjects()): AnalyticsData {
 
   const totalProjects = projects.length
 

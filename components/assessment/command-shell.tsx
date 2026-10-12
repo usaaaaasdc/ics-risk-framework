@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react";
 import {
   Boxes,
   Calendar,
+  BarChart3,
+  BrainCircuit,
   FileCheck2,
   Globe,
   LayoutDashboard,
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { useLanguage, type Language } from "@/lib/i18n/language-context";
 import { assessmentCopy } from "@/lib/assessment-ui-copy";
+import { intelligenceCopy } from "@/lib/intelligence-copy";
 import "./command-center.css";
 
 export function CommandShell({
@@ -23,14 +26,17 @@ export function CommandShell({
   title,
   subtitle,
   children,
+  disclaimer,
 }: {
-  section: "assessment" | "simple" | "iec" | "roadmap";
+  section: "assessment" | "simple" | "iec" | "roadmap" | "analytics" | "ai";
   title: string;
   subtitle?: string;
   children: ReactNode;
+  disclaimer?: string;
 }) {
   const { language, setLanguage, isRTL } = useLanguage();
   const c = assessmentCopy(language);
+  const intelligence = intelligenceCopy(language);
   const [menu, setMenu] = useState(false);
   const [query, setQuery] = useState("");
   const links = [
@@ -40,6 +46,8 @@ export function CommandShell({
     { href: "/iec-calculator", label: "IEC 62443", icon: FileCheck2, id: "iec" },
     { href: "/compliance-roadmap", label: c.roadmap, icon: Calendar, id: "roadmap" },
     { href: "/network-topology", label: c.topology, icon: Network, id: "topology" },
+    { href: "/analytics", label: intelligence.analytics, icon: BarChart3, id: "analytics" },
+    { href: "/ai-prediction", label: intelligence.ai, icon: BrainCircuit, id: "ai" },
     { href: "/projects", label: c.projects, icon: Boxes, id: "projects" },
   ];
   return (
@@ -158,13 +166,13 @@ export function CommandShell({
           <div>
             <span className="ac-eyebrow">ICS / OT SECURITY</span>
             <h1>{title}</h1>
-            <p>{subtitle ?? c.disclaimer}</p>
+            <p>{subtitle ?? disclaimer ?? c.disclaimer}</p>
           </div>
         </div>
         {children}
         <footer className="ac-disclaimer">
           <ShieldCheck size={17} />
-          <span>{c.disclaimer}</span>
+          <span>{disclaimer ?? c.disclaimer}</span>
         </footer>
       </main>
     </div>
