@@ -119,6 +119,7 @@ export function IndustrialEnvironment({
                 inspect={c.inspect}
                 sceneLabel={c.scene3d}
                 command={command}
+                risk={risk}
               />
             </FactoryBoundary>
             <div className="ac-factory-zones" aria-hidden="true">
@@ -316,6 +317,14 @@ export function IndustrialEnvironment({
                 }}
                 transform={`translate(${p.x} ${p.y})`}
               >
+                <rect
+                  x="-64"
+                  y="-86"
+                  width="128"
+                  height="140"
+                  fill="transparent"
+                  aria-hidden="true"
+                />
                 <ellipse
                   rx="58"
                   ry="18"

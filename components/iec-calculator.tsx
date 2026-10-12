@@ -73,6 +73,7 @@ function IECReview({ project }: { project?: Project }) {
   const results = calculateIECScore(review.checked);
   const requirements = iec62443Standards.flatMap((fr) => fr.requirements);
   const confirmed = review.checked.length;
+  const notAssessed = requirements.length - confirmed - review.notApplicable.length;
   const coverage = Math.round((confirmed / requirements.length) * 100);
   const missing = requirements.filter((req) => !review.checked.includes(req.id));
   const text = (obj: { nameEn: string; nameAr: string; nameDe: string }) =>
@@ -146,8 +147,8 @@ function IECReview({ project }: { project?: Project }) {
           <ClipboardCheck size={26} />
           <div>
             <small>{c.sl}</small>
-            <strong data-testid="iec-level" dir="ltr">
-              SL-{results.overallSL}
+            <strong data-testid="iec-level" dir={confirmed ? "ltr" : undefined}>
+              {confirmed ? `SL-${results.overallSL}` : c.unassessed}
             </strong>
           </div>
           <p>{c.subset}</p>
@@ -160,7 +161,11 @@ function IECReview({ project }: { project?: Project }) {
               <i className="ac-dot" /> {c.confirmed} <b data-testid="iec-confirmed">{confirmed}</b>
             </p>
             <p>
-              <i className="ac-dot amber" /> {c.unchecked} <b>{missing.length}</b>
+              <i className="ac-dot amber" /> {c.unassessed} <b>{notAssessed}</b>
+            </p>
+            <p>
+              <i className="ac-dot neutral" /> N/A{" "}
+              <b data-testid="iec-na">{review.notApplicable.length}</b>
             </p>
             <small>
               <bdi dir="ltr">
@@ -187,6 +192,13 @@ function IECReview({ project }: { project?: Project }) {
           {c.roadmap}
           <ArrowUpRight size={13} />
         </Link>
+      </nav>
+      <nav className="ac-review-steps" aria-label={c.review}>
+        {c.reviewSteps.split("|").map((label, i) => (
+          <a key={label} href={`#${["iec-zones", "iec-evidence", "iec-gaps"][i]}`}>
+            {label}
+          </a>
+        ))}
       </nav>
       <div className="ac-iec-hero" id="iec-zones">
         <IndustrialEnvironment
@@ -251,7 +263,10 @@ function IECReview({ project }: { project?: Project }) {
                 <Icon size={25} />
                 <h3>{text(fr)}</h3>
                 <span>
-                  {fr.id} · SL-{score.achievedSL}
+                  {fr.id} ·{" "}
+                  {fr.requirements.some((r) => review.checked.includes(r.id))
+                    ? `SL-${score.achievedSL}`
+                    : c.unassessed}
                 </span>
                 <ScoreRing
                   value={score.percentage}
@@ -346,75 +361,135 @@ function IECReview({ project }: { project?: Project }) {
               aria-label={c.evidence}
               placeholder="SR / FR…"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setQuery(value);
+                const match = iec62443Standards.find((fr) =>
+                  fr.requirements.some((r) =>
+                    `${fr.id} ${r.id} ${text(r)}`.toLowerCase().includes(value.toLowerCase().trim())
+                  )
+                );
+                if (match) setFamily(match.id);
+              }}
             />
           </label>
         </div>
         <p className="ac-help">{c.evidenceNote}</p>
+        <p className="ac-help">{c.naNote}</p>
         <Accordion type="single" collapsible value={family} onValueChange={setFamily}>
-          {iec62443Standards.map((fr) => (
-            <AccordionItem value={fr.id} key={fr.id}>
-              <AccordionTrigger>
-                <span>
-                  {fr.id} · {text(fr)}
-                </span>
-                <span className="ac-badge">
-                  {results.frScores.find((s) => s.frId === fr.id)?.percentage}%
-                </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="ac-requirements">
-                  {fr.requirements
-                    .filter((r) => `${r.id} ${text(r)}`.toLowerCase().includes(query.toLowerCase()))
-                    .map((req) => (
-                      <div key={req.id} className="ac-requirement">
-                        <Checkbox
-                          id={req.id}
-                          checked={review.checked.includes(req.id)}
-                          onCheckedChange={() =>
-                            updateReview((prev) => ({
-                              ...prev,
-                              checked: prev.checked.includes(req.id)
-                                ? prev.checked.filter((id) => id !== req.id)
-                                : [...prev.checked, req.id],
-                            }))
-                          }
-                        />
-                        <div>
-                          <label htmlFor={req.id}>
-                            <b dir="ltr">{req.id}</b> {text(req)}
-                          </label>
-                          <p>{description(req)}</p>
-                          <span className="ac-badge">
-                            SL-{req.requiredForSL} ·{" "}
-                            {review.checked.includes(req.id) ? c.confirmed : c.unchecked}
-                          </span>
-                          <label className="ac-evidence-note">
-                            <span>{c.evidenceRef}</span>
-                            <input
-                              aria-label={`${req.id} ${c.evidenceRef}`}
-                              maxLength={500}
-                              value={review.notes[req.id] || ""}
-                              onChange={(e) =>
+          {iec62443Standards
+            .filter((fr) =>
+              fr.requirements.some((r) =>
+                `${fr.id} ${r.id} ${text(r)}`.toLowerCase().includes(query.toLowerCase().trim())
+              )
+            )
+            .map((fr) => (
+              <AccordionItem value={fr.id} key={fr.id}>
+                <AccordionTrigger>
+                  <span>
+                    {fr.id} · {text(fr)}
+                  </span>
+                  <span className="ac-badge">
+                    {results.frScores.find((s) => s.frId === fr.id)?.percentage}%
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="ac-requirements">
+                    {fr.requirements
+                      .filter((r) =>
+                        `${fr.id} ${r.id} ${text(r)}`
+                          .toLowerCase()
+                          .includes(query.toLowerCase().trim())
+                      )
+                      .map((req) => (
+                        <div key={req.id} className="ac-requirement">
+                          <Checkbox
+                            id={req.id}
+                            checked={review.checked.includes(req.id)}
+                            onCheckedChange={() =>
+                              updateReview((prev) => ({
+                                ...prev,
+                                checked: prev.checked.includes(req.id)
+                                  ? prev.checked.filter((id) => id !== req.id)
+                                  : [...prev.checked, req.id],
+                                notApplicable: prev.notApplicable.filter((id) => id !== req.id),
+                              }))
+                            }
+                          />
+                          <div>
+                            <label htmlFor={req.id}>
+                              <b dir="ltr">{req.id}</b> {text(req)}
+                            </label>
+                            <span className="ac-badge">
+                              SL-{req.requiredForSL} ·{" "}
+                              {review.checked.includes(req.id)
+                                ? c.confirmed
+                                : review.notApplicable.includes(req.id)
+                                  ? c.notApplicable
+                                  : c.unassessed}
+                            </span>
+                            <button
+                              type="button"
+                              className="ac-na-button"
+                              aria-label={`${req.id} ${c.notApplicable}`}
+                              aria-pressed={review.notApplicable.includes(req.id)}
+                              onClick={() =>
                                 updateReview((prev) => ({
                                   ...prev,
-                                  notes: { ...prev.notes, [req.id]: e.target.value },
+                                  checked: prev.checked.filter((id) => id !== req.id),
+                                  notApplicable: prev.notApplicable.includes(req.id)
+                                    ? prev.notApplicable.filter((id) => id !== req.id)
+                                    : [...prev.notApplicable, req.id],
                                 }))
                               }
-                            />
-                          </label>
+                            >
+                              N/A
+                            </button>
+                            <details className="ac-evidence-details">
+                              <summary aria-label={`${req.id} ${c.reviewDetails}`}>
+                                {c.reviewDetails}
+                                <small>
+                                  {review.notes[req.id] ? c.evidenceRef : c.notProvided}
+                                </small>
+                              </summary>
+                              <p>{description(req)}</p>
+                              <label className="ac-evidence-note">
+                                <span>{c.evidenceRef}</span>
+                                <input
+                                  aria-label={`${req.id} ${c.evidenceRef}`}
+                                  maxLength={500}
+                                  value={review.notes[req.id] || ""}
+                                  onChange={(e) =>
+                                    updateReview((prev) => ({
+                                      ...prev,
+                                      notes: { ...prev.notes, [req.id]: e.target.value },
+                                    }))
+                                  }
+                                />
+                              </label>
+                            </details>
+                          </div>
+                          <CheckCircle2
+                            size={17}
+                            color={review.checked.includes(req.id) ? "#2adfb1" : "#466174"}
+                          />
                         </div>
-                        <CheckCircle2
-                          size={17}
-                          color={review.checked.includes(req.id) ? "#2adfb1" : "#466174"}
-                        />
-                      </div>
-                    ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                      ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
         </Accordion>
+        {query &&
+          !iec62443Standards.some((fr) =>
+            fr.requirements.some((r) =>
+              `${fr.id} ${r.id} ${text(r)}`.toLowerCase().includes(query.toLowerCase().trim())
+            )
+          ) && (
+            <p className="ac-help" role="status">
+              {c.noMatches}
+            </p>
+          )}
       </section>
       <p className="ac-help" role="status">
         {stored.error ? c.storageError : c.saved}
@@ -476,7 +551,7 @@ export default function IECCalculator() {
           </select>
         </label>
         <span className="ac-badge">
-          {c.confirmed} · {c.local}
+          {c.local} · {c.review}
         </span>
       </div>
       {(saved.error || scopeError) && <p role="alert">{c.storageError}</p>}

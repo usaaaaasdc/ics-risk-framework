@@ -2,12 +2,14 @@ import { iec62443Standards } from "@/lib/standards/iec62443";
 
 export interface IECReviewState {
   checked: string[];
+  notApplicable: string[];
   notes: Record<string, string>;
   targets: Record<string, number>;
   maturity: Record<string, number>;
 }
 export const emptyIECReview = (): IECReviewState => ({
   checked: [],
+  notApplicable: [],
   notes: {},
   targets: {},
   maturity: {},
@@ -49,8 +51,18 @@ export function parseIECReview(raw: string | null): IECReviewState {
         }
       return result;
     };
+    const notApplicable = Array.isArray(data.notApplicable)
+      ? [
+          ...new Set(
+            data.notApplicable.filter(
+              (id): id is string => typeof id === "string" && ids.has(id) && !checked.includes(id)
+            )
+          ),
+        ]
+      : [];
     return {
       checked,
+      notApplicable,
       notes,
       targets: levels(
         data.targets,

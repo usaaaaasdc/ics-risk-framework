@@ -1,6 +1,57 @@
 import type { Language } from "@/lib/i18n/language-context";
 
 const phrases = {
+  vendorReview: [
+    "Review enabled services, firmware support and network exposure against the manufacturer's documentation. This is guidance, not a vulnerability finding.",
+    "راجع الخدمات المفعلة ودعم البرامج الثابتة والتعرض للشبكة وفق وثائق الشركة المصنعة. هذا إرشاد وليس نتيجة ثغرة.",
+    "Aktive Dienste, Firmware-Support und Netzwerkexposition anhand der Herstellerdokumentation prüfen. Dies ist ein Hinweis, kein Schwachstellenbefund.",
+    "Etkin servisleri, ürün yazılımı desteğini ve ağ maruziyetini üretici belgeleriyle inceleyin. Bu rehberliktir; güvenlik açığı bulgusu değildir.",
+  ],
+  identity: ["Asset identity", "هوية الأصل", "Asset-Identität", "Varlık kimliği"],
+  connectivity: [
+    "Protocols & interfaces",
+    "البروتوكولات والواجهات",
+    "Protokolle & Schnittstellen",
+    "Protokoller ve arayüzler",
+  ],
+  exposure: [
+    "Exposure & firmware",
+    "التعرض والبرامج الثابتة",
+    "Exposition & Firmware",
+    "Maruziyet ve ürün yazılımı",
+  ],
+  notApplicable: [
+    "Not applicable (N/A)",
+    "غير منطبق (N/A)",
+    "Nicht anwendbar (N/A)",
+    "Uygulanamaz (N/A)",
+  ],
+  notProvided: ["Not provided", "غير مقدم", "Nicht angegeben", "Belirtilmedi"],
+  naNote: [
+    "N/A is a user scope decision, not a satisfied requirement. It remains unconfirmed in the unchanged calculator; document the reason in the review note.",
+    "غير منطبق قرار نطاق من المستخدم وليس متطلباً مستوفى. يبقى غير مؤكد في الحاسبة الحالية؛ وثّق السبب في ملاحظة المراجعة.",
+    "N/A ist eine Benutzerentscheidung zum Umfang, kein erfüllter Nachweis. Im unveränderten Rechner bleibt es unbestätigt; Grund in der Prüfnotiz dokumentieren.",
+    "N/A, karşılanmış gereksinim değil kullanıcı kapsam kararıdır. Mevcut hesaplayıcıda onaylanmamış kalır; gerekçeyi inceleme notuna yazın.",
+  ],
+  reviewDetails: [
+    "Details & evidence note",
+    "التفاصيل وملاحظة الدليل",
+    "Details & Nachweisnotiz",
+    "Ayrıntılar ve kanıt notu",
+  ],
+  reviewSteps: [
+    "1 · Scope & targets|2 · Requirement review|3 · Gaps & remediation",
+    "1 · النطاق والأهداف|2 · مراجعة المتطلبات|3 · الفجوات والمعالجة",
+    "1 · Umfang & Ziele|2 · Anforderungsprüfung|3 · Lücken & Maßnahmen",
+    "1 · Kapsam ve hedefler|2 · Gereksinim incelemesi|3 · Boşluklar ve iyileştirme",
+  ],
+  noMatches: [
+    "No matching requirements",
+    "لا توجد متطلبات مطابقة",
+    "Keine passenden Anforderungen",
+    "Eşleşen gereksinim yok",
+  ],
+  resultStates: ["Result context", "سياق النتائج", "Ergebniskontext", "Sonuç bağlamı"],
   iecIndicators: [
     "Configuration-based indicators · Not a conformity assessment",
     "مؤشرات مبنية على الإعدادات · ليست تقييماً للمطابقة",

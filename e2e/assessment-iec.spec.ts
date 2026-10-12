@@ -46,6 +46,13 @@ test("assessment restores saved calculations, inspects context, filters threats 
     })
   ).toBeVisible();
   await expect(page.locator(".ac-factory-3d canvas")).toHaveAttribute("data-rendered", "true");
+  const canvas = page.locator(".ac-factory-3d canvas");
+  const initialCamera = await canvas.getAttribute("data-camera");
+  expect(initialCamera).toBeTruthy();
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(canvas).not.toHaveAttribute("data-camera", initialCamera!);
+  await page.getByRole("button", { name: "Reset view", exact: true }).click();
+  await expect(canvas).toHaveAttribute("data-camera", initialCamera!);
   await expect(page.getByRole("combobox", { name: /Model/ })).toContainText(config.model);
   await page.getByRole("button", { name: "Inspect HMI · context", exact: true }).click();
   await expect(page.getByRole("region", { name: "Asset Details" })).toContainText("Not assessed");
@@ -68,6 +75,12 @@ test("assessment restores saved calculations, inspects context, filters threats 
   await expect(page.locator(".ac-threat-list details")).not.toHaveCount(0);
   await page.locator(".ac-threat-list summary").first().click();
   await expect(page.locator(".ac-threat-list details[open] p")).toBeVisible();
+  await expect(page.locator(".ac-advanced [role=tablist]")).toBeHidden();
+  await page.locator(".ac-advanced > summary").click();
+  await page.getByRole("tab", { name: "IEC 62443", exact: true }).click();
+  await expect(page.getByRole("tabpanel")).toContainText(
+    "Configuration-based indicators · Not a conformity assessment"
+  );
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export CSV", exact: true }).click();
   expect(await (await download).failure()).toBeNull();
@@ -118,7 +131,7 @@ test("IEC review persists independently per project, retains calculator logic an
     project
   );
   await page.goto("/iec-calculator");
-  await expect(page.getByTestId("iec-level")).toHaveText("SL-0");
+  await expect(page.getByTestId("iec-level")).toHaveText("Not assessed");
   await expect(page.getByTestId("iec-confirmed")).toHaveText("0");
   await page
     .getByRole("combobox", { name: "Target Security Levels: Control / PLC", exact: true })
@@ -129,6 +142,7 @@ test("IEC review persists independently per project, retains calculator logic an
     .selectOption("2");
   const req = page.getByRole("checkbox", { name: /SR 1.1 Human User Identification/ });
   await req.check();
+  await page.locator('summary[aria-label="SR 1.1 Details & evidence note"]').click();
   await page
     .getByRole("textbox", { name: "SR 1.1 Evidence reference / review note", exact: true })
     .fill("Maintenance review ticket #12 (unverified)");
@@ -139,6 +153,7 @@ test("IEC review persists independently per project, retains calculator logic an
   await expect(
     page.getByRole("combobox", { name: "Target Security Levels: Control / PLC", exact: true })
   ).toHaveValue("4");
+  await page.locator('summary[aria-label="SR 1.1 Details & evidence note"]').click();
   await expect(
     page.getByRole("textbox", { name: "SR 1.1 Evidence reference / review note", exact: true })
   ).toHaveValue("Maintenance review ticket #12 (unverified)");
@@ -213,4 +228,61 @@ test("compliance roadmap keeps its checklist and existing planning calculations"
   await expect(
     page.getByText("SL-3 / SL-4 are not evaluated", { exact: false }).first()
   ).toBeVisible();
+});
+
+test("assessment sections retain inputs and IEC N/A stays outside confirmed results", async ({
+  page,
+}) => {
+  await page.addInitScript((c) => localStorage.setItem("quick-config", JSON.stringify(c)), config);
+  await page.goto("/assessment");
+  await expect(
+    page.getByRole("img", { name: "Overall Risk Score: — / 10", exact: true })
+  ).toBeVisible();
+  const connectivity = page
+    .locator(".ac-form-section")
+    .filter({ has: page.locator("#protocol-Modbus\\ TCP") });
+  await connectivity.locator("summary").click();
+  await expect(page.locator('[id="protocol-Modbus TCP"]')).toBeHidden();
+  await connectivity.locator("summary").click();
+  await expect(page.getByRole("checkbox", { name: "Modbus TCP", exact: true })).toBeChecked();
+  const exposure = page.locator(".ac-form-section").filter({ has: page.locator("#osVersion") });
+  await expect(page.locator("#osVersion")).toBeHidden();
+  await exposure.locator("summary").click();
+  await expect(page.locator("#osVersion")).toHaveValue(config.osVersion);
+  await expect(page.locator("#internetConnected")).toBeChecked();
+  await exposure.locator("summary").click();
+  await page.getByRole("button", { name: "Analyze Security", exact: true }).click();
+  await expect(
+    page.getByRole("img", {
+      name: `Overall Risk Score: ${Number(result.riskScore.toFixed(1))} / 10`,
+    })
+  ).toBeVisible();
+
+  await page.goto("/iec-calculator");
+  const na = page.getByRole("button", { name: "SR 1.1 Not applicable (N/A)", exact: true });
+  await na.click();
+  await expect(na).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("iec-confirmed")).toHaveText("0");
+  await expect(page.getByTestId("iec-na")).toHaveText("1");
+  await expect(page.getByTestId("iec-level")).toHaveText("Not assessed");
+  await page.locator('summary[aria-label="SR 1.1 Details & evidence note"]').click();
+  await page
+    .getByRole("textbox", { name: "SR 1.1 Evidence reference / review note", exact: true })
+    .fill("Scope decision awaiting independent review");
+  await page.reload();
+  await expect(na).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("iec-level")).toHaveText("Not assessed");
+  await page.getByRole("checkbox", { name: /SR 1.1 Human User Identification/ }).check();
+  await expect(na).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("iec-na")).toHaveText("0");
+  await expect(page.getByTestId("iec-confirmed")).toHaveText("1");
+  await expect(page.getByTestId("iec-level")).toHaveText("SL-0");
+  const search = page.getByRole("textbox", {
+    name: "Evidence & Assessment Checklist",
+    exact: true,
+  });
+  await search.fill("FR7");
+  await expect(page.locator('[id="SR 7.1"]')).toBeVisible();
+  await search.fill("no-such-requirement");
+  await expect(page.getByText("No matching requirements", { exact: true })).toBeVisible();
 });
