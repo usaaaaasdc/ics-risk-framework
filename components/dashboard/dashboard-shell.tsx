@@ -7,6 +7,7 @@ import {
   ArrowUpRight,
   Bell,
   BookOpen,
+  BrainCircuit,
   ChevronDown,
   Command,
   Cpu,
@@ -29,6 +30,7 @@ const tools = [
   { label: "Risk simulation", href: "/risk-simulation", icon: Activity },
   { label: "Compliance", href: "/compliance-roadmap", icon: ShieldCheck },
   { label: "Reports & analytics", href: "/analytics", icon: FileBarChart2 },
+  { label: "AI risk analysis", href: "/ai-prediction", icon: BrainCircuit },
 ];
 
 export function DashboardShell({
