@@ -79,7 +79,10 @@ export function AssessmentOverview({
                 {[
                   [t("activeProtocols"), isAssessedAsset ? config.protocols.join(", ") : "—"],
                   [t("interfaces"), isAssessedAsset ? config.interfaces.join(", ") : "—"],
-                  [t("osVersion"), isAssessedAsset ? config.osVersion || "—" : "—"],
+                  [
+                    t("osVersion"),
+                    isAssessedAsset ? config.osVersion || c.notProvided : c.unassessed,
+                  ],
                   [
                     t("exposureLevel"),
                     isAssessedAsset
@@ -102,13 +105,17 @@ export function AssessmentOverview({
                 label={c.score}
                 color={color}
               />
-              <span className="ac-badge" style={{ color }}>
+              <span className="ac-badge ac-result-status" style={{ color }}>
                 {score === null ? c.unassessed : assessment?.riskLevel}
               </span>
               <small>{score === null ? c.pending : c.calculated}</small>
             </div>
           </div>
         </section>
+      </div>
+      <div className="ac-result-context" role="note" aria-label={c.resultStates}>
+        <span>{assessment ? c.calculated : c.unassessed}</span>
+        <span>{c.hypothetical}</span>
       </div>
       <div className="ac-analysis-grid">
         <section className="ac-panel">

@@ -13,16 +13,27 @@ describe("IEC review integrity", () => {
     const state = parseIECReview(
       JSON.stringify({
         checked: ["SR 1.1", "SR 1.1", "certified", false],
+        notApplicable: ["SR 1.1", "SR 2.1", "SR 2.1", "fake"],
         notes: { "SR 1.1": "a".repeat(700), fake: "verified" },
         targets: { "zone-0": 3, C1: 4, C2: 5, C3: "2", unknown: 2 },
         maturity: { "0": 2, "1": 2.5, "2": 0, "5": 4 },
       })
     );
     expect(state.checked).toEqual(["SR 1.1"]);
+    expect(state.notApplicable).toEqual(["SR 2.1"]);
     expect(state.notes).toEqual({ "SR 1.1": "a".repeat(500) });
     expect(state.targets).toEqual({ "zone-0": 3, C1: 4 });
     expect(state.maturity).toEqual({ "0": 2 });
     expect(iecReviewKey("project-A")).not.toBe(iecReviewKey("planning"));
+  });
+  it("never treats N/A or missing evidence as a satisfied requirement", () => {
+    const all = iec62443Standards.flatMap((fr) => fr.requirements.map((r) => r.id));
+    const state = parseIECReview(
+      JSON.stringify({ notApplicable: all, notes: { "SR 1.1": "Scope assumption only" } })
+    );
+    expect(state.checked).toEqual([]);
+    expect(calculateIECScore(state.checked).overallSL).toBe(0);
+    expect(calculateIECScore(state.checked).frScores.every((fr) => fr.percentage === 0)).toBe(true);
   });
   it("preserves the existing weakest-link calculator and its SL-2 ceiling", () => {
     const all = iec62443Standards.flatMap((fr) => fr.requirements.map((r) => r.id));

@@ -14,7 +14,7 @@ import { type SystemConfig, type RiskAssessment, assessSystem } from "@/lib/risk
 import { generatePDF } from "@/lib/pdf-generator";
 import { ProjectManager, type Project } from "@/lib/project-manager";
 import vulnerabilitiesData from "@/lib/data/vulnerabilities.json";
-import { Save } from "lucide-react";
+import { ChevronDown, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import {
@@ -207,7 +207,7 @@ function AssessmentForm({ initialProject }: { initialProject: Project | null }) 
           <div className="ac-panel-heading">
             <h2>{copy.configuration}</h2>
           </div>
-          <DeviceInputForm onSubmit={handleSubmit} initialConfig={currentConfig} />
+          <DeviceInputForm onSubmit={handleSubmit} initialConfig={currentConfig} sectioned />
         </section>
         <section className="ac-panel ac-existing-tools">
           <div className="ac-panel-heading">
@@ -231,15 +231,16 @@ function AssessmentForm({ initialProject }: { initialProject: Project | null }) 
         </section>
       </div>
       {assessment && currentConfig && (
-        <section className="ac-panel ac-existing-tools ac-advanced">
-          <div className="ac-panel-heading">
+        <details className="ac-panel ac-existing-tools ac-advanced">
+          <summary className="ac-panel-heading">
             <h2>{copy.tools}</h2>
-          </div>
+            <ChevronDown size={18} />
+          </summary>
           <p className="ac-help">
             {copy.hypothetical} &middot; {copy.disclaimer}
           </p>
           <AdvancedAnalysisTabs config={currentConfig} assessment={assessment} />
-        </section>
+        </details>
       )}
       <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
         <DialogContent>
