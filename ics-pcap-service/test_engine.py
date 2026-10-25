@@ -113,8 +113,6 @@ def create_test_pcap() -> bytes:
 # ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    import sys
-    sys.path.insert(0, "/home/claude/ics-pcap-service")
     from main import ICSPCAPAnalyzer
     from dataclasses import asdict
     import json
@@ -160,10 +158,10 @@ if __name__ == "__main__":
         print(f"   {rec}")
 
     print("\n" + "=" * 60)
-    print("✅ ALL TESTS PASSED — Engine is functional")
+    print("Legacy demonstration completed; classification is not operationally validated.")
     print("=" * 60)
 
     # Save sample output
-   with open("sample_output.json", "w") as f:
+    with open("sample_output.json", "w") as f:
         json.dump(asdict(result), f, indent=2)
     print("\n📄 Full JSON output saved to sample_output.json")

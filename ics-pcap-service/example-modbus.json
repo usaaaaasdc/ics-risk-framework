@@ -1,0 +1,122 @@
+{
+  "description": "Actual synthetic good.pcap analysis excerpt; FC06 request/response, not live telemetry.",
+  "jobId": "c8c6091da3f048ad8f8c440f679c31d9",
+  "state": "COMPLETED",
+  "captureSha256": "e44a83bb3b5148efc40d4a798443d1a4341574f03428a91f990f8c21f11cfee3",
+  "analysisProfile": {
+    "engine": "Zeek",
+    "version": "9.0.0",
+    "executableSha256": "7752f3fa4c750cef9acc27819052f05e67b0fd6b6729a434ca2721c89d764fbb",
+    "scriptSha256": "364035a237210deb275b65952f0efdfa9f0ae509efd866f252b825830f3da271",
+    "normalizerSha256": "81eb5f6af0b4cdc8895938084439614143554774c0bdb9c12ff1321eb7319852",
+    "admissionSha256": "6f58e698bf42a7ee0a3c7a2e20368699cffcc374bb7d22b426dbe0740325f04b",
+    "launcherSha256": "8561594726c0916d94484aea02ab7d850b43f8924ab7d7175391dd269783635a",
+    "limits": {
+      "inputBytes": 33554432,
+      "wallSeconds": 30,
+      "cpuSeconds": 20,
+      "memoryBytes": 2147483648,
+      "outputBytes": 16777216
+    },
+    "sha256": "c3060d5ed439da9693f68d882dcadee5acb46d7d4c8b0c7521b6efc4408c0594"
+  },
+  "dataClassification": "synthetic_fixture",
+  "protocolObservations": [
+    {
+      "id": "obs-c3e6ec4007883eaa5ab9d509",
+      "basis": "observed",
+      "protocol": "modbus/tcp",
+      "decoder": {
+        "name": "Zeek",
+        "version": "9.0.0"
+      },
+      "observedAt": "2023-11-14T22:13:20.050000+00:00",
+      "sourceEpochSeconds": 1700000000.05,
+      "source": {
+        "ip": "192.0.2.10",
+        "port": 41000
+      },
+      "destination": {
+        "ip": "192.0.2.20",
+        "port": 502
+      },
+      "flowId": "flow-2a54b47707d49249d43a8cba",
+      "transactionId": 2,
+      "unitId": 1,
+      "functionCode": 6,
+      "functionName": "WRITE_SINGLE_REGISTER",
+      "direction": "request",
+      "operation": "write",
+      "authorization": "not_evaluated",
+      "identityVerified": false,
+      "evidence": {
+        "captureSha256": "e44a83bb3b5148efc40d4a798443d1a4341574f03428a91f990f8c21f11cfee3",
+        "analysisProfileSha256": "c3060d5ed439da9693f68d882dcadee5acb46d7d4c8b0c7521b6efc4408c0594",
+        "nativeLog": "modbus.log",
+        "nativeRow": 3,
+        "nativeFlowId": "CCVWIp3iDNdkYvAcl",
+        "packetOrdinals": null
+      },
+      "timestampSemantics": "pdu-observed",
+      "uncertainty": []
+    },
+    {
+      "id": "obs-9680e06446701f8d5e666a49",
+      "basis": "observed",
+      "protocol": "modbus/tcp",
+      "decoder": {
+        "name": "Zeek",
+        "version": "9.0.0"
+      },
+      "observedAt": "2023-11-14T22:13:20.060000+00:00",
+      "sourceEpochSeconds": 1700000000.06,
+      "source": {
+        "ip": "192.0.2.20",
+        "port": 502
+      },
+      "destination": {
+        "ip": "192.0.2.10",
+        "port": 41000
+      },
+      "flowId": "flow-2a54b47707d49249d43a8cba",
+      "transactionId": 2,
+      "unitId": 1,
+      "functionCode": 6,
+      "functionName": "WRITE_SINGLE_REGISTER",
+      "direction": "response",
+      "operation": "write",
+      "authorization": "not_evaluated",
+      "identityVerified": false,
+      "evidence": {
+        "captureSha256": "e44a83bb3b5148efc40d4a798443d1a4341574f03428a91f990f8c21f11cfee3",
+        "analysisProfileSha256": "c3060d5ed439da9693f68d882dcadee5acb46d7d4c8b0c7521b6efc4408c0594",
+        "nativeLog": "modbus.log",
+        "nativeRow": 4,
+        "nativeFlowId": "CCVWIp3iDNdkYvAcl",
+        "packetOrdinals": null
+      },
+      "timestampSemantics": "pdu-observed",
+      "uncertainty": []
+    }
+  ],
+  "findings": [],
+  "alerts": [],
+  "quality": {
+    "inputFrames": 12,
+    "truncatedFrames": 0,
+    "linkTypes": [
+      1
+    ],
+    "captureLoss": null,
+    "issues": [],
+    "limitations": [
+      "Offline input does not prove live capture loss or source authenticity.",
+      "P0 admission supports PCAP2.4/microseconds and PCAPNG1.0/EPB/default microseconds/Ethernet only.",
+      "Zeek Modbus native rows expose flow UID and source time, not original packet ordinal.",
+      "No authorization policy or calibrated prediction is evaluated."
+    ],
+    "completeness": "complete-within-profile",
+    "unsupportedRecords": [],
+    "decoderDiagnostics": []
+  }
+}

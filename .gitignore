@@ -44,3 +44,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Offline Python engine runtime caches
+/ics-pcap-service/**/__pycache__/
+/ics-pcap-service/**/*.pyc

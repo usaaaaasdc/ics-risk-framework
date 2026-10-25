@@ -1,0 +1,116 @@
+[
+  {
+    "file": "good.pcap",
+    "bytes": 942,
+    "sha256": "e44a83bb3b5148efc40d4a798443d1a4341574f03428a91f990f8c21f11cfee3",
+    "expected": {
+      "container": "pcap",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    }
+  },
+  {
+    "file": "good.pcapng",
+    "bytes": 1180,
+    "sha256": "e6e114717402fc36ab445c710688b093a0d71cd64bcf2386f0073731a3ea96f1",
+    "expected": {
+      "container": "pcapng",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    }
+  },
+  {
+    "file": "segmented-retransmit.pcap",
+    "bytes": 1094,
+    "sha256": "fe56043ae5f541ba21d18fd816973ab22a8d5c756e2592488b290b5a18a1b740",
+    "expected": {
+      "container": "pcap",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    }
+  },
+  {
+    "file": "request-only.pcap",
+    "bytes": 316,
+    "sha256": "301cd84334f8ac347af959689707d956dd18141af5db88d01ea5ec34718be51c",
+    "expected": {
+      "expected_pdus": 1,
+      "requests": 1,
+      "responses": 0,
+      "write_requests": 0,
+      "pairs": 0
+    }
+  },
+  {
+    "file": "truncated-packet.pcap",
+    "bytes": 313,
+    "sha256": "29a64529b78669fe6e5fd1d4df22a47dbf4d783ab1ce5f4a9d1f9e1f55473f61",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "truncated_frame"
+    }
+  },
+  {
+    "file": "not-modbus-on-502.pcap",
+    "bytes": 530,
+    "sha256": "bbbf1b7590565e0ed88186d497f8e98d49a73fe1c7555a822430c3bd920335b5",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "undecoded_application"
+    }
+  },
+  {
+    "file": "malformed-mbap.pcap",
+    "bytes": 526,
+    "sha256": "9d5023332eb88d8bfb58daff226f6825842aa6cbf8c96c3582b496c2233cd8a3",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "invalid_mbap"
+    }
+  },
+  {
+    "file": "unsupported-link.pcap",
+    "bytes": 942,
+    "sha256": "3d249fed0efade59f0d219bb506c80641fd4895af92f98e4f9d0444f0ab45c6f",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "unsupported_linktype"
+    }
+  },
+  {
+    "file": "empty.pcap",
+    "bytes": 24,
+    "sha256": "acc530668c8bc60b2d229281130b1899bfc81d70fdada5c34b3236c628f739c8",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "no_observations"
+    }
+  },
+  {
+    "file": "malformed.bin",
+    "bytes": 15,
+    "sha256": "a2a458bd08c80f6a124d2597d00815e7e2b86c541856004a5b3de788b2674c7a",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "invalid_container"
+    }
+  },
+  {
+    "file": "truncated-container.pcap",
+    "bytes": 937,
+    "sha256": "cb14a91a667c7bce139e85386c84cd80453871e9c50c17d67f7064f7d7ee36d3",
+    "expected": {
+      "expected_pdus": 0,
+      "quality_issue": "truncated_container"
+    }
+  }
+]

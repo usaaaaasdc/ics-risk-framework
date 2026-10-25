@@ -7,8 +7,41 @@ on:
     branches: [ main, master ]
 
 jobs:
+  zeek-offline:
+    # Jammy permits the unchanged unprivileged namespace sandbox without a
+    # host AppArmor/sysctl exception. Use the matching pinned Zeek package.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Zeek 9.0.0 and isolation runtime
+        run: bash ics-pcap-service/ci-install-zeek.sh
+      - name: Record unprivileged sandbox prerequisites
+        run: |
+          test "$(id -u)" -ne 0
+          id
+          uname -r
+          for setting in kernel/unprivileged_userns_clone kernel/apparmor_restrict_unprivileged_userns user/max_user_namespaces; do
+            if test -r "/proc/sys/$setting"; then
+              printf '%s=' "$setting"
+              cat "/proc/sys/$setting"
+            fi
+          done
+          cat /proc/self/attr/current
+          "$P0_BWRAP" --version
+          test ! -u "$P0_BWRAP"
+          test ! -g "$P0_BWRAP"
+          test -z "$(getcap "$P0_BWRAP")"
+      - name: Offline Python regression suite (real Zeek, no skipped engine tests)
+        working-directory: ics-pcap-service
+        run: |
+          python3 -m py_compile test_engine.py
+          python3 -m unittest discover -s tests -v
+
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4

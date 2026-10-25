@@ -1,0 +1,6 @@
+# Keep the Linux bootstrap executable by bash after a Windows checkout.
+ics-pcap-service/ci-install-zeek.sh text eol=lf
+# Capture identity must be byte-preserved on every platform.
+ics-pcap-service/tests/fixtures/*.pcap -text
+ics-pcap-service/tests/fixtures/*.pcapng -text
+ics-pcap-service/tests/fixtures/*.bin -text
