@@ -7,6 +7,21 @@ on:
     branches: [ main, master ]
 
 jobs:
+  zeek-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Zeek 9.0.0 and isolation runtime
+        run: bash ics-pcap-service/ci-install-zeek.sh
+      - name: Offline Python regression suite (real Zeek, no skipped engine tests)
+        working-directory: ics-pcap-service
+        run: |
+          python3 -m py_compile test_engine.py
+          python3 -m unittest discover -s tests -v
+
   build:
     runs-on: ubuntu-latest
 

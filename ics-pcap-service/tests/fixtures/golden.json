@@ -1,0 +1,119 @@
+{
+  "client": "192.0.2.10",
+  "server": "192.0.2.20",
+  "client_port": 41000,
+  "server_port": 502,
+  "source": "self-authored synthetic offline data; no device or network contact",
+  "license": "CC0-1.0",
+  "good_messages": [
+    {
+      "tid": 1,
+      "unit": 1,
+      "fc": 3,
+      "direction": "request",
+      "operation": "read",
+      "timestamp": 1700000000.03
+    },
+    {
+      "tid": 1,
+      "unit": 1,
+      "fc": 3,
+      "direction": "response",
+      "operation": "read",
+      "timestamp": 1700000000.04
+    },
+    {
+      "tid": 2,
+      "unit": 1,
+      "fc": 6,
+      "direction": "request",
+      "operation": "write",
+      "timestamp": 1700000000.05
+    },
+    {
+      "tid": 2,
+      "unit": 1,
+      "fc": 6,
+      "direction": "response",
+      "operation": "write",
+      "timestamp": 1700000000.06
+    },
+    {
+      "tid": 3,
+      "unit": 1,
+      "fc": 16,
+      "direction": "request",
+      "operation": "write",
+      "timestamp": 1700000000.07
+    },
+    {
+      "tid": 3,
+      "unit": 1,
+      "fc": 16,
+      "direction": "response",
+      "operation": "write",
+      "timestamp": 1700000000.08
+    }
+  ],
+  "fixtures": {
+    "good.pcap": {
+      "container": "pcap",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    },
+    "good.pcapng": {
+      "container": "pcapng",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    },
+    "segmented-retransmit.pcap": {
+      "container": "pcap",
+      "expected_pdus": 6,
+      "requests": 3,
+      "responses": 3,
+      "write_requests": 2,
+      "pairs": 3
+    },
+    "request-only.pcap": {
+      "expected_pdus": 1,
+      "requests": 1,
+      "responses": 0,
+      "write_requests": 0,
+      "pairs": 0
+    },
+    "truncated-packet.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "truncated_frame"
+    },
+    "not-modbus-on-502.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "undecoded_application"
+    },
+    "malformed-mbap.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "invalid_mbap"
+    },
+    "unsupported-link.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "unsupported_linktype"
+    },
+    "empty.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "no_observations"
+    },
+    "malformed.bin": {
+      "expected_pdus": 0,
+      "quality_issue": "invalid_container"
+    },
+    "truncated-container.pcap": {
+      "expected_pdus": 0,
+      "quality_issue": "truncated_container"
+    }
+  }
+}
